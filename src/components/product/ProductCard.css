@@ -1,0 +1,218 @@
+/* ========= KITCHEN FINDS 2.0 - PRODUCT CARD CSS ========= */
+
+.premium-product-card {
+    position: relative;
+    background: white;
+    border-radius: var(--border-radius);
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: var(--shadow-sm);
+}
+
+.premium-product-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-lg);
+}
+
+.card-inner {
+    display: block;
+    color: inherit;
+}
+
+/* Media */
+.card-media {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: var(--border-radius);
+    background: var(--background-alt);
+}
+
+.card-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.premium-product-card:hover .card-media img {
+    transform: scale(1.1);
+}
+
+/* Badges */
+.stock-badge {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    padding: 6px 14px;
+    border-radius: 30px;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    z-index: 5;
+    box-shadow: var(--shadow-sm);
+}
+
+.stock-badge.low {
+    background: var(--accent-color);
+    color: white;
+}
+
+.stock-badge.out {
+    background: var(--text-muted);
+    color: white;
+}
+
+/* Overlay */
+.card-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(94, 100, 114, 0.2);
+    /* Soft Slate Grey Overlay */
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 24px;
+    opacity: 0;
+    transition: opacity 0.4s;
+    z-index: 10;
+}
+
+.premium-product-card:hover .card-overlay {
+    opacity: 1;
+}
+
+.overlay-actions {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+    transform: translateY(20px);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.premium-product-card:hover .overlay-actions {
+    transform: translateY(0);
+}
+
+.action-btn-p {
+    flex: 1;
+    background: white;
+    color: var(--primary-color);
+    padding: 12px;
+    border-radius: var(--border-radius-sm);
+    font-weight: 700;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s;
+    box-shadow: var(--shadow-sm);
+}
+
+.action-btn-p:hover {
+    background: var(--accent-color);
+    color: white;
+    box-shadow: var(--shadow-accent);
+}
+
+.action-btn-icon {
+    width: 44px;
+    height: 44px;
+    background: white;
+    color: var(--primary-color);
+    border-radius: var(--border-radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    box-shadow: var(--shadow-sm);
+}
+
+.action-btn-icon:hover {
+    background: var(--primary-color);
+    color: white;
+}
+
+/* Info */
+.card-info {
+    padding: 20px 8px;
+}
+
+.info-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.card-category {
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--accent-color);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.card-rating {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-muted);
+}
+
+.card-title {
+    font-size: 18px;
+    font-weight: 800;
+    margin-bottom: 12px;
+    color: var(--primary-color);
+    line-height: 1.2;
+}
+
+.info-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-price {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--primary-color);
+}
+
+.view-link {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: color 0.3s;
+}
+
+.premium-product-card:hover .view-link {
+    color: var(--accent-color);
+}
+.card-view-btn {
+    width: 100%;
+    margin-top: 16px;
+    padding: 12px;
+    border-radius: 12px;
+    background: #e5e7eb;
+    color: var(--primary-color);
+    font-weight: 800;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: none;
+    transition: all 0.3s;
+}
+
+.premium-product-card:hover .card-view-btn {
+    background: var(--primary-color);
+    color: white;
+}

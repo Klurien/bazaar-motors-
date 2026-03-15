@@ -1,0 +1,52 @@
+.register-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 180px 20px 100px;
+    background: var(--background-light);
+    /* Soft Cream */
+}
+
+.register-card {
+    width: 100%;
+    max-width: 480px;
+    padding: 56px;
+    background: white;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid rgba(0, 0, 0, 0.03);
+    animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.register-card h2 {
+    font-size: 36px;
+    margin-bottom: 12px;
+    color: var(--primary-color);
+    text-align: center;
+}
+
+.register-card p {
+    color: var(--text-muted);
+    margin-bottom: 40px;
+    text-align: center;
+    font-size: 16px;
+}
+
+.register-footer {
+    margin-top: 40px;
+    text-align: center;
+    font-size: 15px;
+    color: var(--text-muted);
+}
+
+.register-footer a {
+    color: var(--accent-color);
+    font-weight: 800;
+    margin-left: 8px;
+    text-decoration: none;
+}
+
+.register-footer a:hover {
+    color: var(--accent-light);
+}

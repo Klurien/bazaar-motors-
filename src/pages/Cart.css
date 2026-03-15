@@ -1,0 +1,262 @@
+/* ========= KITCHEN FINDS 2.0 - CART CSS ========= */
+
+.cart-page {
+    padding: 180px 0 100px;
+}
+
+.fade-in {
+    animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Empty State */
+.cart-empty {
+    padding: 200px 0;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.empty-visual {
+    position: relative;
+    margin-bottom: 40px;
+    color: var(--accent-color);
+}
+
+.empty-rings {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 120px;
+    height: 120px;
+    border: 1px solid var(--accent-color);
+    border-radius: 50%;
+    opacity: 0.1;
+    animation: pulseRings 2s infinite;
+}
+
+@keyframes pulseRings {
+    0% {
+        transform: translate(-50%, -50%) scale(0.8);
+        opacity: 0.2;
+    }
+
+    100% {
+        transform: translate(-50%, -50%) scale(1.5);
+        opacity: 0;
+    }
+}
+
+/* Layout */
+.editorial-header {
+    margin-bottom: 60px;
+}
+
+.cart-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 60px;
+    align-items: start;
+}
+
+@media (max-width: 1000px) {
+    .cart-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Cart Items */
+.cart-items-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.premium-cart-item {
+    display: flex;
+    gap: 24px;
+    padding: 24px;
+    border-radius: var(--border-radius);
+    align-items: center;
+    box-shadow: var(--shadow-sm);
+    background: white;
+}
+
+.item-image {
+    width: 120px;
+    height: 120px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--background-alt);
+    flex-shrink: 0;
+}
+
+.item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s;
+}
+
+.item-image:hover img {
+    transform: scale(1.1);
+}
+
+.item-details {
+    flex: 1;
+}
+
+.item-cat {
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--accent-color);
+    letter-spacing: 1px;
+}
+
+.item-name {
+    font-size: 18px;
+    font-weight: 800;
+    margin: 4px 0 16px;
+}
+
+.item-controls {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+}
+
+.quantity-architect {
+    display: flex;
+    align-items: center;
+    background: white;
+    padding: 4px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+}
+
+.quantity-architect button {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.quantity-architect button:hover:not(:disabled) {
+    background: var(--primary-color);
+    color: white;
+}
+
+.qty-num {
+    padding: 0 15px;
+    font-weight: 800;
+    font-size: 15px;
+}
+
+.item-remove-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-muted);
+}
+
+.item-remove-btn:hover {
+    color: #e74c3c;
+}
+
+/* Price Side */
+.item-price-side {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+}
+
+.price-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-muted);
+}
+
+.price-val {
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--primary-color);
+}
+
+/* Checkout Panel */
+.checkout-card {
+    padding: 40px;
+    border-radius: 30px;
+}
+
+.sticky-card {
+    position: sticky;
+    top: 120px;
+}
+
+.checkout-card h3 {
+    font-size: 24px;
+    margin-bottom: 30px;
+}
+
+.summary-list {
+    margin-bottom: 30px;
+}
+
+.summary-line {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.free-text {
+    color: var(--accent-color);
+    font-weight: 800;
+}
+
+.summary-divider {
+    height: 1px;
+    background: var(--border-color);
+    margin: 20px 0;
+}
+
+.summary-line.total {
+    font-size: 24px;
+    font-weight: 900;
+    color: var(--primary-color);
+}
+
+.btn-full {
+    width: 100%;
+}
+
+.checkout-trust {
+    margin-top: 40px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+}
+
+.trust-bit {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-muted);
+    background: var(--background-alt);
+    padding: 12px 16px;
+    border-radius: var(--border-radius-sm);
+}
+
+.trust-bit svg {
+    color: var(--accent-color);
+}
