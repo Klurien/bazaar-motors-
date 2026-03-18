@@ -132,7 +132,7 @@ const Checkout = () => {
                                     {cart.map(item => (
                                         <div key={item.id} className="cart-review-item">
                                             <img
-                                                src={item.image_url ? `http://localhost:5000${item.image_url}` : 'https://placehold.co/80x80?text=?'}
+                                                src={item.image_url ? `${import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : "http://localhost:5000")}${item.image_url}` : 'https://placehold.co/80x80?text=?'}
                                                 alt={item.name}
                                             />
                                             <div className="cart-review-info">

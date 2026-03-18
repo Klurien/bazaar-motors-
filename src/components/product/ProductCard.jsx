@@ -15,7 +15,7 @@ const ProductCard = ({ product }) => {
     };
 
     const imageUrl = product.image_url
-        ? `http://localhost:5000${product.image_url}`
+        ? `${import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : "http://localhost:5000")}${product.image_url}`
         : 'https://placehold.co/400x400?text=Kitchen+Find';
 
     return (

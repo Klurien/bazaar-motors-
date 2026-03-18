@@ -39,7 +39,7 @@ const Cart = () => {
                     {cart.map(item => (
                         <div key={item.id} className="premium-cart-item glass">
                             <Link to={`/products/${item.id}`} className="item-image">
-                                <img src={`http://localhost:5000${item.image_url}`} alt={item.name} />
+                                <img src={`${import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : "http://localhost:5000")}${item.image_url}`} alt={item.name} />
                             </Link>
                             <div className="item-details">
                                 <div className="item-header">

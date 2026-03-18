@@ -20,7 +20,8 @@ const config = {
   ssl: process.env.TIDB_SSL_CA ? {
     ca: fs.readFileSync(process.env.TIDB_SSL_CA)
   } : {
-    rejectUnauthorized: false
+    minVersion: 'TLSv1.2',
+    rejectUnauthorized: true
   }
 };
 

@@ -8,7 +8,7 @@ import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 import './AdminDashboard.css';
 
-const API = 'http://localhost:5000';
+const API = (import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : (import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : "http://localhost:5000"))));
 const CATEGORIES = ['Cookware', 'Gadgets', 'Dining', 'Storage', 'Baking', 'Appliances', 'Other'];
 
 // ─── Image Carousel (for Product Preview) ───────────────────────────────────

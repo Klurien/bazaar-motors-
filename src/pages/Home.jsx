@@ -4,7 +4,7 @@ import { ArrowRight, ChefHat, Sparkles, TrendingUp, ShieldCheck, Play, Award, Za
 import ProductCard from '../components/product/ProductCard';
 import './Home.css';
 
-const API = 'http://localhost:5000';
+const API = (import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : (import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : "http://localhost:5000"))));
 
 const FlashSalesCarousel = ({ promotions }) => {
     const [current, setCurrent] = useState(0);
