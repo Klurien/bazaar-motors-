@@ -380,6 +380,7 @@ const AdminDashboard = () => {
     const [activeTab, setActiveTab] = useState('products');
     const [products, setProducts] = useState([]);
     const [promotions, setPromotions] = useState([]);
+    const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
     const [showModal, setShowModal] = useState(false);
@@ -398,20 +399,32 @@ const AdminDashboard = () => {
     const fetchData = useCallback(async () => {
         setLoading(true);
         try {
-            const [pRes, promRes] = await Promise.all([
+            const tokenOverride = localStorage.getItem('token') || token;
+            const headers = tokenOverride ? { Authorization: `Bearer ${tokenOverride}` } : {};
+
+            const [pRes, promRes, ordRes] = await Promise.all([
                 fetch(`${API}/api/products`),
-                fetch(`${API}/api/promotions`)
+                fetch(`${API}/api/promotions`),
+                fetch(`${API}/api/orders/all`, { headers })
             ]);
+
             const pData = await pRes.json();
             const promData = await promRes.json();
+
+            let ordData = [];
+            if (ordRes.ok) {
+                ordData = await ordRes.json();
+            }
+
             setProducts(Array.isArray(pData) ? pData : []);
             setPromotions(Array.isArray(promData) ? promData : []);
+            setOrders(Array.isArray(ordData) ? ordData : []);
         } catch (err) {
-            console.error(err);
+            console.error('Failed dashboard data load:', err);
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [token]);
 
     useEffect(() => { fetchData(); }, [fetchData]);
 
@@ -475,6 +488,26 @@ const AdminDashboard = () => {
         }
     };
 
+    const handleUpdateOrderStatus = async (orderId, newStatus) => {
+        try {
+            const tokenOverride = localStorage.getItem('token') || token;
+            const res = await fetch(`${API}/api/orders/${orderId}/status`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${tokenOverride}`
+                },
+                body: JSON.stringify({ status: newStatus })
+            });
+            if (res.ok) {
+                setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
+                showToast(`Order #${orderId} marked as ${newStatus}`);
+            }
+        } catch {
+            showToast('Failed to update status', 'error');
+        }
+    };
+
     if (!user || user.role !== 'admin') {
         return (
             <div className="admin-access-denied container">
@@ -499,6 +532,9 @@ const AdminDashboard = () => {
                 <nav className="sidebar-nav">
                     <button className={`sidebar-item ${activeTab === 'dashboard' ? 'active' : ''}`} onClick={() => setActiveTab('dashboard')}>
                         <TrendingUp size={18} /> Overview
+                    </button>
+                    <button className={`sidebar-item ${activeTab === 'orders' ? 'active' : ''}`} onClick={() => setActiveTab('orders')}>
+                        <Package size={18} /> Orders
                     </button>
                     <button className={`sidebar-item ${activeTab === 'products' ? 'active' : ''}`} onClick={() => setActiveTab('products')}>
                         <ShoppingBag size={18} /> Inventory
@@ -602,6 +638,74 @@ const AdminDashboard = () => {
                                 </>
                             ) : <div className="detail-empty"><Package size={48} /><p>Select a product to preview</p></div>}
                         </div>
+                    </div>
+                )}
+
+                {activeTab === 'orders' && (
+                    <div className="admin-items-grid" style={{ gridTemplateColumns: '1fr' }}>
+                        {orders.length === 0 ? (
+                            <div className="admin-empty-state glass">
+                                <Package size={48} />
+                                <h3>No Orders Yet</h3>
+                                <p>When customers complete a transaction, it will appear here.</p>
+                            </div>
+                        ) : (
+                            <div className="admin-table-container glass" style={{ borderRadius: '12px', overflow: 'hidden' }}>
+                                <table className="admin-table w-full text-left border-collapse">
+                                    <thead>
+                                        <tr className="border-b border-white/10">
+                                            <th className="p-4 rounded-tl-xl text-sm font-semibold uppercase tracking-wider">Order ID</th>
+                                            <th className="p-4 text-sm font-semibold uppercase tracking-wider">Customer</th>
+                                            <th className="p-4 text-sm font-semibold uppercase tracking-wider">Date</th>
+                                            <th className="p-4 text-sm font-semibold uppercase tracking-wider">Total</th>
+                                            <th className="p-4 text-sm font-semibold uppercase tracking-wider">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {orders.map(order => (
+                                            <React.Fragment key={order.id}>
+                                                <tr className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                                                    <td className="p-4 font-bold">#000{order.id}</td>
+                                                    <td className="p-4">
+                                                        {order.username ? order.username : 'Guest User'}
+                                                    </td>
+                                                    <td className="p-4 text-sm opacity-80">{new Date(order.created_at).toLocaleDateString()}</td>
+                                                    <td className="p-4 font-bold text-[var(--accent-color)]">${parseFloat(order.total_amount).toFixed(2)}</td>
+                                                    <td className="p-4">
+                                                        <select
+                                                            className="status-dropdown bg-black/50 border border-white/20 rounded p-1 text-sm outline-none cursor-pointer focus:border-[var(--accent-color)]"
+                                                            value={order.status}
+                                                            onChange={(e) => handleUpdateOrderStatus(order.id, e.target.value)}
+                                                        >
+                                                            <option value="Processing">Processing</option>
+                                                            <option value="Shipped">Shipped</option>
+                                                            <option value="Delivered">Delivered</option>
+                                                            <option value="Cancelled">Cancelled</option>
+                                                        </select>
+                                                    </td>
+                                                </tr>
+                                                <tr className="border-b border-white/20 bg-black/20">
+                                                    <td colSpan="5" className="p-4 text-sm">
+                                                        <div className="flex flex-col gap-2">
+                                                            <strong>Line Items:</strong>
+                                                            {order.items?.map(item => (
+                                                                <div key={item.id} className="flex gap-4 items-center pl-4 border-l-2 border-white/10">
+                                                                    <div className="w-8 h-8 rounded bg-white/10 overflow-hidden flex-shrink-0">
+                                                                        <img src={item.image_url ? `${API}${item.image_url}` : 'https://placehold.co/40'} className="w-full h-full object-cover" />
+                                                                    </div>
+                                                                    <span>{item.name} <span className="opacity-60">x{item.quantity}</span></span>
+                                                                    <span className="ml-auto opacity-80">${parseFloat(item.price_at_purchase).toFixed(2)}</span>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </React.Fragment>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
                     </div>
                 )}
 

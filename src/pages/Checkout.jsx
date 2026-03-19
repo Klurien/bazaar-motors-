@@ -137,7 +137,28 @@ const Checkout = () => {
         setCurrentStep(s => Math.min(s + 1, STEPS.length - 1));
     };
 
-    const handleSuccessfulPayment = () => {
+    const handleSuccessfulPayment = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const headers = { 'Content-Type': 'application/json' };
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+
+            const orderPayload = {
+                items: cart,
+                total_amount: total,
+                shipping_address: shipping,
+                payment_intent_id: clientSecret || 'mock_paid'
+            };
+
+            await fetch(`${API}/api/orders`, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify(orderPayload)
+            });
+        } catch (err) {
+            console.error('Failed to create order in database', err);
+        }
+
         setOrderPlaced(true);
         clearCart();
         setCurrentStep(3);

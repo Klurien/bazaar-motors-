@@ -91,6 +91,25 @@ export const initDB = async () => {
             active TINYINT(1) DEFAULT 1,
             sort_order INT DEFAULT 0,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )`,
+    `CREATE TABLE IF NOT EXISTS orders (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT,
+            total_amount DECIMAL(10,2) NOT NULL,
+            status VARCHAR(50) DEFAULT 'Processing',
+            shipping_address TEXT,
+            payment_intent_id VARCHAR(255),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+        )`,
+    `CREATE TABLE IF NOT EXISTS order_items (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            order_id INT NOT NULL,
+            product_id INT NOT NULL,
+            quantity INT NOT NULL DEFAULT 1,
+            price_at_purchase DECIMAL(10,2) NOT NULL,
+            FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+            FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
         )`
   ];
 

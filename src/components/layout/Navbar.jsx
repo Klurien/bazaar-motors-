@@ -83,6 +83,7 @@ const Navbar = () => {
                                 <User size={20} />
                                 <div className="user-dropdown-panel glass">
                                     <p>Welcome, {user.username}</p>
+                                    <Link to="/profile"><User size={16} /> My Profile</Link>
                                     <div className="dropdown-divider"></div>
                                     {user.role === 'admin' && (
                                         <Link to="/admin"><LayoutDashboard size={16} /> Admin Panel</Link>
@@ -124,6 +125,7 @@ const Navbar = () => {
                     <div className="mobile-divider"></div>
                     {user ? (
                         <>
+                            <Link to="/profile" onClick={() => setMobileMenuOpen(false)}>My Profile</Link>
                             {user.role === 'admin' && <Link to="/admin" onClick={() => setMobileMenuOpen(false)}>Admin Panel</Link>}
                             <button onClick={() => { logout(); setMobileMenuOpen(false); }}>Sign Out</button>
                         </>
