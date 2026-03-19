@@ -404,8 +404,8 @@ const AdminDashboard = () => {
             ]);
             const pData = await pRes.json();
             const promData = await promRes.json();
-            setProducts(pData);
-            setPromotions(promData);
+            setProducts(Array.isArray(pData) ? pData : []);
+            setPromotions(Array.isArray(promData) ? promData : []);
         } catch (err) {
             console.error(err);
         } finally {

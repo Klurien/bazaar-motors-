@@ -13,8 +13,8 @@ import productRoutes from './routes/products.js';
 import promotionRoutes from './routes/promotions.js';
 import { initDB } from './db/db.js';
 
-// Init DB
-initDB().catch(console.error);
+// Init DB asynchronously, but store the promise
+const dbInitPromise = initDB().catch(console.error);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -23,6 +23,12 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
+// Guard incoming requests until DB finishes initializing
+app.use(async (req, res, next) => {
+    await dbInitPromise;
+    next();
+});
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors({
