@@ -177,3 +177,29 @@ export const deleteProductImage = async (req, res) => {
         res.status(500).json({ message: 'Error deleting image' });
     }
 };
+
+export const resetCatalog = async (req, res) => {
+    try {
+        // Cascade handles product_images when products are deleted, but deleting both is safer 
+        await db.execute('DELETE FROM product_images');
+        await db.execute('DELETE FROM products');
+        await db.execute('DELETE FROM promotions');
+
+        try {
+            const upldDir = path.join(__dirname, '../uploads');
+            if (fs.existsSync(upldDir)) {
+                fs.readdirSync(upldDir).forEach(f => {
+                    const fp = path.join(upldDir, f);
+                    if (fs.statSync(fp).isFile()) fs.unlinkSync(fp);
+                });
+            }
+        } catch (fileErr) {
+            console.error('Failed clearing uploads:', fileErr);
+        }
+
+        res.json({ message: 'Catalog reset successfully' });
+    } catch (error) {
+        console.error('Catalog reset error:', error);
+        res.status(500).json({ message: 'Error completely resetting catalog' });
+    }
+};

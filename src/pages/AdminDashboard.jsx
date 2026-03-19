@@ -460,6 +460,21 @@ const AdminDashboard = () => {
         }
     };
 
+    const handleResetCatalog = async () => {
+        if (!window.confirm("ARE YOU SURE? This will permanently wipe ALL products and promotions to give you a clean slate for actual data!")) return;
+
+        try {
+            await fetch(`${API}/api/products/reset`, {
+                method: 'DELETE',
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            showToast('Catalog completely wiped.');
+            fetchData();
+        } catch {
+            showToast('Failed to wipe catalog.', 'error');
+        }
+    };
+
     if (!user || user.role !== 'admin') {
         return (
             <div className="admin-access-denied container">
@@ -505,7 +520,9 @@ const AdminDashboard = () => {
                     </div>
                     <div className="topbar-actions">
                         {activeTab === 'products' && (
-                            <div />
+                            <button className="btn btn-ghost" style={{ color: '#ef4444' }} onClick={handleResetCatalog}>
+                                <Trash2 size={20} /> Wipe Demo Data
+                            </button>
                         )}
                         {activeTab === 'promotions' && (
                             <button className="btn btn-accent" onClick={() => { setEditingPromo(null); setShowPromoModal(true); }}>

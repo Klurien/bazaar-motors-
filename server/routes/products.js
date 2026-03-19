@@ -34,6 +34,7 @@ router.get('/:id', productController.getProduct);
 // Admin routes - accept up to 10 images at once
 router.post('/', authMiddleware, adminMiddleware, upload.array('images', 10), productController.createProduct);
 router.put('/:id', authMiddleware, adminMiddleware, upload.array('images', 10), productController.updateProduct);
+router.delete('/reset', authMiddleware, adminMiddleware, productController.resetCatalog);
 router.delete('/:id', authMiddleware, adminMiddleware, productController.deleteProduct);
 router.delete('/:productId/images/:imageId', authMiddleware, adminMiddleware, productController.deleteProductImage);
 
