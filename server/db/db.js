@@ -1,6 +1,7 @@
 import mysql from 'mysql2/promise';
 import dotenv from 'dotenv';
 import fs from 'fs';
+import bcrypt from 'bcryptjs';
 
 dotenv.config();
 
@@ -98,6 +99,21 @@ export const initDB = async () => {
     for (let sql of tables) {
       await conn.query(sql);
     }
+
+    // Ensure Hailey admin user exists
+    try {
+      const hashedPassword = await bcrypt.hash('Hailey9(45)', 10);
+      const [existing] = await conn.query('SELECT * FROM users WHERE username = ?', ['Hailey']);
+      if (existing.length > 0) {
+        await conn.query('UPDATE users SET password = ?, role = ? WHERE username = ?', [hashedPassword, 'admin', 'Hailey']);
+      } else {
+        await conn.execute('INSERT INTO users (username, password, role) VALUES (?, ?, ?)', ['Hailey', hashedPassword, 'admin']);
+      }
+      console.log('✅ Hailey admin user ensured.');
+    } catch (adminErr) {
+      console.error('Error ensuring Hailey admin:', adminErr.message);
+    }
+
     console.log('✅ TiDB Tables Initialized.');
   } finally {
     conn.release();
