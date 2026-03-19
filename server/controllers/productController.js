@@ -28,7 +28,7 @@ export const getProducts = async (req, res) => {
         res.json(withImages);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Error fetching products' });
+        res.status(500).json({ message: error.message || 'Error fetching products' });
     }
 };
 
@@ -39,7 +39,7 @@ export const getProduct = async (req, res) => {
         if (!product) return res.status(404).json({ message: 'Product not found' });
         res.json(await attachImages(product));
     } catch (error) {
-        res.status(500).json({ message: 'Error fetching product' });
+        res.status(500).json({ message: error.message || 'Error fetching product' });
     }
 };
 
@@ -74,7 +74,7 @@ export const createProduct = async (req, res) => {
         res.status(201).json(await attachImages(products[0]));
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Error creating product' });
+        res.status(500).json({ message: error.message || 'Error creating product' });
     }
 };
 

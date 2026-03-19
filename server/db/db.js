@@ -5,18 +5,31 @@ import bcrypt from 'bcryptjs';
 
 dotenv.config();
 
+let sslConfig = {
+  minVersion: 'TLSv1.2',
+  rejectUnauthorized: true
+};
+
+if (process.env.TIDB_SSL_CA) {
+  try {
+    if (process.env.TIDB_SSL_CA.startsWith('-----BEGIN CERTIFICATE-----')) {
+      sslConfig.ca = process.env.TIDB_SSL_CA;
+    } else {
+      sslConfig.ca = fs.readFileSync(process.env.TIDB_SSL_CA);
+    }
+  } catch (err) {
+    console.error('⚠️ Could not load TIDB_SSL_CA certificate:', err.message);
+    // Fallback to default SSL settings if the provided CA fails
+  }
+}
+
 const config = {
   host: process.env.TIDB_HOST,
   port: process.env.TIDB_PORT || 4000,
   user: process.env.TIDB_USER,
   password: process.env.TIDB_PASSWORD,
   database: process.env.TIDB_DATABASE,
-  ssl: process.env.TIDB_SSL_CA ? {
-    ca: fs.readFileSync(process.env.TIDB_SSL_CA)
-  } : {
-    minVersion: 'TLSv1.2',
-    rejectUnauthorized: true
-  }
+  ssl: sslConfig
 };
 
 let pool;

@@ -10,7 +10,7 @@ export const getPromotions = async (req, res) => {
         const [rows] = await db.query('SELECT * FROM promotions ORDER BY sort_order ASC');
         res.json(rows);
     } catch (error) {
-        res.status(500).json({ message: 'Error fetching promotions' });
+        res.status(500).json({ message: error.message || 'Error fetching promotions' });
     }
 };
 
@@ -26,7 +26,7 @@ export const createPromotion = async (req, res) => {
         const [rows] = await db.query('SELECT * FROM promotions WHERE id = ?', [result.insertId]);
         res.status(201).json(rows[0]);
     } catch (error) {
-        res.status(500).json({ message: 'Error creating promotion' });
+        res.status(500).json({ message: error.message || 'Error creating promotion' });
     }
 };
 
