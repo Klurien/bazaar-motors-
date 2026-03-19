@@ -96,6 +96,31 @@ const ProductDetail = () => {
                 <meta property="og:description" content={product.description?.substring(0, 160)} />
                 <meta property="og:image" content={images[0]} />
                 <meta name="twitter:card" content="summary_large_image" />
+                <script type="application/ld+json">
+                    {JSON.stringify({
+                        "@context": "https://schema.org/",
+                        "@type": "Product",
+                        "name": product.name,
+                        "image": images,
+                        "description": product.description || "Premium kitchen finding.",
+                        "brand": {
+                            "@type": "Brand",
+                            "name": "Kitchen Finds"
+                        },
+                        "offers": {
+                            "@type": "Offer",
+                            "url": typeof window !== "undefined" ? window.location.href : '',
+                            "priceCurrency": "USD",
+                            "price": parseFloat(product.price),
+                            "itemCondition": "https://schema.org/NewCondition",
+                            "availability": product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+                            "seller": {
+                                "@type": "Organization",
+                                "name": "Kitchen Finds"
+                            }
+                        }
+                    })}
+                </script>
             </Helmet>
             <div className="container">
                 <div className="detail-layout">

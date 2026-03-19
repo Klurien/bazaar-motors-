@@ -12,6 +12,7 @@ import authRoutes from './routes/auth.js';
 import productRoutes from './routes/products.js';
 import promotionRoutes from './routes/promotions.js';
 import checkoutRoutes from './routes/checkout.js';
+import sitemapRoutes from './routes/sitemap.js';
 import { initDB } from './db/db.js';
 
 // Init DB asynchronously, but store the promise
@@ -51,6 +52,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/promotions', promotionRoutes);
 app.use('/api/checkout', checkoutRoutes);
+app.use('/api', sitemapRoutes); // Mounts /api/sitemap.xml
 
 app.get('/', (req, res) => {
     res.send('Ecommerce API is running...');
