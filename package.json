@@ -10,6 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@stripe/react-stripe-js": "^5.6.1",
+    "@stripe/stripe-js": "^8.11.0",
+    "@vercel/blob": "^2.3.1",
     "bcryptjs": "^3.0.3",
     "compression": "^1.8.1",
     "cookie-parser": "^1.4.7",
@@ -25,7 +28,9 @@
     "mysql2": "^3.19.1",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
-    "react-router-dom": "^7.13.1"
+    "react-helmet-async": "^3.0.0",
+    "react-router-dom": "^7.13.1",
+    "stripe": "^20.4.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",

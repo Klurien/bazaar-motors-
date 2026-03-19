@@ -11,6 +11,7 @@ import cookieParser from 'cookie-parser';
 import authRoutes from './routes/auth.js';
 import productRoutes from './routes/products.js';
 import promotionRoutes from './routes/promotions.js';
+import checkoutRoutes from './routes/checkout.js';
 import { initDB } from './db/db.js';
 
 // Init DB asynchronously, but store the promise
@@ -49,6 +50,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/promotions', promotionRoutes);
+app.use('/api/checkout', checkoutRoutes);
 
 app.get('/', (req, res) => {
     res.send('Ecommerce API is running...');

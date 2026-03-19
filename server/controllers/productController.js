@@ -1,6 +1,5 @@
 import db from '../db/db.js';
-import fs from 'fs';
-import path from 'path';
+import { uploadFile, deleteFile } from '../utils/upload.js';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -48,9 +47,14 @@ export const createProduct = async (req, res) => {
     const { name, description, price, category, stock } = req.body;
     if (!name || !price) return res.status(400).json({ message: 'Name and price are required' });
 
-    const image_url = req.files?.length > 0
-        ? `/uploads/${req.files[0].filename}`
-        : (req.file ? `/uploads/${req.file.filename}` : null);
+    let image_url = null;
+    let newImageUrls = [];
+    const files = req.files || (req.file ? [req.file] : []);
+
+    if (files.length > 0) {
+        newImageUrls = await Promise.all(files.map(f => uploadFile(f)));
+        image_url = newImageUrls[0];
+    }
 
     try {
         const [result] = await db.execute(
@@ -59,11 +63,10 @@ export const createProduct = async (req, res) => {
         );
         const productId = result.insertId;
 
-        const files = req.files || (req.file ? [req.file] : []);
-        for (let i = 0; i < files.length; i++) {
+        for (let i = 0; i < newImageUrls.length; i++) {
             await db.execute(
                 'INSERT INTO product_images (product_id, url, sort_order) VALUES (?, ?, ?)',
-                [productId, `/uploads/${files[i].filename}`, i]
+                [productId, newImageUrls[i], i]
             );
         }
 
@@ -86,15 +89,16 @@ export const updateProduct = async (req, res) => {
         const newFiles = req.files || (req.file ? [req.file] : []);
 
         if (newFiles.length > 0) {
+            const uploadedUrls = await Promise.all(newFiles.map(f => uploadFile(f)));
             const [stats] = await db.query('SELECT COUNT(*) as c FROM product_images WHERE product_id = ?', [req.params.id]);
             const existingCount = stats[0].c;
-            for (let i = 0; i < newFiles.length; i++) {
+            for (let i = 0; i < uploadedUrls.length; i++) {
                 await db.execute(
                     'INSERT INTO product_images (product_id, url, sort_order) VALUES (?, ?, ?)',
-                    [req.params.id, `/uploads/${newFiles[i].filename}`, existingCount + i]
+                    [req.params.id, uploadedUrls[i], existingCount + i]
                 );
             }
-            if (!image_url) image_url = `/uploads/${newFiles[0].filename}`;
+            if (!image_url) image_url = uploadedUrls[0];
         }
 
         if (req.body.deleted_image_ids) {
@@ -104,8 +108,7 @@ export const updateProduct = async (req, res) => {
                 const [images] = await db.query('SELECT * FROM product_images WHERE id = ?', [imgId]);
                 const img = images[0];
                 if (img) {
-                    const filePath = path.join(__dirname, '../uploads', path.basename(img.url));
-                    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+                    await deleteFile(img.url);
                     await db.execute('DELETE FROM product_images WHERE id = ?', [imgId]);
                 }
             }
@@ -142,10 +145,7 @@ export const updateProduct = async (req, res) => {
 export const deleteProduct = async (req, res) => {
     try {
         const images = await getProductImages(req.params.id);
-        images.forEach(img => {
-            const filePath = path.join(__dirname, '../uploads', path.basename(img.url));
-            if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-        });
+        await Promise.all(images.map(img => deleteFile(img.url)));
 
         const [result] = await db.execute('DELETE FROM products WHERE id = ?', [req.params.id]);
         if (result.affectedRows === 0) return res.status(404).json({ message: 'Product not found' });
@@ -162,8 +162,7 @@ export const deleteProductImage = async (req, res) => {
         const img = images[0];
         if (!img) return res.status(404).json({ message: 'Image not found' });
 
-        const filePath = path.join(__dirname, '../uploads', path.basename(img.url));
-        if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+        await deleteFile(img.url);
         await db.execute('DELETE FROM product_images WHERE id = ?', [imageId]);
 
         const [products] = await db.query('SELECT * FROM products WHERE id = ?', [productId]);

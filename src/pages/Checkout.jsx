@@ -1,9 +1,63 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ChevronRight, CreditCard, Truck, Check, ShoppingBag, Lock } from 'lucide-react';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import './Checkout.css';
+
+const API = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : "http://localhost:5000");
+
+// Initialize Stripe gracefully, failing back to a mock public key for local testing
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY || 'pk_test_TYooMQauvdEDq54NiTphI7jx');
+
+const StripeCheckoutForm = ({ onSuccess, onBack, clientSecret, isMock }) => {
+    const stripe = useStripe();
+    const elements = useElements();
+    const [isProcessing, setIsProcessing] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (isMock) {
+            // Mock successful charge for demo environment
+            setIsProcessing(true);
+            setTimeout(() => onSuccess(), 1500);
+            return;
+        }
+
+        if (!stripe || !elements) return;
+
+        setIsProcessing(true);
+        const { error } = await stripe.confirmPayment({
+            elements,
+            redirect: 'if_required',
+        });
+
+        if (error) {
+            setErrorMessage(error.message);
+            setIsProcessing(false);
+        } else {
+            onSuccess();
+        }
+    };
+
+    return (
+        <form onSubmit={handleSubmit} className="stripe-form">
+            <PaymentElement />
+            {errorMessage && <div className="field-error" style={{ marginTop: '10px' }}>{errorMessage}</div>}
+
+            <div className="checkout-nav">
+                <button type="button" className="btn btn-outline" onClick={onBack}>Back</button>
+                <button type="submit" className="btn btn-primary btn-next" disabled={isProcessing || !stripe}>
+                    {isProcessing ? 'Processing SECURE Charge...' : 'Complete Secure Payment'}
+                    <Lock size={16} style={{ marginLeft: '8px' }} />
+                </button>
+            </div>
+        </form>
+    );
+};
 
 const STEPS = ['Cart Review', 'Shipping', 'Payment', 'Confirmation'];
 
@@ -14,6 +68,8 @@ const Checkout = () => {
 
     const [currentStep, setCurrentStep] = useState(0);
     const [orderPlaced, setOrderPlaced] = useState(false);
+    const [clientSecret, setClientSecret] = useState(null);
+    const [isMockFlow, setIsMockFlow] = useState(true);
     const [orderNumber] = useState(() => Math.floor(Math.random() * 900000) + 100000);
 
     const [shipping, setShipping] = useState({
@@ -53,26 +109,38 @@ const Checkout = () => {
         return Object.keys(newErrors).length === 0;
     };
 
-    const validatePayment = () => {
-        const newErrors = {};
-        if (payment.method === 'card') {
-            if (payment.cardNumber.replace(/\s/g, '').length !== 16) newErrors.cardNumber = 'Enter 16-digit card number';
-            if (!payment.expiry.match(/^\d{2}\/\d{2}$/)) newErrors.expiry = 'Format: MM/YY';
-            if (payment.cvv.length < 3) newErrors.cvv = 'Required';
-            if (!payment.nameOnCard.trim()) newErrors.nameOnCard = 'Required';
+    const fetchPaymentIntent = async () => {
+        try {
+            const res = await fetch(`${API}/api/checkout/create-payment-intent`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ items: cart })
+            });
+            const data = await res.json();
+            setClientSecret(data.clientSecret);
+            setIsMockFlow(data.isMock);
+        } catch (err) {
+            console.error("Failed to fetch payment intent", err);
         }
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
     };
 
     const handleNext = () => {
-        if (currentStep === 1 && !validateShipping()) return;
-        if (currentStep === 2 && !validatePayment()) return;
+        if (currentStep === 1) {
+            if (!validateShipping()) return;
+            // Generate Stripe intent when leaving shipping
+            if (!clientSecret) fetchPaymentIntent();
+        }
         if (currentStep === 2) {
-            setOrderPlaced(true);
-            clearCart();
+            // Replaced by Stripe confirmPayment
+            return;
         }
         setCurrentStep(s => Math.min(s + 1, STEPS.length - 1));
+    };
+
+    const handleSuccessfulPayment = () => {
+        setOrderPlaced(true);
+        clearCart();
+        setCurrentStep(3);
     };
 
     const handleBack = () => setCurrentStep(s => Math.max(s - 1, 0));
@@ -256,51 +324,16 @@ const Checkout = () => {
                                     ))}
                                 </div>
 
-                                {payment.method === 'card' && (
-                                    <div className="form-grid">
-                                        <div className={`form-group full ${errors.nameOnCard ? 'error' : ''}`}>
-                                            <label>Name on Card</label>
-                                            <input
-                                                type="text"
-                                                value={payment.nameOnCard}
-                                                onChange={e => setPayment({ ...payment, nameOnCard: e.target.value })}
-                                                placeholder="John Doe"
+                                {payment.method === 'card' && clientSecret && (
+                                    <div className="stripe-container-wrapper glass" style={{ padding: '24px', borderRadius: '12px', marginTop: '16px' }}>
+                                        <Elements stripe={stripePromise} options={{ clientSecret }}>
+                                            <StripeCheckoutForm
+                                                onSuccess={handleSuccessfulPayment}
+                                                onBack={handleBack}
+                                                clientSecret={clientSecret}
+                                                isMock={isMockFlow}
                                             />
-                                            {errors.nameOnCard && <span className="field-error">{errors.nameOnCard}</span>}
-                                        </div>
-                                        <div className={`form-group full ${errors.cardNumber ? 'error' : ''}`}>
-                                            <label>Card Number</label>
-                                            <input
-                                                type="text"
-                                                value={payment.cardNumber}
-                                                onChange={e => setPayment({ ...payment, cardNumber: formatCard(e.target.value) })}
-                                                placeholder="1234 5678 9012 3456"
-                                                maxLength={19}
-                                            />
-                                            {errors.cardNumber && <span className="field-error">{errors.cardNumber}</span>}
-                                        </div>
-                                        <div className={`form-group ${errors.expiry ? 'error' : ''}`}>
-                                            <label>Expiry Date</label>
-                                            <input
-                                                type="text"
-                                                value={payment.expiry}
-                                                onChange={e => setPayment({ ...payment, expiry: formatExpiry(e.target.value) })}
-                                                placeholder="MM/YY"
-                                                maxLength={5}
-                                            />
-                                            {errors.expiry && <span className="field-error">{errors.expiry}</span>}
-                                        </div>
-                                        <div className={`form-group ${errors.cvv ? 'error' : ''}`}>
-                                            <label>CVV</label>
-                                            <input
-                                                type="text"
-                                                value={payment.cvv}
-                                                onChange={e => setPayment({ ...payment, cvv: e.target.value.replace(/\D/g, '').slice(0, 4) })}
-                                                placeholder="123"
-                                                maxLength={4}
-                                            />
-                                            {errors.cvv && <span className="field-error">{errors.cvv}</span>}
-                                        </div>
+                                        </Elements>
                                     </div>
                                 )}
 
@@ -340,13 +373,13 @@ const Checkout = () => {
                         )}
 
                         {/* Navigation Buttons */}
-                        {currentStep < 3 && (
+                        {currentStep < 2 && (
                             <div className="checkout-nav">
                                 {currentStep > 0 && (
                                     <button className="btn btn-outline" onClick={handleBack}>Back</button>
                                 )}
                                 <button className="btn btn-primary btn-next" onClick={handleNext}>
-                                    {currentStep === 2 ? 'Place Order' : 'Continue'}
+                                    Continue
                                     <ChevronRight size={18} />
                                 </button>
                             </div>

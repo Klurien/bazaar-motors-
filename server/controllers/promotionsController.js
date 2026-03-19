@@ -1,6 +1,5 @@
 import db from '../db/db.js';
-import fs from 'fs';
-import path from 'path';
+import { uploadFile, deleteFile } from '../utils/upload.js';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -17,7 +16,7 @@ export const getPromotions = async (req, res) => {
 
 export const createPromotion = async (req, res) => {
     const { title, subtitle, link } = req.body;
-    const image_url = req.file ? `/uploads/${req.file.filename}` : null;
+    const image_url = req.file ? await uploadFile(req.file) : null;
 
     try {
         const [result] = await db.execute(
@@ -41,10 +40,9 @@ export const updatePromotion = async (req, res) => {
         let image_url = promotion.image_url;
         if (req.file) {
             if (image_url) {
-                const oldPath = path.join(__dirname, '../uploads', path.basename(image_url));
-                if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+                await deleteFile(image_url);
             }
-            image_url = `/uploads/${req.file.filename}`;
+            image_url = await uploadFile(req.file);
         }
 
         await db.execute(`
@@ -75,8 +73,7 @@ export const deletePromotion = async (req, res) => {
         if (!promotion) return res.status(404).json({ message: 'Promotion not found' });
 
         if (promotion.image_url) {
-            const filePath = path.join(__dirname, '../uploads', path.basename(promotion.image_url));
-            if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+            await deleteFile(promotion.image_url);
         }
 
         await db.execute('DELETE FROM promotions WHERE id = ?', [req.params.id]);

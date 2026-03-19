@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { SlidersHorizontal, Search, X, ChevronDown } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
 import ProductCard from '../components/product/ProductCard';
 import './Products.css';
 
@@ -122,6 +123,10 @@ const Products = () => {
 
     return (
         <div className="products-page">
+            <Helmet>
+                <title>Culinary Finds | Shop Masterpieces</title>
+                <meta name="description" content="Explore our complete collection of luxury cookware and gadgets." />
+            </Helmet>
             {/* Page Header */}
             <div className="products-header">
                 <div className="container">

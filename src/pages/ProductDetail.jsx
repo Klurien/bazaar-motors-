@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ShoppingCart, ArrowLeft, Check, Star, Minus, Plus, Share2, ChevronLeft, ChevronRight, ShieldCheck, Award, Info, Search } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import './ProductDetail.css';
@@ -88,6 +89,14 @@ const ProductDetail = () => {
 
     return (
         <div className="product-detail-page">
+            <Helmet>
+                <title>{product.name} | Kitchen Finds</title>
+                <meta name="description" content={product.description?.substring(0, 160) || "Discover artisan kitchen finds."} />
+                <meta property="og:title" content={`${product.name} | Premium Kitchen Finds`} />
+                <meta property="og:description" content={product.description?.substring(0, 160)} />
+                <meta property="og:image" content={images[0]} />
+                <meta name="twitter:card" content="summary_large_image" />
+            </Helmet>
             <div className="container">
                 <div className="detail-layout">
                     {/* Media Module - Vertical Thumbs Layout */}

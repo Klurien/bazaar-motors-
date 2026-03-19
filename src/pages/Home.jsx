@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { ArrowRight, ChefHat, Sparkles, TrendingUp, ShieldCheck, Play, Award, Zap } from 'lucide-react';
 import ProductCard from '../components/product/ProductCard';
 import './Home.css';
@@ -142,6 +143,10 @@ const Home = () => {
 
     return (
         <div className="home-page">
+            <Helmet>
+                <title>Premium Kitchen Finds | Culinary Artistry</title>
+                <meta name="description" content="A curated luxury collection of professional cookware and rare culinary tools designed for the modern master." />
+            </Helmet>
             <div className="scroll-progress" style={{ width: `${scrollDepth}%` }}></div>
 
             <section className="hero">

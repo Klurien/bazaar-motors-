@@ -3,13 +3,7 @@ import * as promotionsController from '../controllers/promotionsController.js';
 import { authMiddleware, adminMiddleware } from '../middleware/auth.js';
 import multer from 'multer';
 
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => cb(null, 'uploads/'),
-    filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-        cb(null, uniqueSuffix + '-' + file.originalname);
-    }
-});
+const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
 const router = express.Router();
