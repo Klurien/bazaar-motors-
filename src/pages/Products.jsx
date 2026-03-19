@@ -13,6 +13,8 @@ const SORT_OPTIONS = [
     { value: 'name-desc', label: 'Name: Z–A' },
 ];
 
+const API = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : "http://localhost:5000");
+
 const Products = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const [products, setProducts] = useState([]);
@@ -29,9 +31,13 @@ const Products = () => {
 
     useEffect(() => {
         setLoading(true);
-        fetch('http://localhost:5000/api/products')
+        fetch(`${API}/api/products`)
             .then(res => res.json())
             .then(data => {
+                if (!Array.isArray(data)) {
+                    console.error("Products API didn't return an array:", data);
+                    data = [];
+                }
                 setProducts(data);
                 if (data.length > 0) {
                     const max = Math.ceil(Math.max(...data.map(p => p.price)));
