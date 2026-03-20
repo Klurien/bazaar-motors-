@@ -164,6 +164,52 @@ const Checkout = () => {
         setCurrentStep(3);
     };
 
+    const handleWhatsAppCheckout = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const headers = { 'Content-Type': 'application/json' };
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+
+            const orderPayload = {
+                items: cart,
+                total_amount: total,
+                shipping_address: shipping,
+                status: 'Processing',
+                payment_intent_id: 'whatsapp_checkout'
+            };
+
+            await fetch(`${API}/api/orders`, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify(orderPayload)
+            });
+        } catch (err) {
+            console.error('Failed to create order in database', err);
+        }
+
+        const phoneNumber = '254700000000'; // Target seller phone number
+        let message = `*NEW ORDER - KITCHEN FINDS*\n\n`;
+        message += `*Customer:* ${shipping.firstName} ${shipping.lastName}\n`;
+        message += `*Email:* ${shipping.email}\n`;
+        message += `*Delivery To:* ${shipping.address}, ${shipping.city}\n\n`;
+        message += `*Items:*\n`;
+        cart.forEach(item => {
+            message += `- ${item.name} (Qty: ${item.quantity}) - KES ${(item.price * item.quantity).toLocaleString()}\n`;
+        });
+        message += `\n*Subtotal:* KES ${cartTotal.toLocaleString()}\n`;
+        if (shippingCost > 0) message += `*Shipping:* KES ${shippingCost.toLocaleString()}\n`;
+        if (tax > 0) message += `*Tax:* KES ${tax.toLocaleString()}\n`;
+        message += `*GRAND TOTAL: KES ${total.toLocaleString()}*\n\n`;
+        message += `Please confirm my order and share M-Pesa payment details.`;
+
+        const encodedMessage = encodeURIComponent(message);
+        clearCart();
+        window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank');
+
+        setOrderPlaced(true);
+        setCurrentStep(3);
+    };
+
     const handleBack = () => setCurrentStep(s => Math.max(s - 1, 0));
 
     const formatCard = (value) => {
@@ -331,7 +377,7 @@ const Checkout = () => {
                                 <h2><CreditCard size={22} /> Payment</h2>
 
                                 <div className="payment-methods">
-                                    {['card', 'paypal'].map(method => (
+                                    {['card', 'whatsapp'].map(method => (
                                         <label key={method} className={`payment-method-btn ${payment.method === method ? 'active' : ''}`}>
                                             <input
                                                 type="radio"
@@ -340,7 +386,7 @@ const Checkout = () => {
                                                 checked={payment.method === method}
                                                 onChange={() => setPayment({ ...payment, method })}
                                             />
-                                            {method === 'card' ? '💳 Credit / Debit Card' : '🅿️ PayPal (Demo)'}
+                                            {method === 'card' ? '💳 Credit / Debit Card' : '💬 Pay via MPesa / WhatsApp'}
                                         </label>
                                     ))}
                                 </div>
@@ -358,9 +404,14 @@ const Checkout = () => {
                                     </div>
                                 )}
 
-                                {payment.method === 'paypal' && (
-                                    <div className="paypal-demo">
-                                        <p>You'll be redirected to PayPal's secure checkout (demo mode — no real charge).</p>
+                                {payment.method === 'whatsapp' && (
+                                    <div className="whatsapp-checkout-info glass" style={{ padding: '24px', borderRadius: '12px', marginTop: '16px', textAlign: 'center' }}>
+                                        <h3 style={{ marginBottom: '16px' }}>Complete your order via WhatsApp</h3>
+                                        <p style={{ marginBottom: '20px', color: '#ccc' }}>Click the button below to send your structured order details straight to our team and arrange payment via M-Pesa immediately.</p>
+                                        <button className="btn btn-primary" onClick={handleWhatsAppCheckout} style={{ background: '#25D366', color: 'white', borderColor: '#25D366', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                                            Checkout on WhatsApp (KES {total.toLocaleString()})
+                                        </button>
                                     </div>
                                 )}
 
@@ -393,7 +444,7 @@ const Checkout = () => {
                             </div>
                         )}
 
-                        {/* Navigation Buttons */}
+                        {/* Navigation Buttons for Card Processing Only */}
                         {currentStep < 2 && (
                             <div className="checkout-nav">
                                 {currentStep > 0 && (
@@ -403,6 +454,16 @@ const Checkout = () => {
                                     Continue
                                     <ChevronRight size={18} />
                                 </button>
+                            </div>
+                        )}
+                        {currentStep === 2 && payment.method !== 'whatsapp' && (
+                            <div className="checkout-nav">
+                                <button className="btn btn-outline" onClick={handleBack}>Back</button>
+                            </div>
+                        )}
+                        {currentStep === 2 && payment.method === 'whatsapp' && (
+                            <div className="checkout-nav">
+                                <button className="btn btn-outline" onClick={handleBack}>Back</button>
                             </div>
                         )}
                     </div>
