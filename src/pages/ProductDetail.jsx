@@ -4,6 +4,7 @@ import { ShoppingCart, ArrowLeft, Check, Star, Minus, Plus, Share2, ChevronLeft,
 import { Helmet } from 'react-helmet-async';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import ProductCard from '../components/product/ProductCard';
 import './ProductDetail.css';
 
 const API = (import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : (import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : "http://localhost:5000"))));

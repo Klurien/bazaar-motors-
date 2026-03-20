@@ -2,6 +2,7 @@ import db from '../db/db.js';
 import { uploadFile, deleteFile } from '../utils/upload.js';
 import { fileURLToPath } from 'url';
 import path from 'path';
+import fs from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

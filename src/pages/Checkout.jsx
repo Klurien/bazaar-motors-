@@ -93,7 +93,7 @@ const Checkout = () => {
 
     const [errors, setErrors] = useState({});
 
-    const shippingCost = cartTotal > 100 ? 0 : 9.99;
+    const shippingCost = cartTotal > 10000 ? 0 : 500;
     const tax = cartTotal * 0.08;
     const total = cartTotal + shippingCost + tax;
 
@@ -228,7 +228,7 @@ const Checkout = () => {
                                                 <p className="cart-review-name">{item.name}</p>
                                                 <p className="cart-review-qty">Qty: {item.quantity}</p>
                                             </div>
-                                            <p className="cart-review-price">${(item.price * item.quantity).toFixed(2)}</p>
+                                            <p className="cart-review-price">KES {(item.price * item.quantity).toLocaleString()}</p>
                                         </div>
                                     ))}
                                 </div>
@@ -415,30 +415,30 @@ const Checkout = () => {
                                 {(orderPlaced ? [] : cart).map(item => (
                                     <div key={item.id} className="summary-item">
                                         <span>{item.name} × {item.quantity}</span>
-                                        <span>${(item.price * item.quantity).toFixed(2)}</span>
+                                        <span>KES {(item.price * item.quantity).toLocaleString()}</span>
                                     </div>
                                 ))}
                             </div>
                             <div className="summary-divider" />
                             <div className="summary-line">
                                 <span>Subtotal</span>
-                                <span>${cartTotal.toFixed(2)}</span>
+                                <span>KES {cartTotal.toLocaleString()}</span>
                             </div>
                             <div className="summary-line">
                                 <span>Shipping</span>
-                                <span>{shippingCost === 0 ? <span className="free-shipping">FREE</span> : `$${shippingCost.toFixed(2)}`}</span>
+                                <span>{shippingCost === 0 ? <span className="free-shipping">FREE</span> : `KES ${shippingCost.toLocaleString()}`}</span>
                             </div>
                             {shippingCost > 0 && (
-                                <p className="free-shipping-note">Free shipping on orders over $100</p>
+                                <p className="free-shipping-note">Free shipping on orders over KES 10,000</p>
                             )}
                             <div className="summary-line">
                                 <span>Tax (8%)</span>
-                                <span>${tax.toFixed(2)}</span>
+                                <span>KES {tax.toLocaleString()}</span>
                             </div>
                             <div className="summary-divider" />
                             <div className="summary-total">
                                 <span>Total</span>
-                                <span>${total.toFixed(2)}</span>
+                                <span>KES {total.toLocaleString()}</span>
                             </div>
                         </div>
                     )}

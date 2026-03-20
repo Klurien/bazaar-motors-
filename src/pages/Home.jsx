@@ -185,7 +185,7 @@ const Home = () => {
                     <div className="hero-visual-side animate-in-scale">
                         <div className="hero-main-img-wrapper">
                             <img
-                                src="/home/nova/.gemini/antigravity/brain/0586211d-cdf0-4380-8b65-ef9c6e6bf433/premium_kitchen_hero_jpg_1773578871311.png"
+                                src="/hero-kitchen.png"
                                 alt="Culinary Artistry"
                                 className="hero-main-img"
                             />

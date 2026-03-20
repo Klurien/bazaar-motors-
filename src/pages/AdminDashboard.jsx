@@ -575,7 +575,7 @@ const AdminDashboard = () => {
                 <div className="stats-ribbon">
                     <div className="stat-box">
                         <span className="stat-label">Total Revenue</span>
-                        <span className="stat-value">$12,840.50</span>
+                        <span className="stat-value">KES 1,284,050</span>
                         <span className="stat-trend positive">+12.5%</span>
                     </div>
                     <div className="stat-box">
@@ -617,7 +617,7 @@ const AdminDashboard = () => {
                                     <div key={p.id} className={`product-row ${selectedProduct?.id === p.id ? 'selected' : ''}`} onClick={() => setSelectedProduct(p)}>
                                         <div className="row-img-wrap"><img src={`${API}${p.image_url}`} alt="" /></div>
                                         <div className="row-info"><p className="row-name">{p.name}</p></div>
-                                        <div className="row-price">${p.price}</div>
+                                        <div className="row-price">KES {parseFloat(p.price).toLocaleString()}</div>
                                         <div className="row-actions">
                                             <button className="action-btn edit" onClick={(e) => { e.stopPropagation(); setEditingProduct(p); setShowModal(true); }}><Edit2 size={16} /></button>
                                             <button className="action-btn del" onClick={(e) => { e.stopPropagation(); setDeleteConfirm(p); }}><Trash2 size={16} /></button>
@@ -632,7 +632,7 @@ const AdminDashboard = () => {
                                     <ImageCarousel images={selectedProduct.images} />
                                     <div className="detail-body">
                                         <h3>{selectedProduct.name}</h3>
-                                        <p className="detail-price">${selectedProduct.price}</p>
+                                        <p className="detail-price">KES {parseFloat(selectedProduct.price).toLocaleString()}</p>
                                         <p className="detail-desc">{selectedProduct.description}</p>
                                     </div>
                                 </>
@@ -670,7 +670,7 @@ const AdminDashboard = () => {
                                                         {order.username ? order.username : 'Guest User'}
                                                     </td>
                                                     <td className="p-4 text-sm opacity-80">{new Date(order.created_at).toLocaleDateString()}</td>
-                                                    <td className="p-4 font-bold text-[var(--accent-color)]">${parseFloat(order.total_amount).toFixed(2)}</td>
+                                                    <td className="p-4 font-bold text-[var(--accent-color)]">KES {parseFloat(order.total_amount).toLocaleString()}</td>
                                                     <td className="p-4">
                                                         <select
                                                             className="status-dropdown bg-black/50 border border-white/20 rounded p-1 text-sm outline-none cursor-pointer focus:border-[var(--accent-color)]"
@@ -694,7 +694,7 @@ const AdminDashboard = () => {
                                                                         <img src={item.image_url ? `${API}${item.image_url}` : 'https://placehold.co/40'} className="w-full h-full object-cover" />
                                                                     </div>
                                                                     <span>{item.name} <span className="opacity-60">x{item.quantity}</span></span>
-                                                                    <span className="ml-auto opacity-80">${parseFloat(item.price_at_purchase).toFixed(2)}</span>
+                                                                    <span className="ml-auto opacity-80">KES {parseFloat(item.price_at_purchase).toLocaleString()}</span>
                                                                 </div>
                                                             ))}
                                                         </div>

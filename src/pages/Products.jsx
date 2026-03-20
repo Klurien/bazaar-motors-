@@ -191,8 +191,8 @@ const Products = () => {
                     <div className="filter-section">
                         <h4>Price Range</h4>
                         <div className="price-display">
-                            <span>${priceRange[0]}</span>
-                            <span>${priceRange[1]}</span>
+                            <span>KES {priceRange[0]}</span>
+                            <span>KES {priceRange[1]}</span>
                         </div>
                         <input
                             type="range"

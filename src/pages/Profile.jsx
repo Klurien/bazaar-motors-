@@ -105,7 +105,7 @@ const Profile = () => {
                                                     <p>Qty: {item.quantity}</p>
                                                 </div>
                                                 <div className="item-price">
-                                                    ${parseFloat(item.price_at_purchase).toFixed(2)}
+                                                    KES {parseFloat(item.price_at_purchase).toLocaleString()}
                                                 </div>
                                             </div>
                                         ))}
@@ -113,7 +113,7 @@ const Profile = () => {
                                     <div className="order-footer">
                                         <div className="order-total">
                                             <span>Total Investment</span>
-                                            <strong>${parseFloat(order.total_amount).toFixed(2)}</strong>
+                                            <strong>KES {parseFloat(order.total_amount).toLocaleString()}</strong>
                                         </div>
                                     </div>
                                 </div>

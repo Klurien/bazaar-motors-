@@ -12,6 +12,17 @@ const Cart = () => {
         setIsLoaded(true);
     }, []);
 
+    const handleWhatsAppCheckout = () => {
+        const sellerPhone = "254741740376";
+        let message = "Niaje boss! I'd like to place an order:%0A%0A";
+        cart.forEach(item => {
+            message += `- ${item.name} (Qty: ${item.quantity}) = KES ${(item.price * item.quantity).toLocaleString()}%0A`;
+        });
+        message += `%0A*Total: KES ${cartTotal.toLocaleString()}*`;
+
+        window.open(`https://wa.me/${sellerPhone}?text=${message}`, '_blank');
+    };
+
     if (cart.length === 0) {
         return (
             <div className={`cart-empty container ${isLoaded ? 'fade-in' : ''}`}>
@@ -63,7 +74,7 @@ const Cart = () => {
                             </div>
                             <div className="item-price-side">
                                 <span className="price-label">Estimated</span>
-                                <span className="price-val">${(item.price * item.quantity).toFixed(2)}</span>
+                                <span className="price-val">KES {(item.price * item.quantity).toLocaleString()}</span>
                             </div>
                         </div>
                     ))}
@@ -75,7 +86,7 @@ const Cart = () => {
                         <div className="summary-list">
                             <div className="summary-line">
                                 <span>Subtotal</span>
-                                <span>${cartTotal.toFixed(2)}</span>
+                                <span>KES {cartTotal.toLocaleString()}</span>
                             </div>
                             <div className="summary-line">
                                 <span>Artisan Shipping</span>
@@ -84,13 +95,16 @@ const Cart = () => {
                             <div className="summary-divider"></div>
                             <div className="summary-line total">
                                 <span>Grand Total</span>
-                                <span>${cartTotal.toFixed(2)}</span>
+                                <span>KES {cartTotal.toLocaleString()}</span>
                             </div>
                         </div>
 
-                        <button className="btn btn-accent btn-full glow">
-                            Begin Final Acquisition
+                        <button className="btn btn-accent btn-full glow" onClick={handleWhatsAppCheckout}>
+                            Checkout via WhatsApp
                         </button>
+                        <Link to="/checkout" className="btn btn-outline btn-full" style={{ marginTop: '10px', textAlign: 'center' }}>
+                            Alternative: Checkout via Card
+                        </Link>
 
                         <div className="checkout-trust">
                             <div className="trust-bit">

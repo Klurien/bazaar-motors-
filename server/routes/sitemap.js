@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.get('/sitemap.xml', async (req, res) => {
     try {
-        const [products] = await db.query('SELECT id, updated_at, created_at FROM products ORDER BY created_at DESC');
+        const [products] = await db.query('SELECT id, created_at FROM products ORDER BY created_at DESC');
 
         let xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -22,7 +22,7 @@ router.get('/sitemap.xml', async (req, res) => {
 
         for (const product of products) {
             // Prefer updated_at, fallback to created_at or current date if somehow null
-            const dateStr = product.updated_at || product.created_at || new Date();
+            const dateStr = product.created_at || new Date();
             const date = new Date(dateStr).toISOString().split('T')[0];
 
             xml += `

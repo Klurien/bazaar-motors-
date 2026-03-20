@@ -1,91 +1,108 @@
-import Database from 'better-sqlite3';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const db = new Database(path.join(__dirname, 'db', 'ecommerce.db'));
+import './loadEnv.js';
+import { initDB } from './db/db.js';
+import db from './db/db.js';
 
 const products = [
     {
-        name: 'Professional Copper Sauté Pan',
-        description: 'Heavy-duty 5-ply copper construction for precise temperature control. Features a stainless steel interior and a stay-cool handle. Perfect for searing, deglazing, and reducing sauces.',
-        price: 189.99,
+        name: 'Damascus Steel Chef Knife',
+        description: 'Hand-forged 8-inch Japanese chef knife with 67-layer Damascus steel blade and a stabilized wood handle. Razor-sharp precision for the modern culinary artist.',
+        price: 12500,
         category: 'Cookware',
-        stock: 12,
-        image_url: '/uploads/copper-pan.jpg'
-    },
-    {
-        name: 'Master-Grade Chef Knife (8")',
-        description: 'Hand-forged high-carbon Japanese steel with a traditional hammered finish. Exceptional sharpness and balance for all your kitchen prep work.',
-        price: 145.00,
-        category: 'Gadgets',
-        stock: 25,
-        image_url: '/uploads/chef-knife.jpg'
-    },
-    {
-        name: 'Electric Precision Spice Grinder',
-        description: 'Multi-grind settings for everything from coarse peppercorns to fine espresso. One-touch operation with a stainless steel blade and removable bowl.',
-        price: 49.99,
-        category: 'Gadgets',
-        stock: 40,
-        image_url: '/uploads/grinder.jpg'
-    },
-    {
-        name: 'Artisan Ceramic Pasta Bowls (Set of 4)',
-        description: 'Hand-glazed ceramic bowls with a minimalist silhouette. Durable enough for daily use, elegant enough for dinner parties. Dishwasher and microwave safe.',
-        price: 72.00,
-        category: 'Dining',
         stock: 15,
-        image_url: '/uploads/pasta-bowls.jpg'
+        image_url: '/uploads/chef-knife.png'
     },
     {
-        name: 'Airtight Glass Storage Jar Set',
-        description: 'Premium borosilicate glass with bamboo lids and silicone gaskets. Set of 3 sizes for pantry organization. Keeps dry goods fresh for longer.',
-        price: 34.50,
-        category: 'Storage',
-        stock: 30,
-        image_url: '/uploads/jars.jpg'
-    },
-    {
-        name: 'Non-Stick Silicone Baking Mat',
-        description: 'Professional-grade silicone mat that replaces parchment paper. Heat resistant up to 480°F. Ensures even browning and easy release of all baked goods.',
-        price: 18.00,
-        category: 'Baking',
-        stock: 100,
-        image_url: '/uploads/baking-mat.jpg'
-    },
-    {
-        name: 'Modern Matte Flatware Set',
-        description: '20-piece service for 4. Made of high-quality 18/10 stainless steel with a sleek black matte finish. Weighted perfectly for a premium feel.',
-        price: 89.00,
-        category: 'Dining',
-        stock: 8,
-        image_url: '/uploads/flatware.jpg'
-    },
-    {
-        name: 'Cast Iron French Oven (5 Qt)',
-        description: 'Vibrant enameled cast iron for superior heat retention and distribution. Tight-fitting lid locks in moisture. From stove to oven to table.',
-        price: 159.00,
+        name: 'Heritage Cast Iron Skillet',
+        description: 'Pre-seasoned 12-inch cast iron skillet with brass-accent handle. Built to last generations — sear, bake, fry, and braise with unmatched heat retention.',
+        price: 4800,
         category: 'Cookware',
-        stock: 5,
-        image_url: '/uploads/dutch-oven.jpg'
+        stock: 25,
+        image_url: '/uploads/cast-iron-skillet.png'
+    },
+    {
+        name: 'Artisan Walnut Cutting Board',
+        description: 'Premium end-grain walnut cutting board, 18x14 inches. Self-healing surface that keeps your knives sharper longer. Food-safe mineral oil finish.',
+        price: 6200,
+        category: 'Gadgets',
+        stock: 20,
+        image_url: '/uploads/cutting-board.png'
+    },
+    {
+        name: 'Hammered Copper Saucepan',
+        description: 'Hand-hammered 2.5-quart copper saucepan with stainless steel lining and brass handle. The ultimate in heat conductivity for sauces and reductions.',
+        price: 15900,
+        category: 'Cookware',
+        stock: 10,
+        image_url: '/uploads/copper-pan.png'
+    },
+    {
+        name: 'Artisan Spice Collection',
+        description: 'Set of 7 premium glass jars in a handcrafted bamboo rack. Includes saffron, smoked paprika, turmeric, and rare single-origin spices from around the world.',
+        price: 3200,
+        category: 'Dining',
+        stock: 30,
+        image_url: '/uploads/spice-set.png'
+    },
+    {
+        name: 'Professional Mixing Bowl Set',
+        description: 'Set of 3 premium stainless steel mixing bowls (3qt, 5qt, 8qt). Mirror-polished interior with silicone non-slip base. Stackable for easy storage.',
+        price: 5500,
+        category: 'Cookware',
+        stock: 18,
+        image_url: '/uploads/mixing-bowls.png'
     }
 ];
 
-// Clear existing products
-db.prepare('DELETE FROM product_images').run();
-db.prepare('DELETE FROM products').run();
+const promotions = [
+    {
+        title: 'The Copper Collection',
+        subtitle: 'Up to 30% off hand-hammered copper cookware. Artisan quality, limited stock.',
+        image_url: '/uploads/promo-banner.png',
+        link: '/products?category=Cookware',
+        active: 1,
+        sort_order: 0
+    }
+];
 
-const insertProduct = db.prepare(`
-    INSERT INTO products (name, description, price, category, stock, image_url)
-    VALUES (?, ?, ?, ?, ?, ?)
-`);
+async function seed() {
+    console.log('🌱 Seeding database with premium catalog...');
+    await initDB();
 
-for (const p of products) {
-    insertProduct.run(p.name, p.description, p.price, p.category, p.stock, p.image_url);
+    // Clear existing data
+    await db.execute('DELETE FROM product_images');
+    await db.execute('DELETE FROM products');
+    await db.execute('DELETE FROM promotions');
+    console.log('🗑️  Cleared existing products and promotions.');
+
+    // Seed products
+    for (const p of products) {
+        const [result] = await db.execute(
+            'INSERT INTO products (name, description, price, category, stock, image_url) VALUES (?, ?, ?, ?, ?, ?)',
+            [p.name, p.description, p.price, p.category, p.stock, p.image_url]
+        );
+        const productId = result.insertId;
+        // Also insert into product_images table
+        await db.execute(
+            'INSERT INTO product_images (product_id, url, sort_order) VALUES (?, ?, ?)',
+            [productId, p.image_url, 0]
+        );
+        console.log(`  ✅ Added: ${p.name} (KES ${p.price.toLocaleString()})`);
+    }
+
+    // Seed promotions
+    for (const promo of promotions) {
+        await db.execute(
+            'INSERT INTO promotions (title, subtitle, image_url, link, active, sort_order) VALUES (?, ?, ?, ?, ?, ?)',
+            [promo.title, promo.subtitle, promo.image_url, promo.link, promo.active, promo.sort_order]
+        );
+        console.log(`  ✅ Added promotion: ${promo.title}`);
+    }
+
+    console.log('\n🎉 Seed complete! 6 products + 1 promotion loaded.');
+    process.exit(0);
 }
 
-console.log('Seeded 8 Kitchen Finds successfully!');
-db.close();
+seed().catch(err => {
+    console.error('Seed failed:', err);
+    process.exit(1);
+});
