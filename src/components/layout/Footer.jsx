@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, Phone, MapPin, Instagram, Twitter, Facebook, Youtube, Utensils } from 'lucide-react';
+import { Mail, Phone, MapPin, Instagram, Twitter, Facebook, Youtube } from 'lucide-react';
+import { BRAND } from '../../brandConfig';
 import './Footer.css';
 
 const Footer = () => {
@@ -11,12 +12,12 @@ const Footer = () => {
                     {/* Brand */}
                     <div className="footer-brand">
                         <Link to="/" className="footer-logo">
-                            <Utensils className="logo-icon" size={20} color="#D35400" />
-                            <span className="logo-brand">KITCHEN</span>
-                            <span className="logo-suffix">FINDS</span>
+                            <BRAND.logo className="logo-icon" size={20} color="#D35400" />
+                            <span className="logo-brand">{BRAND.name.split(' ')[0]}</span>
+                            <span className="logo-suffix">{BRAND.name.split(' ')[1] || ''}</span>
                         </Link>
                         <p className="footer-tagline">
-                            Curating professional-grade kitchen tools and innovative gadgets for the modern home chef. Elevate your culinary masterpieces today.
+                            {BRAND.description}
                         </p>
                         <div className="footer-social">
                             <a href="#" aria-label="Instagram" className="social-icon"><Instagram size={18} /></a>
@@ -56,15 +57,15 @@ const Footer = () => {
                         <ul className="contact-list">
                             <li>
                                 <Mail size={15} />
-                                <span>hello@kitchenfinds.com</span>
+                                <span>{BRAND.email}</span>
                             </li>
                             <li>
                                 <Phone size={15} />
-                                <span>+1 (800) CHEF-NEST</span>
+                                <span>{BRAND.phone}</span>
                             </li>
                             <li>
                                 <MapPin size={15} />
-                                <span>88 Culinary Way, San Francisco, CA 94103</span>
+                                <span>{BRAND.address}</span>
                             </li>
                         </ul>
                     </div>
@@ -73,7 +74,7 @@ const Footer = () => {
 
             <div className="footer-bottom">
                 <div className="container footer-bottom-inner">
-                    <p>© 2026 KitchenFinds. All rights reserved.</p>
+                    <p>© {new Date().getFullYear()} {BRAND.nameRaw}. All rights reserved.</p>
                     <div className="footer-legal-links">
                         <Link to="#">Privacy Policy</Link>
                         <Link to="#">Terms of Service</Link>

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { ArrowRight, ChefHat, Sparkles, TrendingUp, ShieldCheck, Play, Award, Zap } from 'lucide-react';
 import ProductCard from '../components/product/ProductCard';
+import { BRAND } from '../brandConfig';
 import './Home.css';
 
 const API = (import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : (import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : "http://localhost:5000"))));
@@ -144,8 +145,8 @@ const Home = () => {
     return (
         <div className="home-page">
             <Helmet>
-                <title>Premium Kitchen Finds | Culinary Artistry</title>
-                <meta name="description" content="A curated luxury collection of professional cookware and rare culinary tools designed for the modern master." />
+                <title>{BRAND.nameRaw} | Premium Kitchen Finds</title>
+                <meta name="description" content={BRAND.description} />
             </Helmet>
             <div className="scroll-progress" style={{ width: `${scrollDepth}%` }}></div>
 
@@ -153,15 +154,15 @@ const Home = () => {
                 <div className="container hero-grid">
                     <div className="hero-text-side">
                         <div className="hero-badge animate-in-1">
-                            <Award size={14} /> <span>Voted #1 Kitchen Finding 2026</span>
+                            <Award size={14} /> <span>{BRAND.hero.badge}</span>
                         </div>
                         <h1 className="animate-in-2">
-                            Where Culinary <br />
-                            <span className="accent-text">Craft Meets</span> <br />
-                            Pure Artistry.
+                            {BRAND.hero.titleMain} <br />
+                            <span className="accent-text">{BRAND.hero.titleAccent}</span> <br />
+                            {BRAND.hero.titleSuffix}
                         </h1>
                         <p className="animate-in-3">
-                            Escape the departmental. Discover an architectural collection of professional cookware and rare culinary tools designed for the modern master.
+                            {BRAND.hero.subtitle}
                         </p>
                         <div className="hero-actions animate-in-4">
                             <Link to="/products" className="btn btn-accent glow">

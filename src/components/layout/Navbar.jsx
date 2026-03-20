@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Search, ShoppingCart, User, LogOut, LayoutDashboard, Utensils, Menu, X } from 'lucide-react';
+import { Search, ShoppingCart, User, LogOut, LayoutDashboard, Menu, X } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
+import { BRAND } from '../../brandConfig';
 import './Navbar.css';
 
 const Navbar = () => {
@@ -45,10 +46,10 @@ const Navbar = () => {
         <header className={`navbar-wrapper ${isScrolled ? 'scrolled' : ''}`}>
             <div className="container navbar-container glass">
                 <Link to="/" className="logo">
-                    <Utensils size={28} className="logo-icon" />
+                    <BRAND.logo size={28} className="logo-icon" />
                     <div className="logo-text">
-                        <span className="logo-brand">KITCHEN</span>
-                        <span className="logo-suffix">FINDS</span>
+                        <span className="logo-brand">{BRAND.name.split(' ')[0]}</span>
+                        <span className="logo-suffix">{BRAND.name.split(' ')[1] || ''}</span>
                     </div>
                 </Link>
 

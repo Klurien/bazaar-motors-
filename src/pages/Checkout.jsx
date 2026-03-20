@@ -5,6 +5,7 @@ import { loadStripe } from '@stripe/stripe-js';
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import { BRAND } from '../brandConfig';
 import './Checkout.css';
 
 const API = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : "http://localhost:5000");
@@ -187,8 +188,8 @@ const Checkout = () => {
             console.error('Failed to create order in database', err);
         }
 
-        const phoneNumber = '254700000000'; // Target seller phone number
-        let message = `*NEW ORDER - KITCHEN FINDS*\n\n`;
+        const phoneNumber = BRAND.whatsapp; // Target seller phone number
+        let message = `*NEW ORDER - ${BRAND.name}*\n\n`;
         message += `*Customer:* ${shipping.firstName} ${shipping.lastName}\n`;
         message += `*Email:* ${shipping.email}\n`;
         message += `*Delivery To:* ${shipping.address}, ${shipping.city}\n\n`;
