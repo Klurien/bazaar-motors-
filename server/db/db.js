@@ -33,17 +33,33 @@ if (USE_TIDB) {
     }
   }
 
-  const config = {
+  const baseConfig = {
     host: process.env.TIDB_HOST,
     port: process.env.TIDB_PORT || 4000,
     user: process.env.TIDB_USER,
     password: process.env.TIDB_PASSWORD,
-    database: process.env.TIDB_DATABASE || 'kitchen_finds',
     ssl: sslConfig
   };
 
-  const pool = mysql.default.createPool(config);
-  console.log('🚀 TiDB Connection Pool Created.');
+  const dbName = (process.env.TIDB_DATABASE && process.env.TIDB_DATABASE !== 'sys') ? process.env.TIDB_DATABASE : 'kitchen_finds';
+
+  // 1. Create a temporary connection without a database selected to ensure it exists
+  const tempPool = mysql.default.createPool(baseConfig);
+  try {
+    await tempPool.query(`CREATE DATABASE IF NOT EXISTS \`${dbName}\``);
+    console.log(`✅ Ensured database '${dbName}' exists.`);
+  } catch (err) {
+    console.error(`⚠️ Could not automatically create database '${dbName}':`, err.message);
+  } finally {
+    await tempPool.end();
+  }
+
+  // 2. Create the actual pool bound to the specific database
+  const pool = mysql.default.createPool({
+    ...baseConfig,
+    database: dbName
+  });
+  console.log(`🚀 TiDB Connection Pool Created for database: ${dbName}`);
 
   dbWrapper = {
     _pool: pool,
