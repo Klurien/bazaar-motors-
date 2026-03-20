@@ -239,8 +239,8 @@ const ProductModal = ({ product, onClose, onSaved, token }) => {
                             </div>
                             <div className="form-row-3">
                                 <div className="form-group">
-                                    <label>Price (USD) *</label>
-                                    <input type="number" name="price" value={form.price} onChange={handleChange} step="0.01" required />
+                                    <label>Price (KES) *</label>
+                                    <input type="number" name="price" value={form.price} onChange={handleChange} step="1" required />
                                 </div>
                                 <div className="form-group">
                                     <label>Stock</label>
@@ -575,8 +575,8 @@ const AdminDashboard = () => {
                 <div className="stats-ribbon">
                     <div className="stat-box">
                         <span className="stat-label">Total Revenue</span>
-                        <span className="stat-value">KES 1,284,050</span>
-                        <span className="stat-trend positive">+12.5%</span>
+                        <span className="stat-value">KES {orders.reduce((acc, curr) => acc + parseFloat(curr.total_amount || 0), 0).toLocaleString()}</span>
+                        <span className="stat-trend positive">Total</span>
                     </div>
                     <div className="stat-box">
                         <span className="stat-label">Active Orders</span>
