@@ -13,6 +13,7 @@ import ProductDetail from './pages/ProductDetail';
 import Checkout from './pages/Checkout';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
+import { Analytics } from '@vercel/analytics/react';
 
 function App() {
   return (
@@ -42,6 +43,7 @@ function App() {
               <span>Connect with Concierge</span>
             </a>
           </div>
+          <Analytics />
         </Router>
       </CartProvider>
     </AuthProvider>
