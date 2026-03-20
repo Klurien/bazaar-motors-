@@ -390,6 +390,9 @@ const AdminDashboard = () => {
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [deleteConfirm, setDeleteConfirm] = useState(null);
     const [toast, setToast] = useState(null);
+    const [stats, setStats] = useState({ totalRevenue: 0, activeOrders: 0, visitors: 0, inventoryCount: 0 });
+    const [chartData, setChartData] = useState([]);
+    const [topCategories, setTopCategories] = useState([]);
 
     const showToast = (msg, type = 'success') => {
         setToast({ msg, type });
@@ -402,14 +405,20 @@ const AdminDashboard = () => {
             const tokenOverride = localStorage.getItem('token') || token;
             const headers = tokenOverride ? { Authorization: `Bearer ${tokenOverride}` } : {};
 
-            const [pRes, promRes, ordRes] = await Promise.all([
+            const [pRes, promRes, ordRes, sRes, cRes, tcRes] = await Promise.all([
                 fetch(`${API}/api/products`),
                 fetch(`${API}/api/promotions`),
-                fetch(`${API}/api/orders/all`, { headers })
+                fetch(`${API}/api/orders/all`, { headers }),
+                fetch(`${API}/api/stats/dashboard`, { headers }),
+                fetch(`${API}/api/stats/sales-chart`, { headers }),
+                fetch(`${API}/api/stats/top-categories`, { headers })
             ]);
 
             const pData = await pRes.json();
             const promData = await promRes.json();
+            const sData = await sRes.json();
+            const cData = await cRes.json();
+            const tcData = await tcRes.json();
 
             let ordData = [];
             if (ordRes.ok) {
@@ -419,6 +428,9 @@ const AdminDashboard = () => {
             setProducts(Array.isArray(pData) ? pData : []);
             setPromotions(Array.isArray(promData) ? promData : []);
             setOrders(Array.isArray(ordData) ? ordData : []);
+            setStats(sData);
+            setChartData(Array.isArray(cData) ? cData : []);
+            setTopCategories(Array.isArray(tcData) ? tcData : []);
         } catch (err) {
             console.error('Failed dashboard data load:', err);
         } finally {
@@ -575,22 +587,22 @@ const AdminDashboard = () => {
                 <div className="stats-ribbon">
                     <div className="stat-box">
                         <span className="stat-label">Total Revenue</span>
-                        <span className="stat-value">KES {orders.reduce((acc, curr) => acc + parseFloat(curr.total_amount || 0), 0).toLocaleString()}</span>
-                        <span className="stat-trend positive">Total</span>
+                        <span className="stat-value">KES {parseFloat(stats.totalRevenue).toLocaleString()}</span>
+                        <span className="stat-trend positive">Live</span>
                     </div>
                     <div className="stat-box">
                         <span className="stat-label">Active Orders</span>
-                        <span className="stat-value">24</span>
-                        <span className="stat-trend">Standard</span>
+                        <span className="stat-value">{stats.activeOrders}</span>
+                        <span className="stat-trend">{stats.activeOrders > 0 ? 'Urgent' : 'Clear'}</span>
                     </div>
                     <div className="stat-box">
                         <span className="stat-label">Site Visitors</span>
-                        <span className="stat-value">1.2k</span>
-                        <span className="stat-trend positive">+5%</span>
+                        <span className="stat-value">{(stats.visitors).toLocaleString()}</span>
+                        <span className="stat-trend positive">Total</span>
                     </div>
                     <div className="stat-box">
                         <span className="stat-label">Inventory Items</span>
-                        <span className="stat-value">{products.length}</span>
+                        <span className="stat-value">{stats.inventoryCount}</span>
                         <span className="stat-trend">Live</span>
                     </div>
                 </div>
@@ -743,66 +755,78 @@ const AdminDashboard = () => {
                                     </div>
                                 </div>
                                 <div className="mock-chart">
-                                    {/* Visual representation of a chart */}
-                                    {[40, 60, 45, 90, 65, 80, 70, 95].map((h, i) => (
-                                        <div key={i} className="chart-bar" style={{ height: `${h}%`, animationDelay: `${i * 0.1}s` }}></div>
-                                    ))}
+                                    {chartData.length > 0 ? (
+                                        chartData.map((d, i) => {
+                                            const maxAmount = Math.max(...chartData.map(cd => cd.amount), 1);
+                                            const height = (d.amount / maxAmount) * 100;
+                                            return (
+                                                <div key={i} className="chart-bar-wrap">
+                                                    <div className="chart-bar" style={{ height: `${height}%`, animationDelay: `${i * 0.1}s` }}>
+                                                        <div className="bar-tooltip">KES {parseFloat(d.amount).toLocaleString()}</div>
+                                                    </div>
+                                                    <span className="bar-label">{new Date(d.date).toLocaleDateString([], { weekday: 'short' })}</span>
+                                                </div>
+                                            );
+                                        })
+                                    ) : (
+                                        <div className="no-data-msg">Waiting for first sales...</div>
+                                    )}
                                 </div>
                             </div>
                             <div className="dashboard-grid-2">
                                 <div className="overview-card glass">
                                     <h4>Top Categories</h4>
                                     <div className="mini-list">
-                                        <div className="mini-item"><span>Cookware</span> <span>45%</span></div>
-                                        <div className="mini-item"><span>Appliances</span> <span>30%</span></div>
-                                        <div className="mini-item"><span>Gadgets</span> <span>25%</span></div>
+                                        {topCategories.map((cat, i) => (
+                                            <div key={i} className="mini-item">
+                                                <span>{cat.category || 'Uncategorized'}</span>
+                                                <span>KES {parseFloat(cat.total_sales).toLocaleString()}</span>
+                                            </div>
+                                        ))}
+                                        {topCategories.length === 0 && <p className="opacity-50 text-sm">No sales data yet</p>}
                                     </div>
                                 </div>
                                 <div className="overview-card glass">
                                     <h4>Stock Alerts</h4>
                                     <div className="mini-list">
-                                        {products.filter(p => p.stock < 5).slice(0, 3).map(p => (
+                                        {products.filter(p => p.stock < 5 && p.stock !== null).slice(0, 3).map(p => (
                                             <div key={p.id} className="mini-item warning">
                                                 <span>{p.name}</span> <span>{p.stock} left</span>
                                             </div>
                                         ))}
-                                        {products.filter(p => p.stock < 5).length === 0 && <p className="all-good">All stock levels healthy</p>}
+                                        {products.filter(p => p.stock < 5 && p.stock !== null).length === 0 && (
+                                            <p className="all-good">All stock levels healthy</p>
+                                        )}
                                     </div>
                                 </div>
                             </div>
                         </div>
+
                         <div className="overview-sidebar">
                             <div className="activity-panel glass">
                                 <h3>Recent Activity</h3>
                                 <div className="activity-list">
-                                    <div className="activity-item">
-                                        <div className="activity-icon blue"><ShoppingBag size={14} /></div>
-                                        <div className="activity-info">
-                                            <p>New order #1204</p>
-                                            <span>2 minutes ago</span>
+                                    {orders.slice(0, 5).map(order => (
+                                        <div key={order.id} className="activity-item">
+                                            <div className="activity-icon blue"><ShoppingBag size={14} /></div>
+                                            <div className="activity-info">
+                                                <p>Order #{order.id} placed by {order.username || 'Guest'}</p>
+                                                <span>{new Date(order.created_at).toLocaleTimeString()}</span>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div className="activity-item">
-                                        <div className="activity-icon green"><Check size={14} /></div>
-                                        <div className="activity-info">
-                                            <p>Product "Copper Pan" restocked</p>
-                                            <span>45 minutes ago</span>
+                                    ))}
+                                    {products.slice(0, 2).map(p => (
+                                        <div key={p.id} className="activity-item">
+                                            <div className="activity-icon green"><Package size={14} /></div>
+                                            <div className="activity-info">
+                                                <p>New product "{p.name}" added</p>
+                                                <span>{new Date(p.created_at).toLocaleDateString()}</span>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div className="activity-item">
-                                        <div className="activity-icon orange"><Zap size={14} /></div>
-                                        <div className="activity-info">
-                                            <p>Flash Sale "Spring Prep" started</p>
-                                            <span>2 hours ago</span>
-                                        </div>
-                                    </div>
-                                    <div className="activity-item">
-                                        <div className="activity-icon"><Users size={14} /></div>
-                                        <div className="activity-info">
-                                            <p>New customer registered</p>
-                                            <span>3 hours ago</span>
-                                        </div>
-                                    </div>
+                                    ))}
+                                    {orders.length === 0 && products.length === 0 && (
+                                        <p className="opacity-50 text-sm p-4">No recent activity detected</p>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -813,7 +837,7 @@ const AdminDashboard = () => {
                     <div className="placeholder-screen glass">
                         <Users size={48} className="text-accent" />
                         <h2>Customer Registry</h2>
-                        <p>Database of 2,450 registered culinary enthusiasts.</p>
+                        <p>Database of Culinary enthusiasts.</p>
                         <button className="btn btn-primary" style={{ marginTop: '20px' }}>View Full Directory</button>
                     </div>
                 )}

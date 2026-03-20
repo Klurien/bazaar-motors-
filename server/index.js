@@ -14,7 +14,9 @@ import promotionRoutes from './routes/promotions.js';
 import checkoutRoutes from './routes/checkout.js';
 import ordersRoutes from './routes/orders.js';
 import sitemapRoutes from './routes/sitemap.js';
+import statsRoutes from './routes/stats.js';
 import { initDB } from './db/db.js';
+import db from './db/db.js';
 
 // Init DB asynchronously, but store the promise
 const dbInitPromise = initDB().catch(console.error);
@@ -29,6 +31,20 @@ const PORT = process.env.PORT || 5000;
 // Guard incoming requests until DB finishes initializing
 app.use(async (req, res, next) => {
     await dbInitPromise;
+    next();
+});
+
+// Visitor Tracker
+app.use(async (req, res, next) => {
+    // Basic rate limiting for visitor increment (once per session/cookie)
+    if (!req.cookies.has_visited && !req.path.startsWith('/api') && !req.path.includes('.')) {
+        try {
+            await db.execute('UPDATE site_stats SET stat_value = stat_value + 1 WHERE stat_name = "visitors"');
+            res.cookie('has_visited', 'true', { maxAge: 24 * 60 * 60 * 1000, httpOnly: true });
+        } catch (err) {
+            console.error('Visitor tracking error:', err.message);
+        }
+    }
     next();
 });
 
@@ -54,6 +70,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/promotions', promotionRoutes);
 app.use('/api/checkout', checkoutRoutes);
 app.use('/api/orders', ordersRoutes);
+app.use('/api/stats', statsRoutes);
 app.use('/api', sitemapRoutes); // Mounts /api/sitemap.xml
 
 app.get('/', (req, res) => {

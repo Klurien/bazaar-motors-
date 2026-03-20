@@ -226,6 +226,12 @@ export const initDB = async () => {
             price_at_purchase DECIMAL(10,2) NOT NULL,
             FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
             FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+        )`,
+    `CREATE TABLE IF NOT EXISTS site_stats (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            stat_name VARCHAR(100) UNIQUE NOT NULL,
+            stat_value INT DEFAULT 0,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )`
   ];
 
@@ -245,9 +251,16 @@ export const initDB = async () => {
         } else {
           await conn.execute('INSERT INTO users (username, password, role) VALUES (?, ?, ?)', ['Hailey', hashedPassword, 'admin']);
         }
-        console.log('✅ Hailey admin user ensured.');
+
+        // Ensure visitors counter exists
+        const [statExists] = await conn.query('SELECT * FROM site_stats WHERE stat_name = ?', ['visitors']);
+        if (statExists.length === 0) {
+          await conn.execute('INSERT INTO site_stats (stat_name, stat_value) VALUES (?, ?)', ['visitors', 0]);
+        }
+
+        console.log('✅ Hailey admin and site stats initialized.');
       } catch (adminErr) {
-        console.error('Error ensuring Hailey admin:', adminErr.message);
+        console.error('Error during initDB additions:', adminErr.message);
       }
 
       console.log('✅ TiDB Tables Initialized.');
