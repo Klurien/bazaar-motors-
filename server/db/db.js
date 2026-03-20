@@ -41,25 +41,36 @@ if (USE_TIDB) {
     ssl: sslConfig
   };
 
-  const dbName = (process.env.TIDB_DATABASE && process.env.TIDB_DATABASE !== 'sys') ? process.env.TIDB_DATABASE : 'kitchen_finds';
+  let targetDb = process.env.TIDB_DATABASE && process.env.TIDB_DATABASE !== 'sys'
+    ? process.env.TIDB_DATABASE
+    : 'test'; // Default TiDB serverless database available to all users
 
   // 1. Create a temporary connection without a database selected to ensure it exists
   const tempPool = mysql.default.createPool(baseConfig);
   try {
-    await tempPool.query(`CREATE DATABASE IF NOT EXISTS \`${dbName}\``);
-    console.log(`✅ Ensured database '${dbName}' exists.`);
+    await tempPool.query(`CREATE DATABASE IF NOT EXISTS \`${targetDb}\``);
+    console.log(`✅ Ensured database '${targetDb}' exists.`);
   } catch (err) {
-    console.error(`⚠️ Could not automatically create database '${dbName}':`, err.message);
+    console.error(`⚠️ Could not automatically create database '${targetDb}' (may already exist or lack permission):`, err.message);
+    try {
+      // If we can't create it, check if we can at least USE it
+      await tempPool.query(`USE \`${targetDb}\``);
+      console.log(`✅ Can securely connect to database '${targetDb}' without creation.`);
+    } catch (useErr) {
+      console.error(`⚠️ Cannot use database '${targetDb}', falling back to 'test'...`);
+      targetDb = 'test';
+      await tempPool.query(`CREATE DATABASE IF NOT EXISTS \`test\``).catch(() => { });
+    }
   } finally {
     await tempPool.end();
   }
 
-  // 2. Create the actual pool bound to the specific database
+  // 2. Create the actual pool bound to the specific verified database
   const pool = mysql.default.createPool({
     ...baseConfig,
-    database: dbName
+    database: targetDb
   });
-  console.log(`🚀 TiDB Connection Pool Created for database: ${dbName}`);
+  console.log(`🚀 TiDB Connection Pool Created for database: ${targetDb}`);
 
   dbWrapper = {
     _pool: pool,
