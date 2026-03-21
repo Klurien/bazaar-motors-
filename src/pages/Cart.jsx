@@ -6,14 +6,21 @@ import './Cart.css';
 
 const Cart = () => {
     const { cart, removeFromCart, updateQuantity, cartTotal, cartCount } = useCart();
-    const [isLoaded, setIsLoaded] = useState(false);
+    const [whatsappNumber, setWhatsappNumber] = useState("254741740376");
 
     useEffect(() => {
         setIsLoaded(true);
+        const API = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : "http://localhost:5000");
+        fetch(`${API}/api/stats/config`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.whatsapp_number) setWhatsappNumber(data.whatsapp_number);
+            })
+            .catch(err => console.error("Config fetch fail", err));
     }, []);
 
     const handleWhatsAppCheckout = () => {
-        const sellerPhone = "254741740376";
+        const sellerPhone = whatsappNumber;
         let message = "Niaje boss! I'd like to place an order:%0A%0A";
         cart.forEach(item => {
             message += `- ${item.name} (Qty: ${item.quantity}) = KES ${(item.price * item.quantity).toLocaleString()}%0A`;
@@ -103,7 +110,7 @@ const Cart = () => {
                             Checkout via WhatsApp
                         </button>
                         <Link to="/checkout" className="btn btn-outline btn-full" style={{ marginTop: '10px', textAlign: 'center' }}>
-                            Alternative: Checkout via Card
+                            Express Delivery Checkout
                         </Link>
 
                         <div className="checkout-trust">
