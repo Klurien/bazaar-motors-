@@ -758,7 +758,7 @@ const AdminDashboard = () => {
                                                     <td className="p-4 font-bold text-[var(--accent-color)]">KES {parseFloat(order.total_amount).toLocaleString()}</td>
                                                     <td className="p-4">
                                                         <select
-                                                            className="status-dropdown bg-black/50 border border-white/20 rounded p-1 text-sm outline-none cursor-pointer focus:border-[var(--accent-color)]"
+                                                            className={`status-select ${order.status.toLowerCase()}`}
                                                             value={order.status}
                                                             onChange={(e) => handleUpdateOrderStatus(order.id, e.target.value)}
                                                         >

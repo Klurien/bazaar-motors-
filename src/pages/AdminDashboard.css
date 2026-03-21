@@ -2247,3 +2247,35 @@
 .stat-trend.negative {
     color: #ef4444;
 }
+/* ── Order Status Selects ───────────────────────────────────── */
+.status-select {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    border: 1px solid rgba(0,0,0,0.05);
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s;
+    background: #f1f5f9;
+}
+
+.status-select.processing {
+    background-color: #fff7ed !important;
+    color: #f97316 !important;
+}
+
+.status-select.shipped {
+    background-color: #eff6ff !important;
+    color: #3b82f6 !important;
+}
+
+.status-select.delivered {
+    background-color: #f0fdf4 !important;
+    color: #16a34a !important;
+}
+
+.status-select.cancelled {
+    background-color: #fef2f2 !important;
+    color: #dc2626 !important;
+}
