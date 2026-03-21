@@ -8,6 +8,7 @@ dotenv.config();
 const USE_TIDB = !!process.env.TIDB_HOST;
 
 let dbWrapper;
+let dbInitPromise;
 
 if (USE_TIDB) {
   // ═══════════════════════════════════════════════════════════════════════════
@@ -279,17 +280,19 @@ export const initDB = async () => {
   }
 };
 
+dbInitPromise = initDB().catch(console.error);
+
 export default {
   query: async (...args) => {
-    if (!dbWrapper) throw new Error("Database not initialized yet (query)");
+    await dbInitPromise;
     return dbWrapper.query(...args);
   },
   execute: async (...args) => {
-    if (!dbWrapper) throw new Error("Database not initialized yet (execute)");
+    await dbInitPromise;
     return dbWrapper.execute(...args);
   },
   getConnection: async () => {
-    if (!dbWrapper) throw new Error("Database not initialized yet (getConnection)");
+    await dbInitPromise;
     return dbWrapper.getConnection();
   }
 };
