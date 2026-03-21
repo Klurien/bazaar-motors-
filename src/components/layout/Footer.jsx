@@ -5,6 +5,18 @@ import { BRAND } from '../../brandConfig';
 import './Footer.css';
 
 const Footer = () => {
+    const [whatsappNumber, setWhatsappNumber] = React.useState(BRAND.phone);
+
+    React.useEffect(() => {
+        const API = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : "http://localhost:5000");
+        fetch(`${API}/api/stats/config`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.whatsapp_number) setWhatsappNumber(data.whatsapp_number);
+            })
+            .catch(err => console.error("Config fetch fail", err));
+    }, []);
+
     return (
         <footer className="footer">
             <div className="footer-top">
@@ -61,7 +73,7 @@ const Footer = () => {
                             </li>
                             <li>
                                 <Phone size={15} />
-                                <span>{BRAND.phone}</span>
+                                <span>{whatsappNumber}</span>
                             </li>
                             <li>
                                 <MapPin size={15} />
