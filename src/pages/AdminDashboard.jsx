@@ -584,6 +584,7 @@ const AdminDashboard = () => {
                     <Zap size={22} className="text-accent" />
                     <span>KitchenAdmin</span>
                 </div>
+                <div className="sidebar-mobile-label">DASHBOARD MENU</div>
                 <nav className="sidebar-nav">
                     <button
                         className={`sidebar-item ${activeTab === 'dashboard' ? 'active' : ''}`}
