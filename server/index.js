@@ -11,7 +11,6 @@ import cookieParser from 'cookie-parser';
 import authRoutes from './routes/auth.js';
 import productRoutes from './routes/products.js';
 import promotionRoutes from './routes/promotions.js';
-import checkoutRoutes from './routes/checkout.js';
 import ordersRoutes from './routes/orders.js';
 import sitemapRoutes from './routes/sitemap.js';
 import statsRoutes from './routes/stats.js';
@@ -68,7 +67,6 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/promotions', promotionRoutes);
-app.use('/api/checkout', checkoutRoutes);
 app.use('/api/orders', ordersRoutes);
 app.use('/api/stats', statsRoutes);
 app.use('/api', sitemapRoutes); // Mounts /api/sitemap.xml
