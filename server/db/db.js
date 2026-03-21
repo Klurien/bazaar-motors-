@@ -45,8 +45,10 @@ if (USE_TIDB) {
     ? process.env.TIDB_DATABASE
     : 'test'; // Default TiDB serverless database available to all users
 
+  const mysqlModule = mysql.default || mysql;
+
   // 1. Create a temporary connection without a database selected to ensure it exists
-  const tempPool = mysql.default.createPool(baseConfig);
+  const tempPool = mysqlModule.createPool(baseConfig);
   try {
     await tempPool.query(`CREATE DATABASE IF NOT EXISTS \`${targetDb}\``);
     console.log(`✅ Ensured database '${targetDb}' exists.`);
@@ -66,7 +68,7 @@ if (USE_TIDB) {
   }
 
   // 2. Create the actual pool bound to the specific verified database
-  const pool = mysql.default.createPool({
+  const pool = mysqlModule.createPool({
     ...baseConfig,
     database: targetDb
   });
@@ -291,4 +293,17 @@ export const initDB = async () => {
   }
 };
 
-export default dbWrapper;
+export default {
+  query: async (...args) => {
+    if (!dbWrapper) throw new Error("Database not initialized yet (query)");
+    return dbWrapper.query(...args);
+  },
+  execute: async (...args) => {
+    if (!dbWrapper) throw new Error("Database not initialized yet (execute)");
+    return dbWrapper.execute(...args);
+  },
+  getConnection: async () => {
+    if (!dbWrapper) throw new Error("Database not initialized yet (getConnection)");
+    return dbWrapper.getConnection();
+  }
+};
