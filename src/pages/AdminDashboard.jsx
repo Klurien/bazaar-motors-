@@ -63,7 +63,7 @@ const ImageUploadZone = ({ existingImages, onNewFiles, onDeleteExisting, onReord
     const fileInputRef = useRef();
 
     const processFiles = (files) => {
-        const valid = Array.from(files).filter(f => f.type.startsWith('image/'));
+        const valid = Array.from(files); // Allow any file structure uploaded by the seller (Vercel/Local will save them regardless)
         const previews = valid.map(f => ({ file: f, url: URL.createObjectURL(f) }));
         setNewPreviews(prev => [...prev, ...previews]);
         onNewFiles(prev => [...prev, ...valid]);
@@ -131,7 +131,6 @@ const ImageUploadZone = ({ existingImages, onNewFiles, onDeleteExisting, onReord
                 <input
                     ref={fileInputRef}
                     type="file"
-                    accept="image/*"
                     multiple
                     style={{ display: 'none' }}
                     onChange={e => processFiles(e.target.files)}

@@ -7,12 +7,13 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export const uploadFile = async (file) => {
+    const originalName = file.originalname || 'upload.bin';
     if (process.env.BLOB_READ_WRITE_TOKEN) {
-        const { url } = await put(Date.now() + '-' + file.originalname, file.buffer, { access: 'public' });
+        const { url } = await put(Date.now() + '-' + originalName, file.buffer, { access: 'public' });
         return url;
     } else {
         // Fallback for local development
-        const filename = Date.now() + '-' + file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_');
+        const filename = Date.now() + '-' + originalName.replace(/[^a-zA-Z0-9.-]/g, '_');
         const uploadPath = path.join(__dirname, '../../uploads', filename);
 
         // Ensure uploads directory exists
