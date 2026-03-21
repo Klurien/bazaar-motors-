@@ -41,37 +41,23 @@ if (USE_TIDB) {
     ssl: sslConfig
   };
 
-  let targetDb = process.env.TIDB_DATABASE && process.env.TIDB_DATABASE !== 'sys'
-    ? process.env.TIDB_DATABASE
-    : 'test'; // Default TiDB serverless database available to all users
-
   const mysqlModule = mysql.default || mysql;
+  const targetDb = process.env.TIDB_DATABASE || 'test';
 
-  // 1. Create a temporary connection without a database selected to ensure it exists
-  const tempPool = mysqlModule.createPool(baseConfig);
-  try {
-    await tempPool.query(`CREATE DATABASE IF NOT EXISTS \`${targetDb}\``);
-    console.log(`✅ Ensured database '${targetDb}' exists.`);
-  } catch (err) {
-    console.error(`⚠️ Could not automatically create database '${targetDb}' (may already exist or lack permission):`, err.message);
-    try {
-      // If we can't create it, check if we can at least USE it
-      await tempPool.query(`USE \`${targetDb}\``);
-      console.log(`✅ Can securely connect to database '${targetDb}' without creation.`);
-    } catch (useErr) {
-      console.error(`⚠️ Cannot use database '${targetDb}', falling back to 'test'...`);
-      targetDb = 'test';
-      await tempPool.query(`CREATE DATABASE IF NOT EXISTS \`test\``).catch(() => { });
-    }
-  } finally {
-    await tempPool.end();
-  }
+  const poolConfig = {
+    ...baseConfig,
+    database: targetDb,
+    waitForConnections: true,
+    connectionLimit: 10,
+    maxIdle: 10, // max idle connections, the default value is the same as `connectionLimit`
+    idleTimeout: 60000, // idle connections timeout, in milliseconds, the default value 60000
+    queueLimit: 0,
+    enableKeepAlive: true,
+    keepAliveInitialDelay: 0
+  };
 
   // 2. Create the actual pool bound to the specific verified database
-  const pool = mysqlModule.createPool({
-    ...baseConfig,
-    database: targetDb
-  });
+  const pool = mysqlModule.createPool(poolConfig);
   console.log(`🚀 TiDB Connection Pool Created for database: ${targetDb}`);
 
   dbWrapper = {
