@@ -21,6 +21,12 @@ export const uploadFile = async (file) => {
         }
     }
 
+    // Safety for Production: Never try to write to read-only disk on Vercel
+    if (process.env.VERCEL) {
+        console.error("CRITICAL: BLOB_READ_WRITE_TOKEN is missing in Production. Image upload skipped.");
+        return `https://placehold.co/600x400?text=Enable+Vercel+Blob+Storage`;
+    }
+
     // Local Development Fallback
     const filename = Date.now() + '-' + originalName.replace(/[^a-zA-Z0-9.-]/g, '_');
     const uploadDir = path.join(__dirname, '../../uploads');
