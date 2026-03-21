@@ -21,8 +21,10 @@ const Navbar = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    // Hide navbar on admin pages
-    if (location.pathname.startsWith('/admin')) {
+    // Hide navbar on admin pages ONLY ON DESKTOP to keep the dashboard focused
+    // On mobile, we keep it so the user can actually navigate out
+    const isDesktop = typeof window !== 'undefined' && window.innerWidth > 900;
+    if (location.pathname.startsWith('/admin') && isDesktop) {
         return null;
     }
 

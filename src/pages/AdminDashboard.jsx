@@ -602,6 +602,11 @@ const AdminDashboard = () => {
                         <Settings size={18} /> Settings
                     </button>
                 </nav>
+                <div className="sidebar-footer">
+                    <Link to="/" className="sidebar-store-link">
+                        <ArrowRight size={14} style={{ transform: 'rotate(180deg)' }} /> Return to Store
+                    </Link>
+                </div>
             </aside>
 
             <div className="admin-main">

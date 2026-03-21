@@ -187,13 +187,110 @@
     gap: 28px;
 }
 
+/* ── Mobile Overrides ───────────────────────────────────────── */
 @media (max-width: 900px) {
+    .admin-page {
+        flex-direction: column;
+        padding-top: 80px;
+        /* Space for Mobile Navbar */
+    }
+
     .admin-sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        background: white;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .sidebar-brand {
+        color: #0f172a;
+        border-bottom: 1px solid #f1f5f9;
+        padding: 16px 20px;
+    }
+
+    .sidebar-nav {
+        flex-direction: row;
+        overflow-x: auto;
+        padding: 12px;
+        gap: 8px;
+        scrollbar-width: none;
+    }
+
+    .sidebar-nav::-webkit-scrollbar {
         display: none;
     }
 
+    .sidebar-item {
+        width: auto;
+        white-space: nowrap;
+        background: #f1f5f9;
+        color: #64748b;
+        padding: 8px 16px;
+    }
+
+    .sidebar-item.active {
+        background: var(--accent-color);
+        color: black;
+    }
+
+    .sidebar-footer {
+        display: none;
+        /* Hide in mobile since we have Navbar */
+    }
+
     .admin-main {
-        padding: 20px;
+        padding: 16px;
+    }
+
+    .admin-topbar h1 {
+        font-size: 22px;
+    }
+
+    .stat-cards {
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    .stat-card {
+        padding: 14px;
+        gap: 10px;
+    }
+
+    .stat-val {
+        font-size: 18px;
+    }
+
+    .admin-content-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-items-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .admin-topbar {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .topbar-actions {
+        width: 100%;
+        gap: 8px;
+        flex-direction: column;
+    }
+
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .admin-user-pill {
+        width: 100%;
+        display: none;
+        /* Already in Navbar */
     }
 }
 
