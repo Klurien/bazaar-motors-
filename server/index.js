@@ -37,7 +37,7 @@ app.use(async (req, res, next) => {
 // Visitor Tracker
 app.use(async (req, res, next) => {
     // Basic rate limiting for visitor increment (once per session/cookie)
-    if (!req.cookies.has_visited && !req.path.startsWith('/api') && !req.path.includes('.')) {
+    if (!req.cookies?.has_visited && !req.path.startsWith('/api') && !req.path.includes('.')) {
         try {
             await db.execute('UPDATE site_stats SET stat_value = stat_value + 1 WHERE stat_name = "visitors"');
             res.cookie('has_visited', 'true', { maxAge: 24 * 60 * 60 * 1000, httpOnly: true });
