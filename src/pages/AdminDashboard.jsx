@@ -4,10 +4,12 @@ import {
     Save, BarChart2, ShoppingBag, Users, Star, Search, Check, AlertCircle,
     Image as ImageIcon, GripVertical, Eye, Zap, TrendingUp, Calendar, ArrowRight
 } from 'lucide-react';
+import { AreaChart, Area, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 import './AdminDashboard.css';
 
+const COLORS = ['#FF7A00', '#00C49F', '#FFBB28', '#FF8042', '#0088FE'];
 const API = (import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : (import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : "http://localhost:5000"))));
 const CATEGORIES = ['Cookware', 'Gadgets', 'Dining', 'Storage', 'Baking', 'Appliances', 'Other'];
 
@@ -393,6 +395,8 @@ const AdminDashboard = () => {
     const [stats, setStats] = useState({ totalRevenue: 0, activeOrders: 0, visitors: 0, inventoryCount: 0 });
     const [chartData, setChartData] = useState([]);
     const [topCategories, setTopCategories] = useState([]);
+    const [customers, setCustomers] = useState([]);
+    const [recentActivity, setRecentActivity] = useState([]);
 
     const showToast = (msg, type = 'success') => {
         setToast({ msg, type });
@@ -405,13 +409,15 @@ const AdminDashboard = () => {
             const tokenOverride = localStorage.getItem('token') || token;
             const headers = tokenOverride ? { Authorization: `Bearer ${tokenOverride}` } : {};
 
-            const [pRes, promRes, ordRes, sRes, cRes, tcRes] = await Promise.all([
+            const [pRes, promRes, ordRes, sRes, cRes, tcRes, custRes, actRes] = await Promise.all([
                 fetch(`${API}/api/products`),
                 fetch(`${API}/api/promotions`),
                 fetch(`${API}/api/orders/all`, { headers }),
                 fetch(`${API}/api/stats/dashboard`, { headers }),
                 fetch(`${API}/api/stats/sales-chart`, { headers }),
-                fetch(`${API}/api/stats/top-categories`, { headers })
+                fetch(`${API}/api/stats/top-categories`, { headers }),
+                fetch(`${API}/api/stats/customers`, { headers }),
+                fetch(`${API}/api/stats/recent-activity`, { headers })
             ]);
 
             const pData = await pRes.json();
@@ -419,6 +425,12 @@ const AdminDashboard = () => {
             const sData = await sRes.json();
             const cData = await cRes.json();
             const tcData = await tcRes.json();
+
+            let custData = [];
+            if (custRes.ok) custData = await custRes.json();
+
+            let actData = [];
+            if (actRes.ok) actData = await actRes.json();
 
             let ordData = [];
             if (ordRes.ok) {
@@ -431,6 +443,8 @@ const AdminDashboard = () => {
             setStats(sData);
             setChartData(Array.isArray(cData) ? cData : []);
             setTopCategories(Array.isArray(tcData) ? tcData : []);
+            setCustomers(Array.isArray(custData) ? custData : []);
+            setRecentActivity(Array.isArray(actData) ? actData : []);
         } catch (err) {
             console.error('Failed dashboard data load:', err);
         } finally {
@@ -746,28 +760,29 @@ const AdminDashboard = () => {
                 {activeTab === 'dashboard' && (
                     <div className="dashboard-overview-grid">
                         <div className="overview-main">
-                            <div className="chart-placeholder glass">
+                            <div className="chart-placeholder glass" style={{ paddingTop: '24px' }}>
                                 <div className="chart-header">
-                                    <h3>Sales Performance</h3>
+                                    <h3>Sales Velocity</h3>
                                     <div className="chart-legend">
-                                        <span className="legend-item"><span className="dot revenue"></span> Revenue</span>
-                                        <span className="legend-item"><span className="dot target"></span> Target</span>
+                                        <span className="legend-item"><span className="dot revenue"></span> Live Revenue (7d)</span>
                                     </div>
                                 </div>
-                                <div className="mock-chart">
+                                <div style={{ width: '100%', height: 320, marginTop: '20px' }}>
                                     {chartData.length > 0 ? (
-                                        chartData.map((d, i) => {
-                                            const maxAmount = Math.max(...chartData.map(cd => cd.amount), 1);
-                                            const height = (d.amount / maxAmount) * 100;
-                                            return (
-                                                <div key={i} className="chart-bar-wrap">
-                                                    <div className="chart-bar" style={{ height: `${height}%`, animationDelay: `${i * 0.1}s` }}>
-                                                        <div className="bar-tooltip">KES {parseFloat(d.amount).toLocaleString()}</div>
-                                                    </div>
-                                                    <span className="bar-label">{new Date(d.date).toLocaleDateString([], { weekday: 'short' })}</span>
-                                                </div>
-                                            );
-                                        })
+                                        <ResponsiveContainer>
+                                            <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                                <defs>
+                                                    <linearGradient id="colorAmount" x1="0" y1="0" x2="0" y2="1">
+                                                        <stop offset="5%" stopColor="var(--accent-color)" stopOpacity={0.8} />
+                                                        <stop offset="95%" stopColor="var(--accent-color)" stopOpacity={0.05} />
+                                                    </linearGradient>
+                                                </defs>
+                                                <XAxis dataKey="date" stroke="rgba(255,255,255,0.3)" tick={{ fontSize: 12 }} tickFormatter={val => new Date(val).toLocaleDateString([], { weekday: 'short' })} />
+                                                <YAxis stroke="rgba(255,255,255,0.3)" tick={{ fontSize: 12 }} tickFormatter={val => `KES ${val.toLocaleString()}`} />
+                                                <RechartsTooltip contentStyle={{ backgroundColor: '#1C1F24', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }} formatter={(val) => [`KES ${parseFloat(val).toLocaleString()}`, 'Revenue']} labelFormatter={val => new Date(val).toDateString()} />
+                                                <Area type="monotone" dataKey="amount" stroke="var(--accent-color)" strokeWidth={3} fillOpacity={1} fill="url(#colorAmount)" />
+                                            </AreaChart>
+                                        </ResponsiveContainer>
                                     ) : (
                                         <div className="no-data-msg">Waiting for first sales...</div>
                                     )}
@@ -776,26 +791,34 @@ const AdminDashboard = () => {
                             <div className="dashboard-grid-2">
                                 <div className="overview-card glass">
                                     <h4>Top Categories</h4>
-                                    <div className="mini-list">
-                                        {topCategories.map((cat, i) => (
-                                            <div key={i} className="mini-item">
-                                                <span>{cat.category || 'Uncategorized'}</span>
-                                                <span>KES {parseFloat(cat.total_sales).toLocaleString()}</span>
-                                            </div>
-                                        ))}
-                                        {topCategories.length === 0 && <p className="opacity-50 text-sm">No sales data yet</p>}
-                                    </div>
+                                    {topCategories.length > 0 ? (
+                                        <div style={{ width: '100%', height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                            <ResponsiveContainer>
+                                                <PieChart>
+                                                    <Pie data={topCategories} dataKey="total_sales" nameKey="category" cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={5}>
+                                                        {topCategories.map((entry, index) => (
+                                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                                        ))}
+                                                    </Pie>
+                                                    <RechartsTooltip contentStyle={{ backgroundColor: '#1C1F24', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }} formatter={(val) => [`KES ${parseFloat(val).toLocaleString()}`, 'Sales']} />
+                                                </PieChart>
+                                            </ResponsiveContainer>
+                                        </div>
+                                    ) : (
+                                        <p className="opacity-50 text-sm">No categorical data yet</p>
+                                    )}
                                 </div>
                                 <div className="overview-card glass">
                                     <h4>Stock Alerts</h4>
-                                    <div className="mini-list">
-                                        {products.filter(p => p.stock < 5 && p.stock !== null).slice(0, 3).map(p => (
+                                    <div className="mini-list" style={{ marginTop: '20px' }}>
+                                        {products.filter(p => p.stock < 10 && p.stock !== null).slice(0, 4).map(p => (
                                             <div key={p.id} className="mini-item warning">
-                                                <span>{p.name}</span> <span>{p.stock} left</span>
+                                                <AlertCircle size={16} className="text-orange-500" />
+                                                <span>{p.name}</span> <span className="text-orange-400 font-bold">{p.stock} left</span>
                                             </div>
                                         ))}
-                                        {products.filter(p => p.stock < 5 && p.stock !== null).length === 0 && (
-                                            <p className="all-good">All stock levels healthy</p>
+                                        {products.filter(p => p.stock < 10 && p.stock !== null).length === 0 && (
+                                            <p className="all-good"><Check size={16} /> All stock levels healthy</p>
                                         )}
                                     </div>
                                 </div>
@@ -803,29 +826,21 @@ const AdminDashboard = () => {
                         </div>
 
                         <div className="overview-sidebar">
-                            <div className="activity-panel glass">
-                                <h3>Recent Activity</h3>
+                            <div className="activity-panel glass h-full">
+                                <h3>Live Data Feed</h3>
                                 <div className="activity-list">
-                                    {orders.slice(0, 5).map(order => (
-                                        <div key={order.id} className="activity-item">
+                                    {recentActivity.map((act, i) => (
+                                        <div key={i} className="activity-item">
                                             <div className="activity-icon blue"><ShoppingBag size={14} /></div>
                                             <div className="activity-info">
-                                                <p>Order #{order.id} placed by {order.username || 'Guest'}</p>
-                                                <span>{new Date(order.created_at).toLocaleTimeString()}</span>
+                                                <p>Order #{act.id} by <strong>{act.username || 'Guest'}</strong></p>
+                                                <span className="text-xs text-[var(--accent-color)]">KES {parseFloat(act.total_amount).toLocaleString()} • {act.status}</span>
+                                                <span className="block mt-1">{new Date(act.created_at).toLocaleString()}</span>
                                             </div>
                                         </div>
                                     ))}
-                                    {products.slice(0, 2).map(p => (
-                                        <div key={p.id} className="activity-item">
-                                            <div className="activity-icon green"><Package size={14} /></div>
-                                            <div className="activity-info">
-                                                <p>New product "{p.name}" added</p>
-                                                <span>{new Date(p.created_at).toLocaleDateString()}</span>
-                                            </div>
-                                        </div>
-                                    ))}
-                                    {orders.length === 0 && products.length === 0 && (
-                                        <p className="opacity-50 text-sm p-4">No recent activity detected</p>
+                                    {recentActivity.length === 0 && (
+                                        <p className="opacity-50 text-sm p-4">Awaiting network activity...</p>
                                     )}
                                 </div>
                             </div>
@@ -834,11 +849,45 @@ const AdminDashboard = () => {
                 )}
 
                 {activeTab === 'customers' && (
-                    <div className="placeholder-screen glass">
-                        <Users size={48} className="text-accent" />
-                        <h2>Customer Registry</h2>
-                        <p>Database of Culinary enthusiasts.</p>
-                        <button className="btn btn-primary" style={{ marginTop: '20px' }}>View Full Directory</button>
+                    <div className="admin-items-grid" style={{ gridTemplateColumns: '1fr' }}>
+                        {customers.length === 0 ? (
+                            <div className="placeholder-screen glass">
+                                <Users size={48} className="text-accent" />
+                                <h2>Customer Registry Empty</h2>
+                                <p>No registered users found in the database yet.</p>
+                            </div>
+                        ) : (
+                            <div className="admin-table-container glass" style={{ borderRadius: '12px', overflow: 'hidden' }}>
+                                <table className="admin-table w-full text-left border-collapse">
+                                    <thead>
+                                        <tr className="border-b border-white/10 bg-black/20">
+                                            <th className="p-4 rounded-tl-xl text-sm font-semibold uppercase tracking-wider">User ID</th>
+                                            <th className="p-4 text-sm font-semibold uppercase tracking-wider">Username</th>
+                                            <th className="p-4 text-sm font-semibold uppercase tracking-wider">Role</th>
+                                            <th className="p-4 text-sm font-semibold uppercase tracking-wider">Total Orders</th>
+                                            <th className="p-4 text-sm font-semibold uppercase tracking-wider">Lifetime Value</th>
+                                            <th className="p-4 rounded-tr-xl text-sm font-semibold uppercase tracking-wider">Joined</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {customers.map(c => (
+                                            <tr key={c.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                                                <td className="p-4 font-bold text-white/50">#{c.id}</td>
+                                                <td className="p-4 font-semibold text-white">{c.username}</td>
+                                                <td className="p-4">
+                                                    <span className={`px-2 py-1 rounded-full text-xs font-bold ${c.role === 'admin' ? 'bg-orange-500/20 text-orange-400' : 'bg-blue-500/20 text-blue-400'}`}>
+                                                        {c.role.toUpperCase()}
+                                                    </span>
+                                                </td>
+                                                <td className="p-4">{c.total_orders} orders</td>
+                                                <td className="p-4 font-bold text-[var(--accent-color)]">KES {parseFloat(c.total_spent).toLocaleString()}</td>
+                                                <td className="p-4 text-sm opacity-80">{new Date(c.created_at).toLocaleDateString()}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
                     </div>
                 )}
             </div>
