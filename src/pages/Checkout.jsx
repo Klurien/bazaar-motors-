@@ -23,6 +23,16 @@ const Checkout = () => {
 
     const [errors, setErrors] = useState({});
     const [isProcessing, setIsProcessing] = useState(false);
+    const [whatsappNumber, setWhatsappNumber] = useState(BRAND.whatsapp);
+
+    React.useEffect(() => {
+        fetch(`${API}/api/stats/config`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.whatsapp_number) setWhatsappNumber(data.whatsapp_number);
+            })
+            .catch(err => console.error("Config fetch fail", err));
+    }, []);
 
     // KES Pricing logic
     const shippingCost = cartTotal > 10000 ? 0 : 300; // Flat Boda Boda rate
@@ -64,7 +74,7 @@ const Checkout = () => {
             console.error('Failed to create order in database', err);
         }
 
-        const phoneNumber = BRAND.whatsapp; // Target seller phone number
+        const phoneNumber = whatsappNumber; // Target seller phone number from DB config
 
         // Generate Kenyan "Hustle flow" text message
         let text = `Niaje! I want to order:\n`;

@@ -224,6 +224,12 @@ export const initDB = async () => {
             stat_name VARCHAR(100) UNIQUE NOT NULL,
             stat_value INT DEFAULT 0,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )`,
+    `CREATE TABLE IF NOT EXISTS site_config (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            config_name VARCHAR(100) UNIQUE NOT NULL,
+            config_value TEXT,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )`
   ];
 
@@ -248,6 +254,12 @@ export const initDB = async () => {
         const [statExists] = await conn.query('SELECT * FROM site_stats WHERE stat_name = ?', ['visitors']);
         if (statExists.length === 0) {
           await conn.execute('INSERT INTO site_stats (stat_name, stat_value) VALUES (?, ?)', ['visitors', 0]);
+        }
+
+        // Ensure whatsapp_number exists in config
+        const [configExists] = await conn.query('SELECT * FROM site_config WHERE config_name = ?', ['whatsapp_number']);
+        if (configExists.length === 0) {
+          await conn.execute('INSERT INTO site_config (config_name, config_value) VALUES (?, ?)', ['whatsapp_number', '254741740376']);
         }
 
         console.log('✅ Hailey admin and site stats initialized.');

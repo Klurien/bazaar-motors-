@@ -137,3 +137,28 @@ export const getRecentActivity = async (req, res) => {
         res.status(500).json({ message: 'Error fetching recent activity' });
     }
 };
+
+export const getSiteConfig = async (req, res) => {
+    try {
+        const [config] = await db.query('SELECT config_name, config_value FROM site_config');
+        const configMap = config.reduce((acc, curr) => {
+            acc[curr.config_name] = curr.config_value;
+            return acc;
+        }, {});
+        res.json(configMap);
+    } catch (error) {
+        res.status(500).json({ message: 'Failed to fetch config' });
+    }
+};
+
+export const updateSiteConfig = async (req, res) => {
+    try {
+        const { whatsapp_number } = req.body;
+        if (whatsapp_number) {
+            await db.execute('UPDATE site_config SET config_value = ? WHERE config_name = ?', [whatsapp_number, 'whatsapp_number']);
+        }
+        res.json({ message: 'Configuration updated' });
+    } catch (error) {
+        res.status(500).json({ message: 'Failed to update config' });
+    }
+};

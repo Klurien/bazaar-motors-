@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
     Plus, Edit2, Trash2, Package, Upload, X, ChevronLeft, ChevronRight,
     Save, BarChart2, ShoppingBag, Users, Star, Search, Check, AlertCircle,
-    Image as ImageIcon, GripVertical, Eye, Zap, TrendingUp, Calendar, ArrowRight
+    Image as ImageIcon, GripVertical, Eye, Zap, TrendingUp, Calendar, ArrowRight, Settings
 } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { useAuth } from '../context/AuthContext';
@@ -396,6 +396,8 @@ const AdminDashboard = () => {
     const [topCategories, setTopCategories] = useState([]);
     const [customers, setCustomers] = useState([]);
     const [recentActivity, setRecentActivity] = useState([]);
+    const [siteConfig, setSiteConfig] = useState({ whatsapp_number: '' });
+    const [savingConfig, setSavingConfig] = useState(false);
 
     const showToast = (msg, type = 'success') => {
         setToast({ msg, type });
@@ -408,7 +410,7 @@ const AdminDashboard = () => {
             const tokenOverride = localStorage.getItem('token') || token;
             const headers = tokenOverride ? { Authorization: `Bearer ${tokenOverride}` } : {};
 
-            const [pRes, promRes, ordRes, sRes, cRes, tcRes, custRes, actRes] = await Promise.all([
+            const [pRes, promRes, ordRes, sRes, cRes, tcRes, custRes, actRes, confRes] = await Promise.all([
                 fetch(`${API}/api/products`),
                 fetch(`${API}/api/promotions`),
                 fetch(`${API}/api/orders/all`, { headers }),
@@ -416,7 +418,8 @@ const AdminDashboard = () => {
                 fetch(`${API}/api/stats/sales-chart`, { headers }),
                 fetch(`${API}/api/stats/top-categories`, { headers }),
                 fetch(`${API}/api/stats/customers`, { headers }),
-                fetch(`${API}/api/stats/recent-activity`, { headers })
+                fetch(`${API}/api/stats/recent-activity`, { headers }),
+                fetch(`${API}/api/stats/config`)
             ]);
 
             const pData = pRes.ok ? await pRes.json() : [];
@@ -424,6 +427,7 @@ const AdminDashboard = () => {
             const sData = sRes.ok ? await sRes.json() : { totalRevenue: 0, activeOrders: 0, visitors: 0, inventoryCount: 0 };
             const cData = cRes.ok ? await cRes.json() : [];
             const tcData = tcRes.ok ? await tcRes.json() : [];
+            const confData = confRes.ok ? await confRes.json() : { whatsapp_number: '' };
 
             let custData = [];
             if (custRes.ok) custData = await custRes.json();
@@ -444,6 +448,7 @@ const AdminDashboard = () => {
             setTopCategories(Array.isArray(tcData) ? tcData : []);
             setCustomers(Array.isArray(custData) ? custData : []);
             setRecentActivity(Array.isArray(actData) ? actData : []);
+            setSiteConfig(confData);
         } catch (err) {
             console.error('Failed dashboard data load:', err);
         } finally {
@@ -533,6 +538,29 @@ const AdminDashboard = () => {
         }
     };
 
+    const handleUpdateConfig = async (e) => {
+        e.preventDefault();
+        setSavingConfig(true);
+        try {
+            const tokenOverride = localStorage.getItem('token') || token;
+            const res = await fetch(`${API}/api/stats/config`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${tokenOverride}`
+                },
+                body: JSON.stringify(siteConfig)
+            });
+            if (res.ok) {
+                showToast('Settings updated successfully!');
+            }
+        } catch {
+            showToast('Failed to update settings', 'error');
+        } finally {
+            setSavingConfig(false);
+        }
+    };
+
     if (!user || user.role !== 'admin') {
         return (
             <div className="admin-access-denied container">
@@ -569,6 +597,9 @@ const AdminDashboard = () => {
                     </button>
                     <button className={`sidebar-item ${activeTab === 'customers' ? 'active' : ''}`} onClick={() => setActiveTab('customers')}>
                         <Users size={18} /> Customers
+                    </button>
+                    <button className={`sidebar-item ${activeTab === 'settings' ? 'active' : ''}`} onClick={() => setActiveTab('settings')}>
+                        <Settings size={18} /> Settings
                     </button>
                 </nav>
             </aside>
@@ -887,6 +918,50 @@ const AdminDashboard = () => {
                                 </table>
                             </div>
                         )}
+                    </div>
+                )}
+                {activeTab === 'settings' && (
+                    <div className="admin-items-grid" style={{ gridTemplateColumns: 'minmax(0, 600px)' }}>
+                        <div className="admin-form-panel glass p-8" style={{ borderRadius: '16px' }}>
+                            <div className="flex items-center gap-3 mb-6">
+                                <div className="p-3 rounded-xl bg-[var(--accent-color)] text-black">
+                                    <Settings size={28} />
+                                </div>
+                                <div>
+                                    <h2 className="text-2xl font-bold text-white mb-1">Store Configuration</h2>
+                                    <p className="opacity-60 text-sm">Update your store's global contact settings.</p>
+                                </div>
+                            </div>
+
+                            <form onSubmit={handleUpdateConfig} className="space-y-6">
+                                <div className="form-group-full">
+                                    <label className="text-sm font-semibold text-white/80 block mb-2 uppercase tracking-widest">WhatsApp Checkout Number</label>
+                                    <p className="text-xs opacity-50 mb-3 italic">Format: 254XXXXXXXXX (No + sign). Used for redirected checkout messages.</p>
+                                    <input
+                                        type="text"
+                                        placeholder="e.g. 254741740376"
+                                        className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white focus:border-[var(--accent-color)] outline-none transition-all text-lg font-mono"
+                                        value={siteConfig.whatsapp_number}
+                                        onChange={e => setSiteConfig({ ...siteConfig, whatsapp_number: e.target.value })}
+                                    />
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    disabled={savingConfig}
+                                    className="w-full bg-[var(--accent-color)] text-black font-bold py-4 rounded-xl hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-[var(--accent-color)]/20 flex items-center justify-center gap-2"
+                                >
+                                    <Save size={20} />
+                                    {savingConfig ? 'Saving Changes...' : 'Save Global Settings'}
+                                </button>
+                            </form>
+
+                            <div className="mt-8 p-4 bg-white/5 border-l-4 border-yellow-500/50 rounded-r-xl">
+                                <p className="text-sm text-yellow-200/80">
+                                    <strong>Note:</strong> Changes to the phone number take effect immediately for all new customers clicking the <i>WhatsApp Checkout</i> button.
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 )}
             </div>
