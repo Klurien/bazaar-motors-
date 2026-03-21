@@ -255,8 +255,8 @@ const Home = () => {
 
             <section className="experience-section">
                 <div className="container experience-grid">
-                    <div className="experience-box glass h-full">
-                        <span className="badge">The Experience</span>
+                    <div className="experience-box h-full">
+                        <span className="badge experience-badge">The Experience</span>
                         <h2>Unboxing Excellence</h2>
                         <p>Every finding comes with a personalized care guide and an artisan authenticity certificate.</p>
                         <ul className="premium-list">
@@ -267,9 +267,9 @@ const Home = () => {
                     </div>
                     <div className="experience-visual">
                         <div className="floating-elements">
-                            <div className="float f1 glass">Gadgets</div>
-                            <div className="float f2 glass">Dining</div>
-                            <div className="float f3 glass">Copper</div>
+                            <img src={`${API}/uploads/chef-knife.png`} alt="Chef Knife" className="float-img f1" />
+                            <img src={`${API}/uploads/cast-iron-skillet.png`} alt="Cast Iron Skillet" className="float-img f2" />
+                            <img src={`${API}/uploads/copper-pan.png`} alt="Copper Pan" className="float-img f3" />
                         </div>
                     </div>
                 </div>

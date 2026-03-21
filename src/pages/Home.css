@@ -380,10 +380,32 @@
     }
 }
 
+.experience-box {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 60px 50px;
+    border-radius: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.02);
+}
+
+.experience-badge {
+    align-self: flex-start;
+    margin-bottom: 10px;
+}
+
 .experience-box h2 {
     color: white;
     font-size: 48px;
-    margin: 20px 0;
+    margin: 10px 0 20px;
+}
+
+.experience-box p {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 18px;
+    line-height: 1.6;
 }
 
 .badge {
@@ -407,11 +429,12 @@
     gap: 12px;
     font-weight: 600;
     font-size: 17px;
+    color: rgba(255, 255, 255, 0.9);
 }
 
 .experience-visual {
     position: relative;
-    height: 400px;
+    height: 480px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -423,45 +446,70 @@
     height: 100%;
 }
 
-@keyframes floatAnim {
+@keyframes floatAnimImg1 {
 
     0%,
     100% {
-        transform: translateY(0) rotate(0);
+        transform: translateY(0) rotate(-15deg);
     }
 
     50% {
-        transform: translateY(-30px) rotate(5deg);
+        transform: translateY(-20px) rotate(-10deg);
     }
 }
 
-.float {
+@keyframes floatAnimImg2 {
+
+    0%,
+    100% {
+        transform: translateY(0) rotate(15deg);
+    }
+
+    50% {
+        transform: translateY(-25px) rotate(20deg);
+    }
+}
+
+@keyframes floatAnimImg3 {
+
+    0%,
+    100% {
+        transform: translateY(0) rotate(0deg);
+    }
+
+    50% {
+        transform: translateY(-15px) rotate(-5deg);
+    }
+}
+
+.float-img {
     position: absolute;
-    padding: 15px 30px;
-    border-radius: 40px;
-    font-weight: 800;
-    font-size: 18px;
-    animation: floatAnim 6s ease-in-out infinite;
+    filter: drop-shadow(0 30px 40px rgba(0, 0, 0, 0.6));
+    object-fit: contain;
+    transition: transform 0.3s ease;
 }
 
-.float.f1 {
-    top: 10%;
-    left: 10%;
-    animation-delay: 0s;
+.float-img.f1 {
+    width: 280px;
+    top: 5%;
+    left: 0%;
+    animation: floatAnimImg1 7s ease-in-out infinite;
 }
 
-.float.f2 {
+.float-img.f2 {
+    width: 240px;
     top: 40%;
-    right: 10%;
+    right: 0%;
+    animation: floatAnimImg2 6s ease-in-out infinite;
     animation-delay: 1s;
 }
 
-.float.f3 {
-    bottom: 10%;
-    left: 20%;
+.float-img.f3 {
+    width: 300px;
+    bottom: 5%;
+    left: 10%;
+    animation: floatAnimImg3 8s ease-in-out infinite;
     animation-delay: 2s;
-    background: var(--accent-color);
-    border: none;
 }
 
 /* ── Newsletter Editorial ─────────────────────────────────── */
@@ -521,6 +569,7 @@
     border-color: var(--accent-color);
     box-shadow: var(--shadow-accent);
 }
+
 /* ── Flash Sales Carousel ─────────────────────────────────── */
 .flash-sales-section {
     padding: 80px 0;
@@ -552,7 +601,7 @@
     border-radius: var(--border-radius-lg);
     background: white;
     box-shadow: var(--shadow-lg);
-    border: 1px solid rgba(0,0,0,0.03);
+    border: 1px solid rgba(0, 0, 0, 0.03);
     position: relative;
     z-index: 2;
 }
@@ -598,7 +647,7 @@
     height: 100%;
     width: 100%;
     object-fit: contain;
-    filter: drop-shadow(0 20px 40px rgba(0,0,0,0.1));
+    filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.1));
 }
 
 .flash-nav {
@@ -642,10 +691,12 @@
         text-align: center;
         padding: 40px;
     }
+
     .flash-visual {
         height: 250px;
         order: -1;
     }
+
     .flash-info h2 {
         font-size: 36px;
     }
