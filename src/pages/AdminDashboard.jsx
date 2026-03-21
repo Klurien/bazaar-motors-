@@ -453,24 +453,6 @@ const AdminDashboard = () => {
 
     useEffect(() => { fetchData(); }, [fetchData]);
 
-    const handleResetCatalog = async () => {
-        if (!window.confirm("CRITICAL: This will permanently delete ALL products and images. Proceed?")) return;
-        try {
-            const tokenOverride = localStorage.getItem('token') || token;
-            const res = await fetch(`${API}/api/products/reset`, {
-                method: 'DELETE',
-                headers: { Authorization: `Bearer ${tokenOverride}` }
-            });
-            if (res.ok) {
-                setProducts([]);
-                showToast("Catalog reset successfully");
-                fetchData();
-            }
-        } catch (err) {
-            showToast("Reset failed", "error");
-        }
-    };
-
     const handleProductSaved = (saved) => {
         setProducts(prev => {
             const exists = prev.find(p => p.id === saved.id);
