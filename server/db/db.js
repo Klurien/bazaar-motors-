@@ -43,7 +43,10 @@ if (USE_TIDB) {
   };
 
   const mysqlModule = mysql.default || mysql;
-  const targetDb = process.env.TIDB_DATABASE || 'test';
+  // IMPORTANT: On TiDB Serverless, 'sys' is restricted. We MUST default to 'test' if no database is specified.
+  const targetDb = (process.env.TIDB_DATABASE && process.env.TIDB_DATABASE !== 'sys')
+    ? process.env.TIDB_DATABASE
+    : 'test';
 
   const poolConfig = {
     ...baseConfig,
