@@ -419,11 +419,11 @@ const AdminDashboard = () => {
                 fetch(`${API}/api/stats/recent-activity`, { headers })
             ]);
 
-            const pData = await pRes.json();
-            const promData = await promRes.json();
-            const sData = await sRes.json();
-            const cData = await cRes.json();
-            const tcData = await tcRes.json();
+            const pData = pRes.ok ? await pRes.json() : [];
+            const promData = promRes.ok ? await promRes.json() : [];
+            const sData = sRes.ok ? await sRes.json() : { totalRevenue: 0, activeOrders: 0, visitors: 0, inventoryCount: 0 };
+            const cData = cRes.ok ? await cRes.json() : [];
+            const tcData = tcRes.ok ? await tcRes.json() : [];
 
             let custData = [];
             if (custRes.ok) custData = await custRes.json();
@@ -452,6 +452,24 @@ const AdminDashboard = () => {
     }, [token]);
 
     useEffect(() => { fetchData(); }, [fetchData]);
+
+    const handleResetCatalog = async () => {
+        if (!window.confirm("CRITICAL: This will permanently delete ALL products and images. Proceed?")) return;
+        try {
+            const tokenOverride = localStorage.getItem('token') || token;
+            const res = await fetch(`${API}/api/products/reset`, {
+                method: 'DELETE',
+                headers: { Authorization: `Bearer ${tokenOverride}` }
+            });
+            if (res.ok) {
+                setProducts([]);
+                showToast("Catalog reset successfully");
+                fetchData();
+            }
+        } catch (err) {
+            showToast("Reset failed", "error");
+        }
+    };
 
     const handleProductSaved = (saved) => {
         setProducts(prev => {
