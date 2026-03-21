@@ -267,9 +267,15 @@ const Home = () => {
                     </div>
                     <div className="experience-visual">
                         <div className="floating-elements">
-                            <img src={`${API}/uploads/chef-knife.png`} alt="Chef Knife" className="float-img f1" />
-                            <img src={`${API}/uploads/cast-iron-skillet.png`} alt="Cast Iron Skillet" className="float-img f2" />
-                            <img src={`${API}/uploads/copper-pan.png`} alt="Copper Pan" className="float-img f3" />
+                            <div className="float-img f1">
+                                <img src="/images/chef-knife.png" alt="Chef Knife" />
+                            </div>
+                            <div className="float-img f2">
+                                <img src="/images/cast-iron-skillet.png" alt="Cast Iron Skillet" />
+                            </div>
+                            <div className="float-img f3">
+                                <img src="/images/copper-pan.png" alt="Copper Pan" />
+                            </div>
                         </div>
                     </div>
                 </div>
