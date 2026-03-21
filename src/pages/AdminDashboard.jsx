@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
     Plus, Edit2, Trash2, Package, Upload, X, ChevronLeft, ChevronRight,
     Save, BarChart2, ShoppingBag, Users, Star, Search, Check, AlertCircle,
-    Image as ImageIcon, GripVertical, Eye, Zap, TrendingUp, Calendar, ArrowRight, Settings
+    Image as ImageIcon, GripVertical, Eye, Zap, TrendingUp, Calendar, ArrowRight, Settings, Menu
 } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { useAuth } from '../context/AuthContext';
@@ -379,6 +379,7 @@ const AdminDashboard = () => {
     const token = user?.token;
 
     const [activeTab, setActiveTab] = useState('products');
+    const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
     const [products, setProducts] = useState([]);
     const [promotions, setPromotions] = useState([]);
     const [orders, setOrders] = useState([]);
@@ -577,28 +578,47 @@ const AdminDashboard = () => {
         <div className="admin-page">
             {toast && <div className={`toast ${toast.type}`}>{toast.msg}</div>}
 
-            <aside className="admin-sidebar">
+            <aside className={`admin-sidebar ${mobileSidebarOpen ? 'open' : ''}`}>
+                <button className="mobile-sidebar-close" onClick={() => setMobileSidebarOpen(false)}><X size={24} /></button>
                 <div className="sidebar-brand">
                     <Zap size={22} className="text-accent" />
                     <span>KitchenAdmin</span>
                 </div>
                 <nav className="sidebar-nav">
-                    <button className={`sidebar-item ${activeTab === 'dashboard' ? 'active' : ''}`} onClick={() => setActiveTab('dashboard')}>
+                    <button
+                        className={`sidebar-item ${activeTab === 'dashboard' ? 'active' : ''}`}
+                        onClick={() => { setActiveTab('dashboard'); setMobileSidebarOpen(false); }}
+                    >
                         <TrendingUp size={18} /> Overview
                     </button>
-                    <button className={`sidebar-item ${activeTab === 'orders' ? 'active' : ''}`} onClick={() => setActiveTab('orders')}>
+                    <button
+                        className={`sidebar-item ${activeTab === 'orders' ? 'active' : ''}`}
+                        onClick={() => { setActiveTab('orders'); setMobileSidebarOpen(false); }}
+                    >
                         <Package size={18} /> Orders
                     </button>
-                    <button className={`sidebar-item ${activeTab === 'products' ? 'active' : ''}`} onClick={() => setActiveTab('products')}>
+                    <button
+                        className={`sidebar-item ${activeTab === 'products' ? 'active' : ''}`}
+                        onClick={() => { setActiveTab('products'); setMobileSidebarOpen(false); }}
+                    >
                         <ShoppingBag size={18} /> Inventory
                     </button>
-                    <button className={`sidebar-item ${activeTab === 'promotions' ? 'active' : ''}`} onClick={() => setActiveTab('promotions')}>
+                    <button
+                        className={`sidebar-item ${activeTab === 'promotions' ? 'active' : ''}`}
+                        onClick={() => { setActiveTab('promotions'); setMobileSidebarOpen(false); }}
+                    >
                         <Zap size={18} /> Campaigns
                     </button>
-                    <button className={`sidebar-item ${activeTab === 'customers' ? 'active' : ''}`} onClick={() => setActiveTab('customers')}>
+                    <button
+                        className={`sidebar-item ${activeTab === 'customers' ? 'active' : ''}`}
+                        onClick={() => { setActiveTab('customers'); setMobileSidebarOpen(false); }}
+                    >
                         <Users size={18} /> Customers
                     </button>
-                    <button className={`sidebar-item ${activeTab === 'settings' ? 'active' : ''}`} onClick={() => setActiveTab('settings')}>
+                    <button
+                        className={`sidebar-item ${activeTab === 'settings' ? 'active' : ''}`}
+                        onClick={() => { setActiveTab('settings'); setMobileSidebarOpen(false); }}
+                    >
                         <Settings size={18} /> Settings
                     </button>
                 </nav>
@@ -611,6 +631,9 @@ const AdminDashboard = () => {
 
             <div className="admin-main">
                 <header className="admin-topbar">
+                    <button className="mobile-dashboard-toggle" onClick={() => setMobileSidebarOpen(true)}>
+                        <Menu size={24} />
+                    </button>
                     <div className="topbar-welcome">
                         <h1>{activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}</h1>
                         <p>Welcome back, Administrator. Here's what's happening today.</p>
