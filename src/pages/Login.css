@@ -12,10 +12,14 @@
     width: 100%;
     max-width: 450px;
     padding: 56px;
-    background: white;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border-light);
+    border-bottom-color: var(--glass-border-dark);
+    border-right-color: var(--glass-border-dark);
     border-radius: var(--border-radius-lg);
-    box-shadow: var(--shadow-lg);
-    border: 1px solid rgba(0, 0, 0, 0.03);
+    box-shadow: var(--lg-shadow-outer), var(--lg-shadow-inner);
     animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 

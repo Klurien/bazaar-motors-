@@ -20,7 +20,7 @@
 .empty-visual {
     position: relative;
     margin-bottom: 40px;
-    color: var(--accent-color);
+    color: var(--lg-purple);
 }
 
 .empty-rings {
@@ -30,7 +30,7 @@
     transform: translate(-50%, -50%);
     width: 120px;
     height: 120px;
-    border: 1px solid var(--accent-color);
+    border: 1px solid var(--lg-purple);
     border-radius: 50%;
     opacity: 0.1;
     animation: pulseRings 2s infinite;
@@ -79,8 +79,13 @@
     padding: 24px;
     border-radius: var(--border-radius);
     align-items: center;
-    box-shadow: var(--shadow-sm);
-    background: white;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border-light);
+    border-bottom-color: var(--glass-border-dark);
+    border-right-color: var(--glass-border-dark);
+    box-shadow: var(--lg-shadow-outer), var(--lg-shadow-inner);
 }
 
 .item-image {
@@ -111,7 +116,7 @@
     font-size: 11px;
     font-weight: 800;
     text-transform: uppercase;
-    color: var(--accent-color);
+    color: var(--lg-purple);
     letter-spacing: 1px;
 }
 
@@ -130,10 +135,11 @@
 .quantity-architect {
     display: flex;
     align-items: center;
-    background: white;
+    background: rgba(255, 255, 255, 0.1);
     padding: 4px;
     border-radius: 12px;
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--glass-border-dark);
+    box-shadow: var(--lg-shadow-inner);
 }
 
 .quantity-architect button {
@@ -193,6 +199,13 @@
 .checkout-card {
     padding: 40px;
     border-radius: 30px;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border-light);
+    border-bottom-color: var(--glass-border-dark);
+    border-right-color: var(--glass-border-dark);
+    box-shadow: var(--lg-shadow-outer), var(--lg-shadow-inner);
 }
 
 .sticky-card {
@@ -218,8 +231,9 @@
 }
 
 .free-text {
-    color: var(--accent-color);
+    color: var(--lg-purple);
     font-weight: 800;
+    filter: drop-shadow(0 0 5px var(--lg-purple-glow));
 }
 
 .summary-divider {
@@ -251,12 +265,14 @@
     gap: 12px;
     font-size: 13px;
     font-weight: 700;
-    color: var(--text-muted);
-    background: var(--background-alt);
+    color: var(--lg-grey-base);
+    background: rgba(255, 255, 255, 0.1);
     padding: 12px 16px;
     border-radius: var(--border-radius-sm);
+    border: 1px solid var(--glass-border-dark);
+    box-shadow: var(--lg-shadow-inner);
 }
 
 .trust-bit svg {
-    color: var(--accent-color);
+    color: var(--lg-purple);
 }
