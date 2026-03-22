@@ -169,14 +169,14 @@ h6 {
 }
 
 .btn-accent {
-  background: linear-gradient(135deg, #9afcf0, #7ce6da);
-  color: #0b4f46;
+  background: linear-gradient(135deg, #d3a4ff, #b588ff);
+  color: white;
 }
 
 .btn-accent:hover {
-  background: linear-gradient(135deg, #88f0ff, #5ed1c5);
+  background: linear-gradient(135deg, #e4adff, #c38fff);
   transform: translateY(-3px);
-  box-shadow: 0 12px 30px rgba(124, 230, 218, 0.3), var(--glass-inner);
+  box-shadow: 0 12px 30px rgba(181, 136, 255, 0.3), var(--glass-inner);
 }
 
 .btn-outline {
