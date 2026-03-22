@@ -47,13 +47,12 @@ const Login = () => {
                 <h2>Welcome Back</h2>
                 <p>Sign in to manage your account or shop our collection.</p>
 
-                {error && <div className="error-message">{error}</div>}
-
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
-                        <label><Mail size={16} /> Username</label>
+                        <label className={error ? "text-error" : ""}><Mail size={16} /> Username</label>
                         <input
                             type="text"
+                            className={error ? "error-input" : ""}
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
                             placeholder="Enter your username"
@@ -62,14 +61,16 @@ const Login = () => {
                     </div>
 
                     <div className="form-group">
-                        <label><Lock size={16} /> Password</label>
+                        <label className={error ? "text-error" : ""}><Lock size={16} /> Password</label>
                         <input
                             type="password"
+                            className={error ? "error-input" : ""}
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="••••••••"
                             required
                         />
+                        {error && <span className="liquid-error-text text-editorial" style={{ marginTop: '10px' }}>{error}</span>}
                     </div>
 
                     <button type="submit" className="btn btn-accent btn-full" disabled={loading}>

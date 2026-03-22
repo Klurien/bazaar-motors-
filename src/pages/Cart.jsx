@@ -7,6 +7,7 @@ import './Cart.css';
 const Cart = () => {
     const { cart, removeFromCart, updateQuantity, cartTotal, cartCount } = useCart();
     const [whatsappNumber, setWhatsappNumber] = useState("254741740376");
+    const [isLoaded, setIsLoaded] = useState(false);
 
     useEffect(() => {
         setIsLoaded(true);

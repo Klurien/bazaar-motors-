@@ -2,15 +2,20 @@
 
 .premium-product-card {
     position: relative;
-    background: white;
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    border-bottom-color: rgba(255, 255, 255, 0.2);
+    border-right-color: rgba(255, 255, 255, 0.2);
     border-radius: var(--border-radius);
     transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-sm), var(--glass-inner);
 }
 
 .premium-product-card:hover {
     transform: translateY(-8px);
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--shadow-lg), var(--glass-inner);
 }
 
 .card-inner {
@@ -97,7 +102,7 @@
 
 .action-btn-p {
     flex: 1;
-    background: white;
+    background: rgba(255, 255, 255, 0.4);
     color: var(--primary-color);
     padding: 12px;
     border-radius: var(--border-radius-sm);
@@ -108,30 +113,34 @@
     justify-content: center;
     gap: 8px;
     transition: all 0.2s;
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-sm), var(--glass-inner);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(10px);
 }
 
 .action-btn-p:hover {
-    background: var(--accent-color);
+    background: linear-gradient(135deg, #e4adff, #c38fff);
     color: white;
-    box-shadow: var(--shadow-accent);
+    box-shadow: var(--shadow-accent), var(--glass-inner);
 }
 
 .action-btn-icon {
     width: 44px;
     height: 44px;
-    background: white;
+    background: rgba(255, 255, 255, 0.4);
     color: var(--primary-color);
     border-radius: var(--border-radius-sm);
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.2s;
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-sm), var(--glass-inner);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(10px);
 }
 
 .action-btn-icon:hover {
-    background: var(--primary-color);
+    background: linear-gradient(135deg, #e4adff, #c38fff);
     color: white;
 }
 
@@ -197,22 +206,24 @@
 .premium-product-card:hover .view-link {
     color: var(--accent-color);
 }
+
 .card-view-btn {
     width: 100%;
     margin-top: 16px;
     padding: 12px;
     border-radius: 12px;
-    background: #e5e7eb;
+    background: rgba(255, 255, 255, 0.3);
     color: var(--primary-color);
     font-weight: 800;
     font-size: 13px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    border: none;
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-inner);
     transition: all 0.3s;
 }
 
 .premium-product-card:hover .card-view-btn {
-    background: var(--primary-color);
-    color: white;
+    background: linear-gradient(135deg, #9afcf0, #7ce6da);
+    color: #0b4f46;
 }
