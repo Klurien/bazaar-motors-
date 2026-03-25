@@ -24,7 +24,7 @@ const Footer = () => {
                     {/* Brand */}
                     <div className="footer-brand">
                         <Link to="/" className="footer-logo">
-                            <BRAND.logo className="logo-icon" size={20} color="#D35400" />
+                            <BRAND.logo className="logo-icon" size={20} color="#FF7A00" />
                             <span className="logo-brand">{BRAND.name.split(' ')[0]}</span>
                             <span className="logo-suffix">{BRAND.name.split(' ')[1] || ''}</span>
                         </Link>
@@ -32,34 +32,34 @@ const Footer = () => {
                             {BRAND.description}
                         </p>
                         <div className="footer-social">
-                            <a href="#" aria-label="Instagram" className="social-icon"><Instagram size={18} /></a>
-                            <a href="#" aria-label="Twitter" className="social-icon"><Twitter size={18} /></a>
-                            <a href="#" aria-label="Facebook" className="social-icon"><Facebook size={18} /></a>
-                            <a href="#" aria-label="YouTube" className="social-icon"><Youtube size={18} /></a>
+                            <a href={BRAND.social.instagram} aria-label="Instagram" className="social-icon" target="_blank" rel="noopener noreferrer"><Instagram size={18} /></a>
+                            <a href={BRAND.social.twitter} aria-label="Twitter" className="social-icon" target="_blank" rel="noopener noreferrer"><Twitter size={18} /></a>
+                            <a href={BRAND.social.facebook} aria-label="Facebook" className="social-icon" target="_blank" rel="noopener noreferrer"><Facebook size={18} /></a>
+                            <a href={BRAND.social.youtube} aria-label="YouTube" className="social-icon" target="_blank" rel="noopener noreferrer"><Youtube size={18} /></a>
                         </div>
                     </div>
 
-                    {/* Shop */}
+                    {/* Inventory */}
                     <div className="footer-col">
-                        <h4>Explore Findings</h4>
+                        <h4>Inventory</h4>
                         <ul>
-                            <li><Link to="/products">All Findings</Link></li>
-                            <li><Link to="/products?category=Cookware">Cookware</Link></li>
-                            <li><Link to="/products?category=Gadgets">Kitchen Gadgets</Link></li>
-                            <li><Link to="/products?category=Dining">Dining & Bar</Link></li>
-                            <li><Link to="/products?category=Storage">Storage Solutions</Link></li>
+                            <li><Link to="/products">All Inventory</Link></li>
+                            <li><Link to="/products?category=SUV">SUVs</Link></li>
+                            <li><Link to="/products?category=Saloon">Saloon Cars</Link></li>
+                            <li><Link to="/products?category=Hatchback">Hatchbacks</Link></li>
+                            <li><Link to="/products?category=Commercial">Commercial</Link></li>
                         </ul>
                     </div>
 
-                    {/* Help */}
+                    {/* Support */}
                     <div className="footer-col">
-                        <h4>Chef Support</h4>
+                        <h4>Customer Support</h4>
                         <ul>
-                            <li><Link to="/cart">My Cart</Link></li>
-                            <li><Link to="#">Track My Findings</Link></li>
-                            <li><Link to="#">Culinary Guarantees</Link></li>
-                            <li><Link to="#">Care Guides</Link></li>
-                            <li><Link to="#">Chef FAQs</Link></li>
+                            <li><Link to="/products">Book Test Drive</Link></li>
+                            <li><Link to="#">Financing Options</Link></li>
+                            <li><Link to="#">Import Services</Link></li>
+                            <li><Link to="#">Valuation</Link></li>
+                            <li><Link to="#">FAQs</Link></li>
                         </ul>
                     </div>
 
@@ -90,7 +90,7 @@ const Footer = () => {
                     <div className="footer-legal-links">
                         <Link to="#">Privacy Policy</Link>
                         <Link to="#">Terms of Service</Link>
-                        <Link to="#">Shipping Registry</Link>
+                        <Link to="#">Import Registry</Link>
                     </div>
                 </div>
             </div>
@@ -99,3 +99,4 @@ const Footer = () => {
 };
 
 export default Footer;
+

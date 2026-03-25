@@ -39,10 +39,9 @@
 }
 
 .checkout-page {
-    padding: 40px 0 80px;
+    padding: 60px 0 100px;
     min-height: 100vh;
-    background: var(--surface-light);
-    animation: fadeIn 0.3s ease;
+    animation: fadeIn 0.5s ease;
 }
 
 .checkout-title {
@@ -133,12 +132,14 @@
 
 /* Main Panel */
 .checkout-main {
-    background: white;
-    border-radius: 16px;
-    padding: 36px;
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--border-color);
-    animation: slideUp 0.3s ease;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border-radius: var(--border-radius);
+    padding: 48px;
+    box-shadow: var(--shadow-liquid-grey), var(--inner-refraction);
+    border: 1px solid var(--glass-border);
+    animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .checkout-step h2 {
@@ -224,20 +225,26 @@
 
 .form-group input,
 .form-group select {
-    padding: 12px 14px;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
+    padding: 14px 18px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
     font-size: 15px;
-    font-family: inherit;
+    color: var(--lg-grey-dark);
     outline: none;
-    transition: border-color 0.25s;
-    background: white;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow:
+        inset 1px 1px 3px rgba(0, 0, 0, 0.1),
+        inset -1px -1px 3px rgba(255, 255, 255, 0.4);
 }
 
 .form-group input:focus,
 .form-group select:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(0, 101, 62, 0.1);
+    border-color: var(--lg-purple);
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow:
+        inset 2px 2px 5px rgba(0, 0, 0, 0.15),
+        0 0 15px var(--shadow-liquid-purple);
 }
 
 .form-group.error input,
@@ -351,13 +358,15 @@
 
 /* Order Summary */
 .order-summary {
-    background: white;
-    border-radius: 16px;
-    padding: 28px;
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--border-color);
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border-radius: var(--border-radius);
+    padding: 32px;
+    box-shadow: var(--shadow-liquid-grey), var(--inner-refraction);
+    border: 1px solid var(--glass-border);
     position: sticky;
-    top: 100px;
+    top: 120px;
 }
 
 .order-summary h3 {

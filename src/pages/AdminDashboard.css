@@ -84,23 +84,35 @@
 .admin-page {
     display: flex;
     min-height: 100vh;
-    background: var(--background-alt);
-    /* Lighter grey/cream */
+    background: transparent;
+    color: var(--text-main);
     animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* ── Sidebar ─────────────────────────────────────────────────── */
 .admin-sidebar {
-    width: 240px;
+    width: 260px;
     flex-shrink: 0;
-    background: var(--primary-color);
-    /* Slate Grey */
+    background: rgba(18, 20, 24, 0.95);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
     display: flex;
     flex-direction: column;
     position: sticky;
     top: 0;
     height: 100vh;
     overflow-y: auto;
+    z-index: 100;
+}
+
+.admin-sidebar::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: var(--glass-grain);
+    opacity: 0.05;
+    pointer-events: none;
 }
 
 .sidebar-brand {
@@ -150,9 +162,8 @@
 }
 
 .sidebar-item.active {
-    background: rgba(255, 122, 0, 0.2);
-    /* Orange Hue */
-    color: var(--accent-color);
+    background: rgba(181, 136, 255, 0.15);
+    color: var(--lg-purple);
 }
 
 .sidebar-footer {
@@ -365,15 +376,15 @@
 }
 
 .admin-topbar h1 {
-    font-size: 26px;
+    font-size: 28px;
     font-weight: 800;
-    color: #0f172a;
+    color: #ffffff;
     margin: 0;
 }
 
 .admin-topbar p {
     font-size: 14px;
-    color: #64748b;
+    color: rgba(255, 255, 255, 0.6);
     margin: 4px 0 0;
 }
 
@@ -455,14 +466,27 @@
 }
 
 .stat-card {
-    background: white;
-    border-radius: 14px;
-    padding: 20px;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border-radius: 18px;
+    padding: 24px;
     display: flex;
     align-items: center;
     gap: 16px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-    border: 1px solid #e2e8f0;
+    box-shadow: var(--shadow-liquid-obsidian), var(--inner-refraction);
+    border: 1px solid var(--glass-border);
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: var(--glass-grain);
+    opacity: 0.04;
+    pointer-events: none;
 }
 
 .stat-icon {
@@ -530,10 +554,13 @@
 
 /* ── Product List Panel ──────────────────────────────────────── */
 .product-list-panel {
-    background: white;
-    border-radius: 16px;
-    border: 1px solid #e2e8f0;
+    background: rgba(26, 28, 35, 0.6);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border-radius: 20px;
+    border: 1px solid var(--glass-border);
     overflow: hidden;
+    box-shadow: var(--shadow-liquid-obsidian);
 }
 
 .list-search {
@@ -772,13 +799,25 @@
 
 /* ── Detail Panel ────────────────────────────────────────────── */
 .product-detail-panel {
-    background: white;
-    border-radius: 16px;
-    border: 1px solid #e2e8f0;
+    background: rgba(26, 28, 35, 0.8);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border-radius: 20px;
+    border: 1px solid var(--glass-border);
     overflow: hidden;
     position: sticky;
     top: 24px;
+    box-shadow: var(--shadow-liquid-purple), var(--inner-refraction);
     animation: slideInRight 0.3s ease;
+}
+
+.product-detail-panel::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: var(--glass-grain);
+    opacity: 0.05;
+    pointer-events: none;
 }
 
 .detail-top {
@@ -2247,13 +2286,14 @@
 .stat-trend.negative {
     color: #ef4444;
 }
+
 /* ── Order Status Selects ───────────────────────────────────── */
 .status-select {
     padding: 6px 12px;
     border-radius: 8px;
     font-size: 13px;
     font-weight: 700;
-    border: 1px solid rgba(0,0,0,0.05);
+    border: 1px solid rgba(0, 0, 0, 0.05);
     cursor: pointer;
     outline: none;
     transition: all 0.2s;

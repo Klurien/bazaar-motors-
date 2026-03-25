@@ -4,6 +4,7 @@ import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
+import BackgroundBlobs from './components/layout/BackgroundBlobs';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import AdminDashboard from './pages/AdminDashboard';
@@ -35,6 +36,7 @@ function App() {
         <Router>
           <div className="app">
             <Navbar />
+            <BackgroundBlobs />
             <main>
               <Routes>
                 <Route path="/" element={<Home />} />

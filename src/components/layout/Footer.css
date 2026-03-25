@@ -1,10 +1,11 @@
 /* ========= FOOTER ========= */
 
 .footer {
-    background: var(--primary-dark);
-    /* Deep Slate Grey */
-    color: rgba(255, 255, 255, 0.75);
+    background: #0f1115;
+    /* Darker obsidian footer */
+    color: rgba(255, 255, 255, 0.7);
     margin-top: auto;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .footer-top {
@@ -114,7 +115,7 @@
 }
 
 .footer-col ul li a:hover {
-    color: var(--accent-light);
+    color: var(--lg-purple);
 }
 
 /* Contact */

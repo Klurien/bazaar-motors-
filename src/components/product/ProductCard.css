@@ -2,20 +2,31 @@
 
 .premium-product-card {
     position: relative;
-    background: var(--glass-bg);
+    background: rgba(255, 255, 255, 0.03);
     backdrop-filter: var(--glass-blur);
     -webkit-backdrop-filter: var(--glass-blur);
-    border: 1px solid var(--glass-border-light);
-    border-bottom-color: var(--glass-border-dark);
-    border-right-color: var(--glass-border-dark);
+    border: 1px solid var(--glass-border);
     border-radius: var(--border-radius);
-    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: var(--lg-shadow-outer), var(--lg-shadow-inner);
+    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: var(--shadow-liquid-obsidian), var(--inner-refraction);
+    overflow: hidden;
+}
+
+/* Glass Grain */
+.premium-product-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: var(--glass-grain);
+    opacity: 0.05;
+    pointer-events: none;
+    z-index: 1;
 }
 
 .premium-product-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15), var(--lg-shadow-inner);
+    transform: translateY(-12px) scale(1.02);
+    box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.6), var(--inner-refraction);
+    background: rgba(255, 255, 255, 0.06);
 }
 
 .card-inner {
@@ -120,10 +131,9 @@
 }
 
 .action-btn-p:hover {
-    background: linear-gradient(135deg, var(--lg-purple-light), var(--lg-purple));
+    background: linear-gradient(135deg, var(--lg-purple), var(--lg-purple-deep));
     color: white;
-    border-color: var(--lg-purple-light);
-    box-shadow: 0 10px 20px var(--lg-purple-glow), var(--lg-shadow-inner);
+    box-shadow: var(--shadow-liquid-purple), var(--inner-refraction);
 }
 
 .action-btn-icon {
@@ -142,10 +152,9 @@
 }
 
 .action-btn-icon:hover {
-    background: linear-gradient(135deg, var(--lg-purple-light), var(--lg-purple));
+    background: linear-gradient(135deg, var(--lg-purple), var(--lg-purple-deep));
     color: white;
-    border-color: var(--lg-purple-light);
-    box-shadow: 0 10px 20px var(--lg-purple-glow);
+    box-shadow: var(--shadow-liquid-purple);
 }
 
 /* Info */
@@ -216,20 +225,19 @@
     margin-top: 16px;
     padding: 12px;
     border-radius: 14px;
-    background: rgba(255, 255, 255, 0.1);
-    color: var(--lg-grey-base);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--lg-grey-dark);
     font-weight: 800;
     font-size: 13px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    border: 1px solid var(--glass-border-light);
-    box-shadow: var(--lg-shadow-inner);
-    transition: all 0.3s;
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--inner-refraction);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .premium-product-card:hover .card-view-btn {
-    background: linear-gradient(135deg, var(--lg-purple-light), var(--lg-purple));
+    background: linear-gradient(135deg, var(--lg-purple), var(--lg-purple-deep));
     color: white;
-    border-color: var(--lg-purple-light);
-    box-shadow: 0 10px 20px var(--lg-purple-glow);
+    box-shadow: var(--shadow-liquid-purple), var(--inner-refraction);
 }

@@ -1,22 +1,22 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingCart, Eye, Star, Plus } from 'lucide-react';
-import { useCart } from '../../context/CartContext';
+import { ShoppingCart, Eye, Star, MessageCircle, Info } from 'lucide-react';
+import { BRAND } from '../../brandConfig';
 import './ProductCard.css';
 
 const ProductCard = ({ product }) => {
-    const { addToCart } = useCart();
     const [isHovered, setIsHovered] = useState(false);
 
-    const handleAddToCart = (e) => {
+    const handleWhatsApp = (e) => {
         e.preventDefault();
         e.stopPropagation();
-        addToCart(product, 1);
+        const message = `Hi Bazaar Motors, I am interested in the ${product.name} (KES ${product.price.toLocaleString()}). Is it still available?`;
+        window.open(`https://wa.me/${BRAND.whatsapp}?text=${encodeURIComponent(message)}`, '_blank');
     };
 
     const imageUrl = product.image_url
-        ? `${import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : "http://localhost:5000")}${product.image_url}`
-        : 'https://placehold.co/400x400?text=Kitchen+Find';
+        ? (product.image_url.startsWith('http') ? product.image_url : `${import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : "http://localhost:5000")}${product.image_url}`)
+        : 'https://images.unsplash.com/photo-1549317661-bd3293003975?q=80&w=400&auto=format&fit=crop';
 
     return (
         <div
@@ -28,21 +28,20 @@ const ProductCard = ({ product }) => {
                 <div className="card-media">
                     <img src={imageUrl} alt={product.name} />
 
-                    {product.stock <= 5 && product.stock > 0 && (
-                        <span className="stock-badge low">Limited Finding</span>
-                    )}
-                    {product.stock === 0 && (
-                        <span className="stock-badge out">Finding Archived</span>
+                    {product.stock > 0 ? (
+                        <span className="stock-badge low">Available</span>
+                    ) : (
+                        <span className="stock-badge out">Sold Out</span>
                     )}
 
                     <div className="card-overlay">
                         <div className="overlay-actions">
-                            <button className="action-btn-p" onClick={handleAddToCart} disabled={product.stock === 0}>
-                                <Plus size={20} />
-                                <span>Add to Set</span>
+                            <button className="action-btn-p" onClick={handleWhatsApp}>
+                                <MessageCircle size={20} />
+                                <span>Enquire</span>
                             </button>
                             <div className="action-btn-icon">
-                                <Eye size={18} />
+                                <Info size={18} />
                             </div>
                         </div>
                     </div>
@@ -52,25 +51,20 @@ const ProductCard = ({ product }) => {
                     <div className="info-top">
                         <span className="card-category">{product.category}</span>
                         <div className="card-rating">
-                            <Star size={12} fill="#D35400" color="#D35400" />
-                            <span>4.9</span>
+                            <Star size={12} fill="#FF7A00" color="#FF7A00" />
+                            <span>Pristine</span>
                         </div>
                     </div>
                     <h3 className="card-title">{product.name}</h3>
                     <div className="info-bottom">
                         <span className="card-price">KSh {parseFloat(product.price).toLocaleString()}</span>
                     </div>
-                    <button className="card-view-btn">Acquire Piece</button>
+                    <button className="card-view-btn">View Vehicle</button>
                 </div>
             </Link>
         </div>
     );
 };
 
-const ArrowRight = ({ size }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M5 12h14m-7-7 7 7-7 7" />
-    </svg>
-);
-
 export default ProductCard;
+

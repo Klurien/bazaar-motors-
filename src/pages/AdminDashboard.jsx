@@ -7,6 +7,7 @@ import {
 import { AreaChart, Area, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
+import BackgroundBlobs from '../components/layout/BackgroundBlobs';
 import './AdminDashboard.css';
 
 const COLORS = ['#FF7A00', '#00C49F', '#FFBB28', '#FF8042', '#0088FE'];
@@ -576,6 +577,7 @@ const AdminDashboard = () => {
 
     return (
         <div className="admin-page">
+            <BackgroundBlobs />
             {toast && <div className={`toast ${toast.type}`}>{toast.msg}</div>}
 
             <aside className={`admin-sidebar ${mobileSidebarOpen ? 'open' : ''}`}>

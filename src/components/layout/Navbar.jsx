@@ -21,8 +21,6 @@ const Navbar = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    // Hide navbar on admin pages ONLY ON DESKTOP to keep the dashboard focused
-    // On mobile, we keep it so the user can actually navigate out
     const isDesktop = typeof window !== 'undefined' && window.innerWidth > 900;
     if (location.pathname.startsWith('/admin') && isDesktop) {
         return null;
@@ -37,16 +35,15 @@ const Navbar = () => {
     };
 
     const categories = [
-        { name: 'All Finds', path: '/products' },
-        { name: 'Cookware', path: '/products?category=Cookware' },
-        { name: 'Gadgets', path: '/products?category=Gadgets' },
-        { name: 'Dining', path: '/products?category=Dining' },
-        { name: 'Storage', path: '/products?category=Storage' },
+        { name: 'Inventory', path: '/products' },
+        { name: 'SUVs', path: '/products?category=SUV' },
+        { name: 'Saloon', path: '/products?category=Saloon' },
+        { name: 'Hatchbacks', path: '/products?category=Hatchback' },
     ];
 
     return (
         <header className={`navbar-wrapper ${isScrolled ? 'scrolled' : ''}`}>
-            <div className="container navbar-container glass">
+            <div className="navbar-container glass">
                 <Link to="/" className="logo">
                     <BRAND.logo size={28} className="logo-icon" />
                     <div className="logo-text">
@@ -72,7 +69,7 @@ const Navbar = () => {
                         <Search size={18} className="search-icon" />
                         <input
                             type="text"
-                            placeholder="Find masterpieces..."
+                            placeholder="Search inventory..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
@@ -100,7 +97,7 @@ const Navbar = () => {
                                     <User size={20} />
                                 </Link>
                                 <Link to="/register" className="btn btn-primary btn-sm desktop-only">
-                                    Join Circle
+                                    Sign Up
                                 </Link>
                             </>
                         )}
@@ -145,3 +142,4 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
