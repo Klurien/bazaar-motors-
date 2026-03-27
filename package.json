@@ -10,7 +10,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "seed": "node server/seedKitchen.js",
+    "seed": "node server/seedBazaar.js",
     "seed:admin": "node server/seedAdmin.js"
   },
   "dependencies": {

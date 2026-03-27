@@ -14,6 +14,7 @@ import promotionRoutes from './routes/promotions.js';
 import ordersRoutes from './routes/orders.js';
 import sitemapRoutes from './routes/sitemap.js';
 import statsRoutes from './routes/stats.js';
+import categoryRoutes from './routes/categories.js';
 import { initDB } from './db/db.js';
 import db from './db/db.js';
 
@@ -50,7 +51,7 @@ app.use(async (req, res, next) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors({
-    origin: process.env.VERCEL ? true : 'http://localhost:5173', // Allow origin properly
+    origin: true, // Allow all origins during dev to avoid 5173 vs 5174 conflicts
     credentials: true
 }));
 app.use(morgan('dev'));
@@ -69,6 +70,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/promotions', promotionRoutes);
 app.use('/api/orders', ordersRoutes);
 app.use('/api/stats', statsRoutes);
+app.use('/api/categories', categoryRoutes);
 app.use('/api', sitemapRoutes); // Mounts /api/sitemap.xml
 
 app.get('/', (req, res) => {

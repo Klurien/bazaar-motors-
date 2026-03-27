@@ -1,17 +1,19 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { SlidersHorizontal, Search, X, ChevronDown } from 'lucide-react';
+import { SlidersHorizontal, Search, X, ChevronDown, Filter, Grid, List as ListIcon } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import ProductCard from '../components/product/ProductCard';
 import './Products.css';
 
-const CATEGORIES = ['All', 'Cookware', 'Gadgets', 'Dining', 'Storage', 'Baking', 'Appliances'];
+const MAKES = ['All', 'Toyota', 'Lexus', 'Nissan', 'Mazda', 'Subaru', 'Honda', 'Mercedes-Benz', 'BMW', 'Volkswagen'];
+const CONDITIONS = ['All', 'Foreign Used', 'Local Used', 'Brand New'];
+const TRANSMISSIONS = ['All', 'Automatic', 'Manual', 'CVT'];
+
 const SORT_OPTIONS = [
     { value: 'default', label: 'Featured' },
     { value: 'price-asc', label: 'Price: Low to High' },
     { value: 'price-desc', label: 'Price: High to Low' },
-    { value: 'name-asc', label: 'Name: A–Z' },
-    { value: 'name-desc', label: 'Name: Z–A' },
+    { value: 'year-desc', label: 'Latest Year' },
 ];
 
 const API = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : "http://localhost:5000");
@@ -24,10 +26,11 @@ const Products = () => {
 
     // Filter state
     const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
-    const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'All');
-    const [priceRange, setPriceRange] = useState([0, 500]);
-    const [maxPrice, setMaxPrice] = useState(500);
-    const [inStockOnly, setInStockOnly] = useState(false);
+    const [selectedMake, setSelectedMake] = useState(searchParams.get('make') || 'All');
+    const [selectedCondition, setSelectedCondition] = useState(searchParams.get('condition') || 'All');
+    const [selectedTransmission, setSelectedTransmission] = useState(searchParams.get('transmission') || 'All');
+    const [priceRange, setPriceRange] = useState([0, 15000000]);
+    const [maxPrice, setMaxPrice] = useState(15000000);
     const [sort, setSort] = useState('default');
 
     useEffect(() => {
@@ -53,9 +56,11 @@ const Products = () => {
     // Sync search params
     useEffect(() => {
         const q = searchParams.get('q') || '';
-        const cat = searchParams.get('category') || 'All';
+        const make = searchParams.get('make') || 'All';
+        const cond = searchParams.get('condition') || 'All';
         setSearchQuery(q);
-        setSelectedCategory(cat);
+        setSelectedMake(make);
+        setSelectedCondition(cond);
     }, [searchParams]);
 
     const filteredProducts = useMemo(() => {
@@ -66,252 +71,237 @@ const Products = () => {
             const q = searchQuery.toLowerCase();
             result = result.filter(p =>
                 p.name.toLowerCase().includes(q) ||
-                (p.description && p.description.toLowerCase().includes(q)) ||
-                (p.category && p.category.toLowerCase().includes(q))
+                (p.make && p.make.toLowerCase().includes(q)) ||
+                (p.description && p.description.toLowerCase().includes(q))
             );
         }
 
-        // Category
-        if (selectedCategory !== 'All') {
+        // Make
+        if (selectedMake !== 'All') {
             result = result.filter(p =>
-                (p.category || '').toLowerCase() === selectedCategory.toLowerCase()
+                (p.make || '').toLowerCase() === selectedMake.toLowerCase()
+            );
+        }
+
+        // Condition
+        if (selectedCondition !== 'All') {
+            result = result.filter(p =>
+                (p.condition || '').toLowerCase() === selectedCondition.toLowerCase()
+            );
+        }
+
+        // Transmission
+        if (selectedTransmission !== 'All') {
+            result = result.filter(p =>
+                (p.transmission || '').toLowerCase() === selectedTransmission.toLowerCase()
             );
         }
 
         // Price
         result = result.filter(p => p.price >= priceRange[0] && p.price <= priceRange[1]);
 
-        // Stock
-        if (inStockOnly) {
-            result = result.filter(p => p.stock > 0);
-        }
-
         // Sort
         switch (sort) {
             case 'price-asc': result.sort((a, b) => a.price - b.price); break;
             case 'price-desc': result.sort((a, b) => b.price - a.price); break;
+            case 'year-desc': result.sort((a, b) => b.year - a.year); break;
             case 'name-asc': result.sort((a, b) => a.name.localeCompare(b.name)); break;
-            case 'name-desc': result.sort((a, b) => b.name.localeCompare(a.name)); break;
             default: break;
         }
 
         return result;
-    }, [products, searchQuery, selectedCategory, priceRange, inStockOnly, sort]);
+    }, [products, searchQuery, selectedMake, selectedCondition, selectedTransmission, priceRange, sort]);
 
     const handleSearch = (e) => {
         e.preventDefault();
         const params = {};
         if (searchQuery) params.q = searchQuery;
-        if (selectedCategory !== 'All') params.category = selectedCategory;
+        if (selectedMake !== 'All') params.make = selectedMake;
+        if (selectedCondition !== 'All') params.condition = selectedCondition;
         setSearchParams(params);
     };
 
     const clearFilters = () => {
         setSearchQuery('');
-        setSelectedCategory('All');
+        setSelectedMake('All');
+        setSelectedCondition('All');
+        setSelectedTransmission('All');
         setPriceRange([0, maxPrice]);
-        setInStockOnly(false);
         setSort('default');
         setSearchParams({});
     };
 
     const activeFilterCount = [
-        selectedCategory !== 'All',
-        inStockOnly,
+        selectedMake !== 'All',
+        selectedCondition !== 'All',
+        selectedTransmission !== 'All',
         priceRange[0] > 0 || priceRange[1] < maxPrice,
     ].filter(Boolean).length;
 
     return (
-        <div className="products-page">
+        <div className="inventory-page-v3">
             <Helmet>
-                <title>Culinary Finds | Shop Masterpieces</title>
-                <meta name="description" content="Explore our complete collection of luxury cookware and gadgets." />
+                <title>Bazaar Motors | Quality Vehicles for Sale in Kenya</title>
+                <meta name="description" content="Explore our premium collection of foreign and local used vehicles in Ruiru." />
             </Helmet>
-            {/* Page Header */}
-            <div className="products-header">
+
+            <div className="inventory-header-v3">
                 <div className="container">
-                    <nav className="breadcrumb">
-                        <Link to="/">Home</Link>
-                        <span>/</span>
-                        <span>All Products</span>
-                    </nav>
-                    <h1>Explore Culinary Finds</h1>
-                    <p className="products-subtitle">
-                        {loading ? 'Loading...' : `${filteredProducts.length} product${filteredProducts.length !== 1 ? 's' : ''} found`}
-                    </p>
+                    <div className="v3-sub">CURATED SELECTION</div>
+                    <div className="header-flex-v3">
+                        <div className="header-text-v3">
+                            <h1>THE <span className="highlight">SHOWROOM</span></h1>
+                            <p>Discover {filteredProducts.length} high-performance vehicles across our elite collection.</p>
+                        </div>
+                        <div className="header-actions-v3">
+                            <button className="h-action-btn-v3 mobile-only" onClick={() => setSidebarOpen(true)}>
+                                <Filter size={18} />
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div className="container products-layout">
-                {/* Sidebar Overlay */}
-                {sidebarOpen && (
-                    <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />
-                )}
-
-                {/* Filter Sidebar */}
-                <aside className={`filter-sidebar ${sidebarOpen ? 'open' : ''}`}>
-                    <div className="sidebar-header">
-                        <h3>Filters</h3>
-                        <button className="close-sidebar" onClick={() => setSidebarOpen(false)}>
+            <div className="container inventory-grid-layout">
+                {/* Advanced Filters Sidebar */}
+                <aside className={`inventory-sidebar-v3 ${sidebarOpen ? 'sidebar-v3-open' : ''}`}>
+                    <div className="sidebar-v3-header">
+                        <h3>FILTERS</h3>
+                        <button className="v3-close-sidebar" onClick={() => setSidebarOpen(false)}>
                             <X size={20} />
                         </button>
                     </div>
 
-                    {/* Search */}
-                    <div className="filter-section">
-                        <h4>Search</h4>
-                        <form onSubmit={handleSearch} className="sidebar-search">
-                            <input
-                                type="text"
-                                placeholder="Search products..."
-                                value={searchQuery}
-                                onChange={e => setSearchQuery(e.target.value)}
-                            />
-                            <button type="submit"><Search size={16} /></button>
-                        </form>
-                    </div>
-
-                    {/* Category */}
-                    <div className="filter-section">
-                        <h4>Category</h4>
-                        <div className="category-list">
-                            {CATEGORIES.map(cat => (
-                                <button
-                                    key={cat}
-                                    className={`category-btn ${selectedCategory === cat ? 'active' : ''}`}
-                                    onClick={() => setSelectedCategory(cat)}
-                                >
-                                    {cat}
-                                </button>
-                            ))}
+                    <div className="v3-filter-wrapper">
+                        <div className="v3-filter-group">
+                            <label>SEARCH INVENTORY</label>
+                            <div className="v3-search-box glass-panel">
+                                <input
+                                    type="text"
+                                    placeholder="Make, model..."
+                                    value={searchQuery}
+                                    onChange={e => setSearchQuery(e.target.value)}
+                                />
+                                <Search size={16} />
+                            </div>
                         </div>
-                    </div>
 
-                    {/* Price Range */}
-                    <div className="filter-section">
-                        <h4>Price Range</h4>
-                        <div className="price-display">
-                            <span>KES {priceRange[0]}</span>
-                            <span>KES {priceRange[1]}</span>
+                        <div className="v3-filter-group">
+                            <label>SELECT MAKE</label>
+                            <div className="v3-select-grid">
+                                {MAKES.map(make => (
+                                    <button
+                                        key={make}
+                                        className={`v3-select-pill ${selectedMake === make ? 'active' : ''}`}
+                                        onClick={() => setSelectedMake(make)}
+                                    >
+                                        {make}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
-                        <input
-                            type="range"
-                            min={0}
-                            max={maxPrice}
-                            value={priceRange[1]}
-                            onChange={e => setPriceRange([priceRange[0], Number(e.target.value)])}
-                            className="price-slider"
-                        />
-                    </div>
 
-                    {/* Availability */}
-                    <div className="filter-section">
-                        <h4>Availability</h4>
-                        <label className="toggle-label">
-                            <input
-                                type="checkbox"
-                                checked={inStockOnly}
-                                onChange={e => setInStockOnly(e.target.checked)}
-                            />
-                            <span className="toggle-track"></span>
-                            In Stock Only
-                        </label>
-                    </div>
+                        <div className="v3-filter-group">
+                            <label>CONDITION</label>
+                            <div className="v3-select-grid">
+                                {CONDITIONS.map(cond => (
+                                    <button
+                                        key={cond}
+                                        className={`v3-select-pill ${selectedCondition === cond ? 'active' : ''}`}
+                                        onClick={() => setSelectedCondition(cond)}
+                                    >
+                                        {cond}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
 
-                    {activeFilterCount > 0 && (
-                        <button className="clear-filters-btn" onClick={clearFilters}>
-                            <X size={16} /> Clear All Filters ({activeFilterCount})
-                        </button>
-                    )}
+                        <div className="v3-filter-group">
+                            <label>PRICE CAP (KSh)</label>
+                            <div className="v3-price-inputs">
+                                <div className="price-input-v3 glass-panel">
+                                    <input
+                                        type="number"
+                                        value={priceRange[1]}
+                                        onChange={e => setPriceRange([priceRange[0], Number(e.target.value)])}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        {activeFilterCount > 0 && (
+                            <button className="v3-reset-btn" onClick={clearFilters}>
+                                RESET FILTERS
+                            </button>
+                        )}
+                    </div>
                 </aside>
 
-                {/* Main Content */}
-                <div className="products-main">
-                    {/* Toolbar */}
-                    <div className="products-toolbar">
-                        <button
-                            className="filter-toggle-btn"
-                            onClick={() => setSidebarOpen(!sidebarOpen)}
-                        >
-                            <SlidersHorizontal size={18} />
-                            Filters {activeFilterCount > 0 && <span className="filter-badge">{activeFilterCount}</span>}
-                        </button>
-
-                        <div className="sort-select-wrapper">
-                            <select
-                                value={sort}
-                                onChange={e => setSort(e.target.value)}
-                                className="sort-select"
-                            >
-                                {SORT_OPTIONS.map(opt => (
-                                    <option key={opt.value} value={opt.value}>{opt.label}</option>
-                                ))}
-                            </select>
-                            <ChevronDown size={16} className="sort-chevron" />
+                {/* Main Content Area */}
+                <main className="inventory-main-v3">
+                    <div className="v3-toolbar-top">
+                        <div className="toolbar-info-v3">
+                            <p>Showing <strong>{filteredProducts.length}</strong> vehicles</p>
+                        </div>
+                        <div className="toolbar-controls-v3">
+                            <div className="v3-sort-control">
+                                <span>Sort By</span>
+                                <select
+                                    value={sort}
+                                    onChange={e => setSort(e.target.value)}
+                                >
+                                    {SORT_OPTIONS.map(opt => (
+                                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                    ))}
+                                </select>
+                            </div>
                         </div>
                     </div>
 
-                    {/* Active filter tags */}
-                    {(searchQuery || selectedCategory !== 'All') && (
-                        <div className="active-filters">
-                            {searchQuery && (
-                                <span className="filter-tag">
-                                    "{searchQuery}"
-                                    <button onClick={() => { setSearchQuery(''); }}>
-                                        <X size={12} />
-                                    </button>
+                    {/* Active Filter Tags */}
+                    {activeFilterCount > 0 && (
+                        <div className="v3-active-tags">
+                            {selectedMake !== 'All' && (
+                                <span className="v3-tag">
+                                    {selectedMake} <X size={14} onClick={() => setSelectedMake('All')} />
                                 </span>
                             )}
-                            {selectedCategory !== 'All' && (
-                                <span className="filter-tag">
-                                    {selectedCategory}
-                                    <button onClick={() => setSelectedCategory('All')}>
-                                        <X size={12} />
-                                    </button>
+                            {selectedCondition !== 'All' && (
+                                <span className="v3-tag">
+                                    {selectedCondition} <X size={14} onClick={() => setSelectedCondition('All')} />
                                 </span>
                             )}
                         </div>
                     )}
 
-                    {/* Product Grid */}
+                    {/* Content Grid */}
                     {loading ? (
-                        <div className="product-grid">
-                            {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
-                                <div key={i} className="product-skeleton">
-                                    <div className="skeleton-img pulse"></div>
-                                    <div className="skeleton-info">
-                                        <div className="skeleton-text pulse"></div>
-                                        <div className="skeleton-price pulse"></div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    ) : filteredProducts.length > 0 ? (
-                        <div className="product-grid">
-                            {filteredProducts.map((product, index) => (
-                                <div
-                                    key={product.id}
-                                    className="product-card-animate"
-                                    style={{ animationDelay: `${index * 0.05}s` }}
-                                >
-                                    <ProductCard product={product} />
-                                </div>
+                        <div className="v3-inventory-grid">
+                            {[1, 2, 3, 4, 5, 6].map(i => (
+                                <div key={i} className="v3-card-skeleton pulse"></div>
                             ))}
                         </div>
                     ) : (
-                        <div className="empty-state">
-                            <div className="empty-icon">🔍</div>
-                            <h3>No products found</h3>
-                            <p>Try adjusting your filters or search terms.</p>
-                            <button className="btn btn-primary" onClick={clearFilters}>
-                                Clear Filters
-                            </button>
+                        <div className="v3-inventory-grid">
+                            {filteredProducts.map(vehicle => (
+                                <ProductCard key={vehicle.id} product={vehicle} />
+                            ))}
                         </div>
                     )}
-                </div>
+
+                    {!loading && filteredProducts.length === 0 && (
+                        <div className="v3-empty-state">
+                            <Search size={48} />
+                            <h3>No results found</h3>
+                            <p>Try adjusting your filters to find what you're looking for.</p>
+                            <button onClick={clearFilters}>Clear All Filters</button>
+                        </div>
+                    )}
+                </main>
             </div>
         </div>
     );
 };
 
 export default Products;
+

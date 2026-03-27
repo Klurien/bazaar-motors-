@@ -46,7 +46,7 @@ export const getProduct = async (req, res) => {
 };
 
 export const createProduct = async (req, res) => {
-    const { name, description, price, category, stock } = req.body;
+    const { name, description, price, category, stock, make, year, condition, transmission, engine_capacity, fuel_type, mileage, auction_grade, features } = req.body;
     if (!name || !price) return res.status(400).json({ message: 'Name and price are required' });
 
     let image_url = null;
@@ -60,8 +60,24 @@ export const createProduct = async (req, res) => {
 
     try {
         const [result] = await db.execute(
-            'INSERT INTO products (name, description, price, category, stock, image_url) VALUES (?, ?, ?, ?, ?, ?)',
-            [name, description, parseFloat(price), category, parseInt(stock) || 0, image_url]
+            'INSERT INTO products (name, description, price, category, stock, image_url, make, year, condition, transmission, engine_capacity, fuel_type, mileage, auction_grade, features) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [
+                name,
+                description,
+                parseFloat(price),
+                category,
+                parseInt(stock) || 0,
+                image_url,
+                make,
+                parseInt(year) || null,
+                condition,
+                transmission,
+                engine_capacity,
+                fuel_type,
+                parseInt(mileage) || null,
+                auction_grade || null,
+                features || null
+            ]
         );
         const productId = result.insertId;
 
@@ -81,7 +97,7 @@ export const createProduct = async (req, res) => {
 };
 
 export const updateProduct = async (req, res) => {
-    const { name, description, price, category, stock } = req.body;
+    const { name, description, price, category, stock, make, year, condition, transmission, engine_capacity, fuel_type, mileage, auction_grade, features } = req.body;
     try {
         const [products] = await db.query('SELECT * FROM products WHERE id = ?', [req.params.id]);
         const product = products[0];
@@ -132,8 +148,25 @@ export const updateProduct = async (req, res) => {
         }
 
         await db.execute(
-            'UPDATE products SET name = ?, description = ?, price = ?, category = ?, stock = ?, image_url = ? WHERE id = ?',
-            [name, description, parseFloat(price), category, parseInt(stock) || 0, image_url, req.params.id]
+            'UPDATE products SET name = ?, description = ?, price = ?, category = ?, stock = ?, image_url = ?, make = ?, year = ?, condition = ?, transmission = ?, engine_capacity = ?, fuel_type = ?, mileage = ?, auction_grade = ?, features = ? WHERE id = ?',
+            [
+                name,
+                description,
+                parseFloat(price),
+                category,
+                parseInt(stock) || 0,
+                image_url,
+                make,
+                parseInt(year) || null,
+                condition,
+                transmission,
+                engine_capacity,
+                fuel_type,
+                parseInt(mileage) || null,
+                auction_grade || null,
+                features || null,
+                req.params.id
+            ]
         );
 
         const [updated] = await db.query('SELECT * FROM products WHERE id = ?', [req.params.id]);

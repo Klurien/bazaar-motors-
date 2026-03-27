@@ -2,23 +2,24 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
     Plus, Edit2, Trash2, Package, Upload, X, ChevronLeft, ChevronRight,
     Save, BarChart2, ShoppingBag, Users, Star, Search, Check, AlertCircle,
-    Image as ImageIcon, GripVertical, Eye, Zap, TrendingUp, Calendar, ArrowRight, Settings, Menu
+    Image as ImageIcon, GripVertical, Eye, Zap, TrendingUp, Calendar, ArrowRight, Settings, Menu, Car
 } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
-import BackgroundBlobs from '../components/layout/BackgroundBlobs';
 import './AdminDashboard.css';
 
 const COLORS = ['#FF7A00', '#00C49F', '#FFBB28', '#FF8042', '#0088FE'];
-const API = (import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : (import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : "http://localhost:5000"))));
-const CATEGORIES = ['Cookware', 'Gadgets', 'Dining', 'Storage', 'Baking', 'Appliances', 'Other'];
+const API = (import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : "http://localhost:5000"));
+const CONDITIONS = ['Foreign Used', 'Local Used', 'Brand New'];
+const TRANSMISSIONS = ['Automatic', 'Manual', 'CVT'];
+const FUEL_TYPES = ['Petrol', 'Diesel', 'Hybrid', 'Electric'];
 
 // ─── Image Carousel (for Product Preview) ───────────────────────────────────
 const ImageCarousel = ({ images, baseUrl = API }) => {
     const [idx, setIdx] = useState(0);
     const urls = images?.length > 0
-        ? images.map(img => `${baseUrl}${img.url}`)
+        ? images.map(img => img.url.startsWith('http') ? img.url : `${baseUrl}${img.url}`)
         : ['https://placehold.co/600x400?text=No+Image'];
 
     useEffect(() => { setIdx(0); }, [images?.length]);
@@ -166,13 +167,27 @@ const ProductModal = ({ product, onClose, onSaved, token }) => {
         price: product?.price || '',
         category: product?.category || '',
         stock: product?.stock || 0,
+        make: product?.make || '',
+        year: product?.year || '',
+        condition: product?.condition || 'Foreign Used',
+        transmission: product?.transmission || 'Automatic',
+        engine_capacity: product?.engine_capacity || '',
+        fuel_type: product?.fuel_type || 'Petrol',
+        mileage: product?.mileage || '',
+        auction_grade: product?.auction_grade || '',
+        features: product?.features || '',
     });
+    const [categories, setCategories] = useState([]);
     const [existingImages, setExistingImages] = useState(product?.images || []);
     const [newFiles, setNewFiles] = useState([]);
     const [deletedIds, setDeletedIds] = useState([]);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState('');
     const [tab, setTab] = useState('details');
+
+    useEffect(() => {
+        fetch(`${API}/api/categories`).then(res => res.json()).then(setCategories);
+    }, []);
 
     const handleChange = e => setForm(f => ({ ...f, [e.target.name]: e.target.value }));
 
@@ -236,29 +251,71 @@ const ProductModal = ({ product, onClose, onSaved, token }) => {
                     {tab === 'details' ? (
                         <div className="tab-content-panel">
                             <div className="form-group-full">
-                                <label>Product Name *</label>
-                                <input name="name" value={form.name} onChange={handleChange} required />
+                                <label>Vehicle Name (Model) *</label>
+                                <input name="name" value={form.name} onChange={handleChange} required placeholder="e.g. Toyota Harrier Progressive" />
                             </div>
                             <div className="form-row-3">
+                                <div className="form-group">
+                                    <label>Make *</label>
+                                    <input name="make" value={form.make} onChange={handleChange} required placeholder="e.g. Toyota" />
+                                </div>
+                                <div className="form-group">
+                                    <label>Year *</label>
+                                    <input type="number" name="year" value={form.year} onChange={handleChange} required placeholder="e.g. 2018" />
+                                </div>
                                 <div className="form-group">
                                     <label>Price (KES) *</label>
                                     <input type="number" name="price" value={form.price} onChange={handleChange} step="1" required />
                                 </div>
+                            </div>
+                            <div className="form-row-3">
                                 <div className="form-group">
-                                    <label>Stock</label>
-                                    <input type="number" name="stock" value={form.stock} onChange={handleChange} />
+                                    <label>Category *</label>
+                                    <select name="category" value={form.category} onChange={handleChange} required>
+                                        <option value="">— Select —</option>
+                                        {categories.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
+                                    </select>
                                 </div>
                                 <div className="form-group">
-                                    <label>Category</label>
-                                    <select name="category" value={form.category} onChange={handleChange}>
-                                        <option value="">— Select —</option>
-                                        {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                                    <label>Condition</label>
+                                    <select name="condition" value={form.condition} onChange={handleChange}>
+                                        {CONDITIONS.map(c => <option key={c} value={c}>{c}</option>)}
                                     </select>
+                                </div>
+                                <div className="form-group">
+                                    <label>Mileage (km)</label>
+                                    <input type="number" name="mileage" value={form.mileage} onChange={handleChange} placeholder="e.g. 48000" />
+                                </div>
+                            </div>
+                            <div className="form-row-3">
+                                <div className="form-group">
+                                    <label>Transmission</label>
+                                    <select name="transmission" value={form.transmission} onChange={handleChange}>
+                                        {TRANSMISSIONS.map(t => <option key={t} value={t}>{t}</option>)}
+                                    </select>
+                                </div>
+                                <div className="form-group">
+                                    <label>Engine Capacity</label>
+                                    <input name="engine_capacity" value={form.engine_capacity} onChange={handleChange} placeholder="e.g. 2000cc" />
+                                </div>
+                                <div className="form-group">
+                                    <label>Fuel Type</label>
+                                    <select name="fuel_type" value={form.fuel_type} onChange={handleChange}>
+                                        {FUEL_TYPES.map(f => <option key={f} value={f}>{f}</option>)}
+                                    </select>
+                                </div>
+                                <div className="form-group">
+                                    <label>Auction Grade</label>
+                                    <input name="auction_grade" value={form.auction_grade} onChange={handleChange} placeholder="e.g. 4.5/B" />
                                 </div>
                             </div>
                             <div className="form-group-full">
+                                <label>Key Features (comma-separated)</label>
+                                <input name="features" value={form.features} onChange={handleChange} placeholder="e.g. Leather Seats, Panoramic Sunroof, Reverse Camera" />
+                            </div>
+                            <div className="form-group-full">
                                 <label>Description</label>
-                                <textarea name="description" value={form.description} onChange={handleChange} rows={5} />
+                                <textarea name="description" value={form.description} onChange={handleChange} rows={5} placeholder="Pristine condition, verified auction grade..." />
                             </div>
                         </div>
                     ) : (
@@ -399,6 +456,8 @@ const AdminDashboard = () => {
     const [customers, setCustomers] = useState([]);
     const [recentActivity, setRecentActivity] = useState([]);
     const [siteConfig, setSiteConfig] = useState({ whatsapp_number: '' });
+    const [categories, setCategories] = useState([]);
+    const [newCat, setNewCat] = useState('');
     const [savingConfig, setSavingConfig] = useState(false);
 
     const showToast = (msg, type = 'success') => {
@@ -412,7 +471,7 @@ const AdminDashboard = () => {
             const tokenOverride = localStorage.getItem('token') || token;
             const headers = tokenOverride ? { Authorization: `Bearer ${tokenOverride}` } : {};
 
-            const [pRes, promRes, ordRes, sRes, cRes, tcRes, custRes, actRes, confRes] = await Promise.all([
+            const [pRes, promRes, ordRes, sRes, cRes, tcRes, custRes, actRes, confRes, catsRes] = await Promise.all([
                 fetch(`${API}/api/products`),
                 fetch(`${API}/api/promotions`),
                 fetch(`${API}/api/orders/all`, { headers }),
@@ -421,7 +480,8 @@ const AdminDashboard = () => {
                 fetch(`${API}/api/stats/top-categories`, { headers }),
                 fetch(`${API}/api/stats/customers`, { headers }),
                 fetch(`${API}/api/stats/recent-activity`, { headers }),
-                fetch(`${API}/api/stats/config`)
+                fetch(`${API}/api/stats/config`),
+                fetch(`${API}/api/categories`)
             ]);
 
             const pData = pRes.ok ? await pRes.json() : [];
@@ -430,6 +490,7 @@ const AdminDashboard = () => {
             const cData = cRes.ok ? await cRes.json() : [];
             const tcData = tcRes.ok ? await tcRes.json() : [];
             const confData = confRes.ok ? await confRes.json() : { whatsapp_number: '' };
+            const catData = catsRes.ok ? await catsRes.json() : [];
 
             let custData = [];
             if (custRes.ok) custData = await custRes.json();
@@ -451,6 +512,7 @@ const AdminDashboard = () => {
             setCustomers(Array.isArray(custData) ? custData : []);
             setRecentActivity(Array.isArray(actData) ? actData : []);
             setSiteConfig(confData);
+            setCategories(Array.isArray(catData) ? catData : []);
         } catch (err) {
             console.error('Failed dashboard data load:', err);
         } finally {
@@ -563,6 +625,47 @@ const AdminDashboard = () => {
         }
     };
 
+    const handleAddCategory = async (e) => {
+        e.preventDefault();
+        if (!newCat.trim()) return;
+        try {
+            const res = await fetch(`${API}/api/categories`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${localStorage.getItem('token') || token}`
+                },
+                body: JSON.stringify({ name: newCat })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                setCategories(prev => [...prev, data]);
+                setNewCat('');
+                showToast('Category added!');
+            } else {
+                showToast(data.message, 'error');
+            }
+        } catch {
+            showToast('Failed to add category', 'error');
+        }
+    };
+
+    const handleDeleteCategory = async (id) => {
+        if (!window.confirm("Deleting this category will not remove products, but they will be 'Uncategorized'. Proceed?")) return;
+        try {
+            const res = await fetch(`${API}/api/categories/${id}`, {
+                method: 'DELETE',
+                headers: { Authorization: `Bearer ${localStorage.getItem('token') || token}` }
+            });
+            if (res.ok) {
+                setCategories(prev => prev.filter(c => c.id !== id));
+                showToast('Category deleted', 'error');
+            }
+        } catch {
+            showToast('Failed to delete category', 'error');
+        }
+    };
+
     if (!user || user.role !== 'admin') {
         return (
             <div className="admin-access-denied container">
@@ -577,14 +680,13 @@ const AdminDashboard = () => {
 
     return (
         <div className="admin-page">
-            <BackgroundBlobs />
             {toast && <div className={`toast ${toast.type}`}>{toast.msg}</div>}
 
             <aside className={`admin-sidebar ${mobileSidebarOpen ? 'open' : ''}`}>
                 <button className="mobile-sidebar-close" onClick={() => setMobileSidebarOpen(false)}><X size={24} /></button>
                 <div className="sidebar-brand">
-                    <Zap size={22} className="text-accent" />
-                    <span>KitchenAdmin</span>
+                    <div className="sidebar-logo-icon"><Car size={20} strokeWidth={2.5} /></div>
+                    <span>BAZAAR <span className="text-secondary-label">ADMIN</span></span>
                 </div>
                 <div className="sidebar-mobile-label">DASHBOARD MENU</div>
                 <nav className="sidebar-nav">
@@ -638,8 +740,8 @@ const AdminDashboard = () => {
                         <Menu size={24} />
                     </button>
                     <div className="topbar-welcome">
-                        <h1>{activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}</h1>
-                        <p>Welcome back, Administrator. Here's what's happening today.</p>
+                        <span className="v3-sub">MANAGEMENT CONSOLE</span>
+                        <h1>{activeTab.toUpperCase()}</h1>
                     </div>
                     <div className="topbar-actions">
                         {activeTab === 'products' && (
@@ -659,26 +761,34 @@ const AdminDashboard = () => {
                     </div>
                 </header>
 
-                <div className="stats-ribbon">
-                    <div className="stat-box">
-                        <span className="stat-label">Total Revenue</span>
-                        <span className="stat-value">KES {parseFloat(stats.totalRevenue).toLocaleString()}</span>
-                        <span className="stat-trend positive">Live</span>
+                <div className="stats-ribbon-v3">
+                    <div className="stat-card-v3 glass-panel">
+                        <span className="stat-label">TOTAL REVENUE (EST)</span>
+                        <div className="stat-main">
+                            <span className="stat-val">KES {parseFloat(stats.totalRevenue).toLocaleString()}</span>
+                            <TrendingUp size={20} className="stat-up" />
+                        </div>
                     </div>
-                    <div className="stat-box">
-                        <span className="stat-label">Active Orders</span>
-                        <span className="stat-value">{stats.activeOrders}</span>
-                        <span className="stat-trend">{stats.activeOrders > 0 ? 'Urgent' : 'Clear'}</span>
+                    <div className="stat-card-v3 glass-panel">
+                        <span className="stat-label">ACTIVE INQUIRIES</span>
+                        <div className="stat-main">
+                            <span className="stat-val">{stats.activeOrders}</span>
+                            <ShoppingBag size={20} className="stat-icon" />
+                        </div>
                     </div>
-                    <div className="stat-box">
-                        <span className="stat-label">Site Visitors</span>
-                        <span className="stat-value">{(stats.visitors).toLocaleString()}</span>
-                        <span className="stat-trend positive">Total</span>
+                    <div className="stat-card-v3 glass-panel">
+                        <span className="stat-label">REVENUE VISITS</span>
+                        <div className="stat-main">
+                            <span className="stat-val">{(stats.visitors).toLocaleString()}</span>
+                            <Users size={20} className="stat-icon" />
+                        </div>
                     </div>
-                    <div className="stat-box">
-                        <span className="stat-label">Inventory Items</span>
-                        <span className="stat-value">{stats.inventoryCount}</span>
-                        <span className="stat-trend">Live</span>
+                    <div className="stat-card-v3 glass-panel">
+                        <span className="stat-label">LIVE INVENTORY</span>
+                        <div className="stat-main">
+                            <span className="stat-val">{stats.inventoryCount}</span>
+                            <Car size={20} className="stat-icon" />
+                        </div>
                     </div>
                 </div>
 
@@ -702,8 +812,11 @@ const AdminDashboard = () => {
                                 </div>
                                 {filteredProducts.map(p => (
                                     <div key={p.id} className={`product-row ${selectedProduct?.id === p.id ? 'selected' : ''}`} onClick={() => setSelectedProduct(p)}>
-                                        <div className="row-img-wrap"><img src={`${API}${p.image_url}`} alt="" /></div>
-                                        <div className="row-info"><p className="row-name">{p.name}</p></div>
+                                        <div className="row-img-wrap"><img src={p.image_url ? (p.image_url.startsWith('http') ? p.image_url : `${API}${p.image_url}`) : 'https://placehold.co/100'} alt="" /></div>
+                                        <div className="row-info">
+                                            <p className="row-name">{p.name}</p>
+                                            <p className="row-meta">{p.year} • {p.condition} • {p.mileage?.toLocaleString()}km</p>
+                                        </div>
                                         <div className="row-price">KES {parseFloat(p.price).toLocaleString()}</div>
                                         <div className="row-actions">
                                             <button className="action-btn edit" onClick={(e) => { e.stopPropagation(); setEditingProduct(p); setShowModal(true); }}><Edit2 size={16} /></button>
@@ -718,8 +831,13 @@ const AdminDashboard = () => {
                                 <>
                                     <ImageCarousel images={selectedProduct.images} />
                                     <div className="detail-body">
-                                        <h3>{selectedProduct.name}</h3>
+                                        <h3>{selectedProduct.year} {selectedProduct.name}</h3>
                                         <p className="detail-price">KES {parseFloat(selectedProduct.price).toLocaleString()}</p>
+                                        <div className="detail-specs-mini">
+                                            <span><strong>Make:</strong> {selectedProduct.make}</span>
+                                            <span><strong>Engine:</strong> {selectedProduct.engine_capacity}</span>
+                                            <span><strong>Fuel:</strong> {selectedProduct.fuel_type}</span>
+                                        </div>
                                         <p className="detail-desc">{selectedProduct.description}</p>
                                     </div>
                                 </>
@@ -778,7 +896,7 @@ const AdminDashboard = () => {
                                                             {order.items?.map(item => (
                                                                 <div key={item.id} className="flex gap-4 items-center pl-4 border-l-2 border-white/10">
                                                                     <div className="w-8 h-8 rounded bg-white/10 overflow-hidden flex-shrink-0">
-                                                                        <img src={item.image_url ? `${API}${item.image_url}` : 'https://placehold.co/40'} className="w-full h-full object-cover" />
+                                                                        <img src={item.image_url ? (item.image_url.startsWith('http') ? item.image_url : `${API}${item.image_url}`) : 'https://placehold.co/40'} className="w-full h-full object-cover" />
                                                                     </div>
                                                                     <span>{item.name} <span className="opacity-60">x{item.quantity}</span></span>
                                                                     <span className="ml-auto opacity-80">KES {parseFloat(item.price_at_purchase).toLocaleString()}</span>
@@ -892,10 +1010,10 @@ const AdminDashboard = () => {
                                 <div className="activity-list">
                                     {recentActivity.map((act, i) => (
                                         <div key={i} className="activity-item">
-                                            <div className="activity-icon blue"><ShoppingBag size={14} /></div>
+                                            <div className="activity-icon primary"><ShoppingBag size={14} /></div>
                                             <div className="activity-info">
                                                 <p>Order #{act.id} by <strong>{act.username || 'Guest'}</strong></p>
-                                                <span className="text-xs text-[var(--accent-color)]">KES {parseFloat(act.total_amount).toLocaleString()} • {act.status}</span>
+                                                <span className="text-xs text-[var(--primary)]">KES {parseFloat(act.total_amount).toLocaleString()} • {act.status}</span>
                                                 <span className="block mt-1">{new Date(act.created_at).toLocaleString()}</span>
                                             </div>
                                         </div>
@@ -936,12 +1054,12 @@ const AdminDashboard = () => {
                                                 <td className="p-4 font-bold text-white/50">#{c.id}</td>
                                                 <td className="p-4 font-semibold text-white">{c.username}</td>
                                                 <td className="p-4">
-                                                    <span className={`px-2 py-1 rounded-full text-xs font-bold ${c.role === 'admin' ? 'bg-orange-500/20 text-orange-400' : 'bg-blue-500/20 text-blue-400'}`}>
+                                                    <span className={`px-2 py-1 rounded-full text-xs font-bold ${c.role === 'admin' ? 'bg-orange-500/20 text-orange-400' : 'bg-orange-500/10 text-orange-300'}`}>
                                                         {c.role.toUpperCase()}
                                                     </span>
                                                 </td>
                                                 <td className="p-4">{c.total_orders} orders</td>
-                                                <td className="p-4 font-bold text-[var(--accent-color)]">KES {parseFloat(c.total_spent).toLocaleString()}</td>
+                                                <td className="p-4 font-bold text-[var(--primary)]">KES {parseFloat(c.total_spent).toLocaleString()}</td>
                                                 <td className="p-4 text-sm opacity-80">{new Date(c.created_at).toLocaleDateString()}</td>
                                             </tr>
                                         ))}
@@ -955,7 +1073,7 @@ const AdminDashboard = () => {
                     <div className="admin-items-grid" style={{ gridTemplateColumns: 'minmax(0, 600px)' }}>
                         <div className="admin-form-panel glass p-8" style={{ borderRadius: '16px' }}>
                             <div className="flex items-center gap-3 mb-6">
-                                <div className="p-3 rounded-xl bg-[var(--accent-color)] text-black">
+                                <div className="p-3 rounded-xl bg-[var(--primary)] text-black">
                                     <Settings size={28} />
                                 </div>
                                 <div>
@@ -970,8 +1088,8 @@ const AdminDashboard = () => {
                                     <p className="text-xs opacity-50 mb-3 italic">Format: 254XXXXXXXXX (No + sign). Used for redirected checkout messages.</p>
                                     <input
                                         type="text"
-                                        placeholder="e.g. 254741740376"
-                                        className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white focus:border-[var(--accent-color)] outline-none transition-all text-lg font-mono"
+                                        placeholder="e.g. 254789249004"
+                                        className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white focus:border-[var(--primary)] outline-none transition-all text-lg font-mono"
                                         value={siteConfig.whatsapp_number}
                                         onChange={e => setSiteConfig({ ...siteConfig, whatsapp_number: e.target.value })}
                                     />
@@ -980,17 +1098,41 @@ const AdminDashboard = () => {
                                 <button
                                     type="submit"
                                     disabled={savingConfig}
-                                    className="w-full bg-[var(--accent-color)] text-black font-bold py-4 rounded-xl hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-[var(--accent-color)]/20 flex items-center justify-center gap-2"
+                                    className="w-full bg-[var(--primary)] text-black font-bold py-4 rounded-xl hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-[var(--primary)]/20 flex items-center justify-center gap-2"
                                 >
                                     <Save size={20} />
                                     {savingConfig ? 'Saving Changes...' : 'Save Global Settings'}
                                 </button>
                             </form>
 
-                            <div className="mt-8 p-4 bg-white/5 border-l-4 border-yellow-500/50 rounded-r-xl">
-                                <p className="text-sm text-yellow-200/80">
-                                    <strong>Note:</strong> Changes to the phone number take effect immediately for all new customers clicking the <i>WhatsApp Checkout</i> button.
-                                </p>
+                            <div className="mt-12 pt-8 border-t border-white/10">
+                                <h3 className="text-xl font-bold text-white mb-6">Manage Vehicle Categories</h3>
+                                <form onSubmit={handleAddCategory} className="flex gap-2 mb-6">
+                                    <input
+                                        type="text"
+                                        placeholder="New Category Name..."
+                                        className="flex-1 bg-white/5 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-[var(--primary)]"
+                                        value={newCat}
+                                        onChange={e => setNewCat(e.target.value)}
+                                    />
+                                    <button type="submit" className="p-3 bg-white text-black font-bold rounded-lg hover:bg-[var(--primary)] transition-colors">
+                                        <Plus size={20} />
+                                    </button>
+                                </form>
+
+                                <div className="category-chips flex flex-wrap gap-3">
+                                    {categories.map(cat => (
+                                        <div key={cat.id} className="group relative flex items-center gap-2 bg-white/5 border border-white/10 px-4 py-2 rounded-full text-sm font-semibold hover:border-red-500/50 transition-colors">
+                                            {cat.name}
+                                            <button
+                                                onClick={() => handleDeleteCategory(cat.id)}
+                                                className="opacity-0 group-hover:opacity-100 text-red-500 hover:text-red-400 p-1 transition-opacity"
+                                            >
+                                                <X size={14} />
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     </div>

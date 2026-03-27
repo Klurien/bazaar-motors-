@@ -173,12 +173,26 @@ export const initDB = async () => {
             role VARCHAR(50) DEFAULT 'user',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )`,
+    `CREATE TABLE IF NOT EXISTS categories (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(100) UNIQUE NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )`,
     `CREATE TABLE IF NOT EXISTS products (
             id INT AUTO_INCREMENT PRIMARY KEY,
             name VARCHAR(255) NOT NULL,
             description TEXT,
-            price DECIMAL(10,2) NOT NULL,
+            price DECIMAL(12,2) NOT NULL,
             category VARCHAR(100),
+            make VARCHAR(100),
+            year INT,
+            condition VARCHAR(50),
+            transmission VARCHAR(50),
+            engine_capacity VARCHAR(50),
+            fuel_type VARCHAR(50),
+            mileage INT,
+            auction_grade VARCHAR(50),
+            features TEXT,
             stock INT DEFAULT 0,
             image_url VARCHAR(512),
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -256,10 +270,19 @@ export const initDB = async () => {
           await conn.execute('INSERT INTO site_stats (stat_name, stat_value) VALUES (?, ?)', ['visitors', 0]);
         }
 
+        // Ensure default categories exist
+        const [catsExist] = await conn.query('SELECT COUNT(*) as c FROM categories');
+        if (catsExist[0].c === 0) {
+          const defaults = ['SUV', 'Sedan', 'Hatchback', 'Pickup', 'Luxury', 'Performance'];
+          for (let name of defaults) {
+            await conn.execute('INSERT INTO categories (name) VALUES (?)', [name]);
+          }
+        }
+
         // Ensure whatsapp_number exists in config
         const [configExists] = await conn.query('SELECT * FROM site_config WHERE config_name = ?', ['whatsapp_number']);
         if (configExists.length === 0) {
-          await conn.execute('INSERT INTO site_config (config_name, config_value) VALUES (?, ?)', ['whatsapp_number', '254741740376']);
+          await conn.execute('INSERT INTO site_config (config_name, config_value) VALUES (?, ?)', ['whatsapp_number', '254789249004']);
         }
 
         console.log('✅ Hailey admin and site stats initialized.');
@@ -286,6 +309,15 @@ export const initDB = async () => {
       } else {
         await dbWrapper.execute('INSERT INTO users (username, password, role) VALUES (?, ?, ?)', ['Hailey', hashedPassword, 'admin']);
       }
+      // Ensure default categories exist
+      const [catsExist] = await dbWrapper.query('SELECT COUNT(*) as c FROM categories');
+      if (catsExist[0].c === 0) {
+        const defaults = ['SUV', 'Sedan', 'Hatchback', 'Pickup', 'Luxury', 'Performance'];
+        for (let name of defaults) {
+          await dbWrapper.execute('INSERT INTO categories (name) VALUES (?)', [name]);
+        }
+      }
+
       console.log('✅ Hailey admin user ensured.');
     } catch (adminErr) {
       console.error('Error ensuring Hailey admin:', adminErr.message);

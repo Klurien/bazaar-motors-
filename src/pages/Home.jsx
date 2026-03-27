@@ -1,315 +1,180 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { ChevronRight, ShieldCheck, Clock, MapPin, Search, Car, Globe, ArrowRight, Instagram } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
-import { ArrowRight, Car, Sparkles, TrendingUp, ShieldCheck, Play, Award, Zap, Fuel, Gauge, Settings } from 'lucide-react';
+import { motion } from 'framer-motion';
 import ProductCard from '../components/product/ProductCard';
 import { BRAND } from '../brandConfig';
 import './Home.css';
 
-const API = (import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : "http://localhost:5000"));
-
-const FlashSalesCarousel = ({ promotions }) => {
-    const [current, setCurrent] = useState(0);
-    const [isTransitioning, setIsTransitioning] = useState(true);
-
-    const slides = promotions.length > 1
-        ? [promotions[promotions.length - 1], ...promotions, promotions[0]]
-        : promotions;
-
-    useEffect(() => {
-        if (promotions.length <= 1) return;
-        const timer = setInterval(() => handleNext(), 5000);
-        return () => clearInterval(timer);
-    }, [promotions.length, current]);
-
-    const handleNext = () => {
-        if (promotions.length <= 1) return;
-        setCurrent(prev => prev + 1);
-    };
-
-    const handleTransitionEnd = () => {
-        if (current >= promotions.length) {
-            setIsTransitioning(false);
-            setCurrent(0);
-        } else if (current < 0) {
-            setIsTransitioning(false);
-            setCurrent(promotions.length - 1);
-        }
-    };
-
-    useEffect(() => {
-        if (!isTransitioning) {
-            setTimeout(() => setIsTransitioning(true), 50);
-        }
-    }, [isTransitioning]);
-
-    if (!promotions || promotions.length === 0) return null;
-
-    const displayIdx = promotions.length > 1 ? current + 1 : 0;
-
-    return (
-        <section className="flash-sales-section container">
-            <div className="flash-carousel-outer">
-                <div
-                    className="flash-carousel-inner"
-                    onTransitionEnd={handleTransitionEnd}
-                    style={{
-                        transform: `translateX(-${displayIdx * 100}%)`,
-                        transition: (promotions.length > 1 && isTransitioning) ? 'transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)' : 'none',
-                        width: `${slides.length * 100}%`
-                    }}
-                >
-                    {slides.map((promo, i) => (
-                        <div key={`${promo.id}-${i}`} className="flash-slide" style={{ width: `${100 / slides.length}%` }}>
-                            <div className="flash-card-glow"></div>
-                            <div className="flash-content glass">
-                                <div className="flash-info">
-                                    <div className="flash-tag">
-                                        <Zap size={14} /> <span>Featured Import</span>
-                                    </div>
-                                    <h2>{promo.title}</h2>
-                                    <p>{promo.subtitle}</p>
-                                    <Link to={promo.link || "/products"} className="btn btn-accent">
-                                        View Details <ArrowRight size={18} />
-                                    </Link>
-                                </div>
-                                <div className="flash-visual">
-                                    <img src={promo.image_url?.startsWith('http') ? promo.image_url : `${API}${promo.image_url}`} alt={promo.title} />
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-                {promotions.length > 1 && (
-                    <div className="flash-nav">
-                        {promotions.map((_, i) => (
-                            <button
-                                key={i}
-                                className={`flash-dot ${i === current ? 'active' : ''}`}
-                                onClick={() => setCurrent(i)}
-                            />
-                        ))}
-                    </div>
-                )}
-            </div>
-        </section>
-    );
-};
-
 const Home = () => {
-    const [products, setProducts] = useState([]);
-    const [promotions, setPromotions] = useState([]);
+    const [featuredProducts, setFeaturedProducts] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [scrollDepth, setScrollDepth] = useState(0);
+    const navigate = useNavigate();
+
+    // Quick search state
+    const [searchMake, setSearchMake] = useState('All');
 
     useEffect(() => {
-        const handleScroll = () => {
-            const h = document.documentElement, b = document.body, st = 'scrollTop', sh = 'scrollHeight';
-            const percent = (h[st] || b[st]) / ((h[sh] || b[sh]) - h.clientHeight) * 100;
-            setScrollDepth(percent);
-        };
-        window.addEventListener('scroll', handleScroll);
-
-        const fetchData = async () => {
-            try {
-                const [pRes, promRes] = await Promise.all([
-                    fetch(`${API}/api/products`),
-                    fetch(`${API}/api/promotions`)
-                ]);
-                const pData = await pRes.json();
-                const promData = await promRes.json();
-                setProducts(pData.slice(0, 8));
-                setPromotions(promData);
-            } catch (err) {
-                console.error(err);
-                // Placeholder content if API is down
-                setPromotions([
-                    {
-                        id: 1,
-                        title: "2018 Toyota Harrier",
-                        subtitle: "Pristine condition, Pearl White, Direct Import.",
-                        image_url: "https://images.unsplash.com/photo-1621359983222-7517c4690ef1?q=80&w=2070&auto=format&fit=crop"
-                    },
-                    {
-                        id: 2,
-                        title: "Lexus NX300h",
-                        subtitle: "Hybrid Efficiency meets Luxury.",
-                        image_url: "https://images.unsplash.com/photo-1549317661-bd3293003975?q=80&w=2070&auto=format&fit=crop"
-                    }
-                ]);
-            } finally {
+        const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : "http://localhost:5000");
+        fetch(`${API_URL}/api/products`)
+            .then(res => res.json())
+            .then(data => {
+                if (Array.isArray(data)) {
+                    setFeaturedProducts(data.slice(0, 6));
+                }
                 setLoading(false);
-            }
-        };
-
-        fetchData();
-        return () => window.removeEventListener('scroll', handleScroll);
+            })
+            .catch(() => setLoading(false));
     }, []);
 
     return (
-        <div className="home-page">
+        <div className="home-v3">
             <Helmet>
-                <title>{BRAND.nameRaw} | Premium Japanese Imports</title>
-                <meta name="description" content={BRAND.description} />
+                <title>Bazaar Motors | Your Trusted Partner for Quality Vehicles in Ruiru</title>
+                <meta name="description" content="Discover premium foreign and local used vehicles at Bazaar Motors, Ruiru. Direct imports, verified quality, and seamless ownership." />
             </Helmet>
-            <div className="scroll-progress" style={{ width: `${scrollDepth}%` }}></div>
 
-            <section className="hero">
-                <div className="container hero-grid">
-                    <div className="hero-text-side">
-                        <div className="hero-badge animate-in-1">
-                            <Award size={14} /> <span>{BRAND.hero.badge}</span>
+            {/* Hero V3 - High Impact */}
+            <section className="hero-v3">
+                <div className="container hero-v3-inner">
+                    <motion.div
+                        className="hero-v3-content"
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8 }}
+                    >
+                        <div className="hero-v3-badge">
+                            <span className="badge-dot"></span>
+                            Est. in Ruiru, Driven by Excellence
                         </div>
-                        <h1 className="animate-in-2">
-                            {BRAND.hero.titleMain} <br />
-                            <span className="accent-text">{BRAND.hero.titleAccent}</span> <br />
-                            {BRAND.hero.titleSuffix}
-                        </h1>
-                        <p className="animate-in-3">
-                            {BRAND.hero.subtitle}
-                        </p>
-                        <div className="hero-actions animate-in-4">
-                            <Link to="/products" className="btn btn-primary glow">
-                                Explore Inventory
+                        <h1 className="gradient-text">Uncompromising <br /> <span className="accent">Performance.</span></h1>
+                        <p className="hero-v3-desc">Specializing in pristine Japanese imports and luxury vehicles. Elevate your journey with hand-picked units, direct-import butler services, and verified quality in the heart of Ruiru.</p>
+
+                        <div className="hero-v3-actions">
+                            <Link to="/products" className="primary-btn hero-btn">
+                                Explore Collection <ArrowRight size={18} />
                             </Link>
-                            <Link to="/products?category=SUV" className="btn btn-accent">
-                                View SUVs
-                            </Link>
+                            <a href={`https://wa.me/${BRAND.whatsapp}`} className="glass-btn secondary-hero-btn">
+                                Custom Import <Globe size={16} />
+                            </a>
                         </div>
+                    </motion.div>
+                </div>
+                <div className="hero-v3-image">
+                    <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=2070&auto=format&fit=crop" alt="Luxury Sports Car" />
+                    <div className="hero-v3-overlay"></div>
+                </div>
+            </section>
 
-                        <div className="hero-trust animate-in-5">
-                            <div className="trust-pill">
-                                <ShieldCheck size={14} /> Certified Imports
-                            </div>
-                            <div className="trust-pill">
-                                <Zap size={14} /> Financing Available
-                            </div>
-                        </div>
+            {/* Stats / Trust Bar */}
+            <section className="trust-bar-v3">
+                <div className="container trust-flex-v3">
+                    <div className="trust-item-v3">
+                        <strong>500+</strong>
+                        <span>Vehicles Delivered</span>
                     </div>
+                    <div className="trust-divider-v3"></div>
+                    <div className="trust-item-v3">
+                        <strong>100%</strong>
+                        <span>Verified History</span>
+                    </div>
+                    <div className="trust-divider-v3"></div>
+                    <div className="trust-item-v3">
+                        <strong>4.9/5</strong>
+                        <span>Customer Rating</span>
+                    </div>
+                </div>
+            </section>
 
-                    <div className="hero-visual-side animate-in-scale">
-                        <div className="hero-main-img-wrapper">
-                            <img
-                                src="https://images.unsplash.com/photo-1550355291-bbee04a92027?q=80&w=1936&auto=format&fit=crop"
-                                alt="Bazaar Motors Luxury Showroom"
-                                className="hero-main-img"
-                            />
-                            <div className="hero-floating-card glass">
-                                <span className="card-label">Top Choice</span>
-                                <h4>Toyota Prado TX-L</h4>
-                                <p>Diesel Turbo 2.8L</p>
-                                <Link to="/products" className="card-link">View Details <ArrowRight size={14} /></Link>
-                            </div>
+            {/* Featured Showroom */}
+            <section className="showroom-v3 container">
+                <div className="v3-section-header">
+                    <div className="v3-header-text">
+                        <span className="v3-sub">Curated Selections</span>
+                        <h2>LATEST <span className="accent">ARRIVALS</span></h2>
+                    </div>
+                    <Link to="/products" className="v3-link-more glass-panel">
+                        Live Inventory <ChevronRight size={18} />
+                    </Link>
+                </div>
+
+                <div className="v3-showroom-grid">
+                    {loading ? (
+                        [1, 2, 3].map(i => <div key={i} className="v3-skeleton pulse"></div>)
+                    ) : (
+                        featuredProducts.map((car, idx) => (
+                            <motion.div
+                                key={car.id}
+                                initial={{ opacity: 0, y: 30 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                transition={{ delay: idx * 0.1 }}
+                                viewport={{ once: true }}
+                            >
+                                <ProductCard product={car} />
+                            </motion.div>
+                        ))
+                    )}
+                </div>
+            </section>
+
+            {/* Why Bazaar Motors */}
+            <section className="features-v3">
+                <div className="container">
+                    <div className="v3-features-grid">
+                        <div className="v3-feature-card">
+                            <div className="v3-feature-icon"><Globe /></div>
+                            <h3>Direct Imports</h3>
+                            <p>Seamlessly importing high-grade vehicles from Japan and UK auction houses directly to Ruiru.</p>
+                        </div>
+                        <div className="v3-feature-card">
+                            <div className="v3-feature-icon"><ShieldCheck /></div>
+                            <h3>Rigorous Inspection</h3>
+                            <p>Every vehicle undergoes a detailed 100-point mechanical and body inspection for your peace of mind.</p>
+                        </div>
+                        <div className="v3-feature-card">
+                            <div className="v3-feature-icon"><Clock /></div>
+                            <h3>Ownership Support</h3>
+                            <p>We handle all documentation, registration, and post-purchase maintenance support for you.</p>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <div className="trust-ribbon">
-                <div className="ribbon-track">
-                    {[1, 2, 3, 4, 5, 6].map(i => (
-                        <div key={i} className="ribbon-item">
-                            <Car size={16} /> PREMIUM IMPORTS
-                            <Gauge size={16} /> VERIFIED MILEAGE
-                            <Settings size={16} /> FULL SERVICE HISTORY
-                            <ShieldCheck size={16} /> QISJ CERTIFIED
-                        </div>
-                    ))}
-                </div>
-            </div>
-
-            <FlashSalesCarousel promotions={promotions} />
-
-            <section className="featured-section container">
-                <div className="section-intro">
-                    <span className="eyebrow">Our Collections</span>
-                    <h2>Featured Vehicles</h2>
-                    <p>Hand-picked luxury and utility vehicles that define reliability and style.</p>
-                </div>
-
-                <div className="product-layout-grid">
-                    <div className="grid-sidebar-info">
-                        <div className="bento-card bento-cta glass">
-                            <h3>Looking for something specific?</h3>
-                            <p>We handle direct imports from Japan to your doorstep. Tell us your dream car.</p>
-                            <a href={`https://wa.me/${BRAND.whatsapp}`} className="btn btn-primary btn-sm">Talk to Us</a>
-                        </div>
-                        <div className="bento-card bento-stat">
-                            <span className="big-num">500+</span>
-                            <p>Happy Drivers Served</p>
-                        </div>
+            {/* Japanese Imports Promo */}
+            <section className="import-promo-v3">
+                <div className="container import-flex-v3">
+                    <div className="import-text-v3">
+                        <span className="v3-sub">Special Services</span>
+                        <h2>Direct Japanese <span className="accent">Import Butler</span></h2>
+                        <p>Have a specific car in mind? Let us bid, clear, and deliver your dream vehicle straight from Japan to your doorstep with full transparency.</p>
+                        <button className="btn-v3-dark" onClick={() => window.open(`https://wa.me/${BRAND.whatsapp}`, '_blank')}>
+                            Start Import Process
+                        </button>
                     </div>
-
-                    <div className="grid-main-content">
-                        {loading ? (
-                            <div className="product-grid-skeleton">
-                                {[1, 2, 3, 4].map(i => (
-                                    <div key={i} className="skeleton-card pulse"></div>
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="product-grid">
-                                {products.length > 0 ? products.map((product) => (
-                                    <ProductCard key={product.id} product={product} />
-                                )) : (
-                                    <div className="no-products glass">
-                                        <p>Our inventory is being updated. Check back shortly!</p>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </section>
-
-            <section className="experience-section">
-                <div className="container experience-grid">
-                    <div className="experience-box h-full">
-                        <span className="badge experience-badge">The Bazaar Way</span>
-                        <h2>Buying Made Easy</h2>
-                        <p>We ensure a transparent, secure, and delightful car buying experience from start to finish.</p>
-                        <ul className="premium-list">
-                            <li><CheckCircle size={18} /> Transparent Pricing Policy</li>
-                            <li><CheckCircle size={18} /> Verified Logbooks & History</li>
-                            <li><CheckCircle size={18} /> Flexible Finance Options</li>
-                        </ul>
-                    </div>
-                    <div className="experience-visual">
-                        <div className="floating-elements">
-                            <div className="float-img f1">
-                                <img src="https://images.unsplash.com/photo-1549317661-bd3293003975?q=80&w=1000&auto=format&fit=crop" alt="Lexus" />
-                            </div>
-                            <div className="float-img f2">
-                                <img src="https://images.unsplash.com/photo-1621359983222-7517c4690ef1?q=80&w=1000&auto=format&fit=crop" alt="Harrier" />
-                            </div>
-                            <div className="float-img f3">
-                                <img src="https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?q=80&w=1000&auto=format&fit=crop" alt="Prado" />
-                            </div>
+                    <div className="import-visual-v3">
+                        <div className="import-image-wrap">
+                            <img src="https://images.unsplash.com/photo-1549399542-7e3f8b79c3d9?q=80&w=2070&auto=format&fit=crop" alt="Japan car auction" />
                         </div>
                     </div>
                 </div>
             </section>
 
-            <section className="newsletter-editorial container">
-                <div className="editorial-inner glass">
-                    <div className="editorial-text">
-                        <h2>Join the Inner Circle</h2>
-                        <p>Get notified about new arrivals and special import deals before they hit the yard.</p>
+            {/* Social Connection */}
+            <section className="social-v3 container">
+                <div className="social-v3-card">
+                    <div className="social-v3-content">
+                        <Instagram size={32} />
+                        <h3>Follow Our Journey</h3>
+                        <p>Check out our latest deliveries and new stock arrivals on Instagram.</p>
+                        <a href={BRAND.social.instagram} target="_blank" rel="noreferrer" className="btn-v3-social">
+                            @bazaar_motors
+                        </a>
                     </div>
-                    <form className="newsletter-premium-form" onSubmit={(e) => e.preventDefault()}>
-                        <input type="email" placeholder="Your aesthetic email..." />
-                        <button type="submit" className="btn btn-primary">Subscribe</button>
-                    </form>
                 </div>
             </section>
         </div>
     );
 };
 
-const CheckCircle = ({ size }) => (
-    <div style={{ color: 'var(--accent-color)', display: 'flex' }}><ShieldCheck size={size} /></div>
-);
-
-
 export default Home;
-

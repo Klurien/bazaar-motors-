@@ -1,29 +1,210 @@
-/* Reset the default Vite styles that conflict with our app layout */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+/* NUCLEAR RESET FOR MYSTERY BLUE/CYAN GLOW */
+html,
+body,
+#root,
+.app {
+  box-shadow: none !important;
+  outline: none !important;
+  border: none !important;
+}
+
+* {
+  outline: none !important;
+}
 
 :root {
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  /* Luxury Palette - Deep Black, Graphite & Gold */
+  --primary: #FF7A00;
+  /* Keeping brand orange but refined */
+  --primary-raw: 255, 122, 0;
+  --bg-black: #000000;
+  --bg-dark: #0A0A0B;
+  --bg-surface: #141416;
+  --bg-hover: #1C1C1F;
+
+  /* Text */
+  --text-primary: #FFFFFF;
+  --text-secondary: #A1A1AA;
+  --text-muted: #52525B;
+
+  /* Borders & Accents */
+  --border-dim: rgba(255, 255, 255, 0.08);
+  --border-gold: rgba(255, 122, 0, 0.3);
+
+  /* Tokens */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+  --transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Base Reset */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  margin: 0;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--bg-black);
+  color: var(--text-primary);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
-#root {
-  width: 100%;
-  min-height: 100svh;
+h1,
+h2,
+h3,
+h4,
+.font-display {
+  font-family: 'Outfit', sans-serif;
+  letter-spacing: -0.02em;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+/* --- Layout --- */
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0 20px;
+  }
+}
+
+/* --- Buttons --- */
+.primary-btn {
+  background: var(--primary);
+  color: #000;
+  padding: 14px 32px;
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.85rem;
+  border: none;
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.primary-btn:hover {
+  background: #FFF;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(255, 122, 0, 0.2);
+}
+
+.glass-panel {
+  background: rgba(20, 20, 22, 0.8);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-dim);
+  border-radius: var(--radius-md);
+}
+
+/* --- Typography Helpers --- */
+.gradient-text {
+  background: linear-gradient(135deg, #FFF 60%, rgba(255, 255, 255, 0.4));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.accent {
+  color: var(--primary);
+}
+
+/* --- Global Scrollbar --- */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-black);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #27272A;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}
+
+/* --- Animations --- */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-reveal {
+  animation: fadeIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+/* --- Floating Elements --- */
+.floating-whatsapp {
+  position: fixed;
+  bottom: 40px;
+  right: 40px;
+  background: #FFF;
+  color: #000;
+  padding: 12px 24px;
+  border-radius: 4px;
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+  z-index: 1000;
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  transition: var(--transition);
+  border: 1px solid var(--border-dim);
 }
 
-.app {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
+.floating-whatsapp:hover {
+  background: var(--primary);
+  transform: translateY(-5px);
+  box-shadow: 0 30px 60px rgba(255, 122, 0, 0.3);
 }
 
-main {
-  flex: 1;
+.floating-whatsapp svg {
+  width: 18px;
+  height: 18px;
+}
+
+@media (max-width: 768px) {
+  .floating-whatsapp {
+    bottom: 20px;
+    right: 20px;
+    padding: 12px;
+  }
+
+  .floating-whatsapp span {
+    display: none;
+  }
 }

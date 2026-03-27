@@ -1,96 +1,104 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, Phone, MapPin, Instagram, Twitter, Facebook, Youtube } from 'lucide-react';
+import {
+    Mail,
+    Phone,
+    MapPin,
+    Instagram,
+    Twitter,
+    Facebook,
+    Youtube,
+    Music,
+    Search,
+    Shield,
+    CheckCircle
+} from 'lucide-react';
 import { BRAND } from '../../brandConfig';
 import './Footer.css';
 
 const Footer = () => {
-    const [whatsappNumber, setWhatsappNumber] = React.useState(BRAND.phone);
-
-    React.useEffect(() => {
-        const API = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : "http://localhost:5000");
-        fetch(`${API}/api/stats/config`)
-            .then(res => res.json())
-            .then(data => {
-                if (data.whatsapp_number) setWhatsappNumber(data.whatsapp_number);
-            })
-            .catch(err => console.error("Config fetch fail", err));
-    }, []);
-
     return (
-        <footer className="footer">
-            <div className="footer-top">
-                <div className="container footer-grid">
-                    {/* Brand */}
-                    <div className="footer-brand">
-                        <Link to="/" className="footer-logo">
-                            <BRAND.logo className="logo-icon" size={20} color="#FF7A00" />
-                            <span className="logo-brand">{BRAND.name.split(' ')[0]}</span>
-                            <span className="logo-suffix">{BRAND.name.split(' ')[1] || ''}</span>
-                        </Link>
-                        <p className="footer-tagline">
-                            {BRAND.description}
-                        </p>
-                        <div className="footer-social">
-                            <a href={BRAND.social.instagram} aria-label="Instagram" className="social-icon" target="_blank" rel="noopener noreferrer"><Instagram size={18} /></a>
-                            <a href={BRAND.social.twitter} aria-label="Twitter" className="social-icon" target="_blank" rel="noopener noreferrer"><Twitter size={18} /></a>
-                            <a href={BRAND.social.facebook} aria-label="Facebook" className="social-icon" target="_blank" rel="noopener noreferrer"><Facebook size={18} /></a>
-                            <a href={BRAND.social.youtube} aria-label="YouTube" className="social-icon" target="_blank" rel="noopener noreferrer"><Youtube size={18} /></a>
+        <footer className="footer-v3">
+            <div className="container footer-v3-top">
+                {/* Brand */}
+                <div className="f-v3-col brand-col">
+                    <Link to="/" className="v3-logo">
+                        <div className="v3-logo-symbol"></div>
+                        <span className="v3-logo-text">BAZAAR <span className="highlight">MOTORS</span></span>
+                    </Link>
+                    <p className="f-v3-description">
+                        Kenya's premier destination for high-quality foreign and local used vehicles. With over a decade of trust in Ruiru, we deliver excellence through transparency, verified quality, and seamless ownership.
+                    </p>
+                    <div className="f-v3-social">
+                        <a href={BRAND.social.facebook} className="social-link-v3 fb"><Facebook size={18} /></a>
+                        <a href={BRAND.social.twitter} className="social-link-v3 tw"><Twitter size={18} /></a>
+                        <a href={BRAND.social.instagram} className="social-link-v3 ig"><Instagram size={18} /></a>
+                        <a href={BRAND.social.tiktok || "#"} className="social-link-v3 tk"><Music size={18} /></a>
+                    </div>
+                </div>
+
+                {/* Quick Links */}
+                <div className="f-v3-col">
+                    <h4 className="f-v3-heading">Quick Links</h4>
+                    <ul className="f-v3-links">
+                        <li><Link to="/products">Browse Showroom</Link></li>
+                        <li><Link to="/products?category=SUV">Luxury SUVs</Link></li>
+                        <li><Link to="/products?condition=Foreign Used">Foreign Imports</Link></li>
+                        <li><Link to="#">Financing Solutions</Link></li>
+                        <li><Link to="#">Custom Import Concierge</Link></li>
+                    </ul>
+                </div>
+
+                {/* Company */}
+                <div className="f-v3-col">
+                    <h4 className="f-v3-heading">Company</h4>
+                    <ul className="f-v3-links">
+                        <li><Link to="/">About Us</Link></li>
+                        <li><Link to="/">Meet the Team</Link></li>
+                        <li><Link to="/">Contact Us</Link></li>
+                        <li><Link to="/">Testimonials</Link></li>
+                        <li><Link to="/">Visit our Yard</Link></li>
+                    </ul>
+                </div>
+
+                {/* Contact */}
+                <div className="f-v3-col contact-col">
+                    <h4 className="f-v3-heading">Contact Us</h4>
+                    <div className="f-v3-contact">
+                        <div className="contact-item-v3">
+                            <Phone size={18} className="icon-orange" />
+                            <div className="contact-text">
+                                <span>Phone & WhatsApp</span>
+                                <p>{BRAND.phone}</p>
+                            </div>
                         </div>
-                    </div>
-
-                    {/* Inventory */}
-                    <div className="footer-col">
-                        <h4>Inventory</h4>
-                        <ul>
-                            <li><Link to="/products">All Inventory</Link></li>
-                            <li><Link to="/products?category=SUV">SUVs</Link></li>
-                            <li><Link to="/products?category=Saloon">Saloon Cars</Link></li>
-                            <li><Link to="/products?category=Hatchback">Hatchbacks</Link></li>
-                            <li><Link to="/products?category=Commercial">Commercial</Link></li>
-                        </ul>
-                    </div>
-
-                    {/* Support */}
-                    <div className="footer-col">
-                        <h4>Customer Support</h4>
-                        <ul>
-                            <li><Link to="/products">Book Test Drive</Link></li>
-                            <li><Link to="#">Financing Options</Link></li>
-                            <li><Link to="#">Import Services</Link></li>
-                            <li><Link to="#">Valuation</Link></li>
-                            <li><Link to="#">FAQs</Link></li>
-                        </ul>
-                    </div>
-
-                    {/* Contact */}
-                    <div className="footer-col">
-                        <h4>Get In Touch</h4>
-                        <ul className="contact-list">
-                            <li>
-                                <Mail size={15} />
-                                <span>{BRAND.email}</span>
-                            </li>
-                            <li>
-                                <Phone size={15} />
-                                <span>{whatsappNumber}</span>
-                            </li>
-                            <li>
-                                <MapPin size={15} />
-                                <span>{BRAND.address}</span>
-                            </li>
-                        </ul>
+                        <div className="contact-item-v3">
+                            <Mail size={18} className="icon-orange" />
+                            <div className="contact-text">
+                                <span>Email Address</span>
+                                <p>{BRAND.email}</p>
+                            </div>
+                        </div>
+                        <div className="contact-item-v3">
+                            <MapPin size={18} className="icon-orange" />
+                            <div className="contact-text">
+                                <span>Ruiru Yard</span>
+                                <p>{BRAND.address}</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div className="footer-bottom">
-                <div className="container footer-bottom-inner">
-                    <p>© {new Date().getFullYear()} {BRAND.nameRaw}. All rights reserved.</p>
-                    <div className="footer-legal-links">
+            <div className="footer-v3-bottom">
+                <div className="container footer-v3-inner">
+                    <p>© {new Date().getFullYear()} Bazaar Motors Ltd. All rights reserved.</p>
+                    <div className="f-v3-legal">
                         <Link to="#">Privacy Policy</Link>
-                        <Link to="#">Terms of Service</Link>
-                        <Link to="#">Import Registry</Link>
+                        <span className="f-v3-dot"></span>
+                        <Link to="#">Terms of Sale</Link>
+                        <span className="f-v3-dot"></span>
+                        <Link to="#">Import Declaration</Link>
                     </div>
                 </div>
             </div>

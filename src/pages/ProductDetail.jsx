@@ -1,26 +1,48 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ShoppingCart, ArrowLeft, Check, Star, Minus, Plus, Share2, ChevronLeft, ChevronRight, ShieldCheck, Award, Info, Search } from 'lucide-react';
+import {
+    ArrowLeft,
+    Check,
+    ChevronLeft,
+    ChevronRight,
+    Gauge,
+    Fuel,
+    Settings,
+    Dna,
+    User,
+    Phone,
+    Mail,
+    MessageSquare,
+    Calendar,
+    Zap,
+    Wind,
+    ShieldCheck,
+    CarFront
+} from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
-import { useCart } from '../context/CartContext';
-import { useAuth } from '../context/AuthContext';
 import ProductCard from '../components/product/ProductCard';
+import { BRAND } from '../brandConfig';
 import './ProductDetail.css';
 
-const API = (import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : (import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : "http://localhost:5000"))));
+const API = (import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : "http://localhost:5000"));
 
 const ProductDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { addToCart } = useCart();
-    const { user } = useAuth();
 
     const [product, setProduct] = useState(null);
     const [relatedProducts, setRelatedProducts] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [quantity, setQuantity] = useState(1);
-    const [addedFeedback, setAddedFeedback] = useState(false);
     const [selectedImageIdx, setSelectedImageIdx] = useState(0);
+
+    // Form state
+    const [formData, setFormData] = useState({
+        name: '',
+        phone: '',
+        email: '',
+        subject: '',
+        message: ''
+    });
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -30,11 +52,11 @@ const ProductDetail = () => {
                 const data = await res.json();
                 setProduct(data);
 
-                // Fetch related products
+                // Fetch suggested products (by category or make)
                 const allRes = await fetch(`${API}/api/products`);
                 const allData = await allRes.json();
                 const filtered = allData
-                    .filter(p => p.category === data.category && p.id !== data.id)
+                    .filter(p => (p.category === data.category || p.make === data.make) && p.id !== data.id)
                     .slice(0, 4);
                 setRelatedProducts(filtered);
 
@@ -48,34 +70,22 @@ const ProductDetail = () => {
         fetchProductData();
     }, [id]);
 
-    const handleAddToCart = () => {
-        if (!user) {
-            navigate('/login');
-            return;
-        }
-        addToCart(product, quantity);
-        setAddedFeedback(true);
-        setTimeout(() => setAddedFeedback(false), 2000);
-    };
-
-    const handleBuyNow = () => {
-        if (!user) {
-            navigate('/login');
-            return;
-        }
-        addToCart(product, quantity);
-        navigate('/cart');
+    const handleFormSubmit = (e) => {
+        e.preventDefault();
+        // Here you would typically send the inquiry to the backend or WhatsApp
+        const whatsappMsg = `Inquiry for ${product.year} ${product.name}:\nName: ${formData.name}\nEmail: ${formData.email}\nMessage: ${formData.message}`;
+        window.open(`https://wa.me/${BRAND.whatsapp}?text=${encodeURIComponent(whatsappMsg)}`, '_blank');
     };
 
     if (loading) {
         return (
-            <div className="container product-detail-skeleton animate-pulse">
-                <div className="skeleton-grid">
-                    <div className="skeleton-media glass"></div>
-                    <div className="skeleton-info">
-                        <div className="skel-line w-1/4 h-4"></div>
-                        <div className="skel-line w-3/4 h-12"></div>
-                        <div className="skel-line w-full h-32"></div>
+            <div className="product-detail-skeleton-v3 container">
+                <div className="skel-grid">
+                    <div className="skel-media pulse"></div>
+                    <div className="skel-content">
+                        <div className="skel-title pulse"></div>
+                        <div className="skel-specs pulse"></div>
+                        <div className="skel-form pulse"></div>
                     </div>
                 </div>
             </div>
@@ -85,140 +95,188 @@ const ProductDetail = () => {
     if (!product) return null;
 
     const images = product.images?.length > 0
-        ? product.images.map(img => `${API}${img.url}`)
-        : [product.image_url ? `${API}${product.image_url}` : 'https://placehold.co/800x800?text=Finding+Image'];
+        ? product.images.map(img => img.url.startsWith('http') ? img.url : `${API}${img.url}`)
+        : [product.image_url ? (product.image_url.startsWith('http') ? product.image_url : `${API}${product.image_url}`) : 'https://placehold.co/800x600?text=Vehicle+Image'];
+
+    const vehicleSpecs = [
+        { icon: <Dna size={20} />, label: 'Body Type', value: product.category || 'SUV' },
+        { icon: <Gauge size={20} />, label: 'Mileage', value: product.mileage ? `${product.mileage.toLocaleString()} km` : 'TBA' },
+        { icon: <Zap size={20} />, label: 'Engine', value: product.engine_capacity || 'N/A' },
+        { icon: <Fuel size={20} />, label: 'Fuel', value: product.fuel_type || 'Petrol' },
+        { icon: <Settings size={20} />, label: 'Drive', value: product.transmission || 'Automatic' },
+        { icon: <ShieldCheck size={20} />, label: 'Grade', value: product.auction_grade || 'Auction 4.5/B' },
+    ];
+
+    let featuresArray = ["Air Conditioning", "Airbags", "Alloy Wheels", "Power Steering", "Rear Camera"];
+    if (product.features) {
+        try {
+            // Check if it's JSON
+            const parsed = JSON.parse(product.features);
+            if (Array.isArray(parsed)) featuresArray = parsed;
+        } catch {
+            // Otherwise assume comma-separated
+            featuresArray = product.features.split(',').map(f => f.trim());
+        }
+    }
 
     return (
-        <div className="product-detail-page">
+        <div className="vehicle-detail-page">
             <Helmet>
-                <title>{product.name} | Kitchen Finds</title>
-                <meta name="description" content={product.description?.substring(0, 160) || "Discover artisan kitchen finds."} />
-                <meta property="og:title" content={`${product.name} | Premium Kitchen Finds`} />
-                <meta property="og:description" content={product.description?.substring(0, 160)} />
-                <meta property="og:image" content={images[0]} />
-                <meta name="twitter:card" content="summary_large_image" />
-                <script type="application/ld+json">
-                    {JSON.stringify({
-                        "@context": "https://schema.org/",
-                        "@type": "Product",
-                        "name": product.name,
-                        "image": images,
-                        "description": product.description || "Premium kitchen finding.",
-                        "brand": {
-                            "@type": "Brand",
-                            "name": "Kitchen Finds"
-                        },
-                        "offers": {
-                            "@type": "Offer",
-                            "url": typeof window !== "undefined" ? window.location.href : '',
-                            "priceCurrency": "USD",
-                            "price": parseFloat(product.price),
-                            "itemCondition": "https://schema.org/NewCondition",
-                            "availability": product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
-                            "seller": {
-                                "@type": "Organization",
-                                "name": "Kitchen Finds"
-                            }
-                        }
-                    })}
-                </script>
+                <title>{`${product.year} ${product.name} for Sale | Bazaar Motors`}</title>
+                <meta name="description" content={`Check out the ${product.year} ${product.name} at Bazaar Motors Ruiru. Performance: ${product.engine_capacity}, Mileage: ${product.mileage}. Contact us today.`} />
             </Helmet>
+
             <div className="container">
-                <div className="detail-layout">
-                    {/* Media Module - Vertical Thumbs Layout */}
-                    <div className="media-module-v2">
-                        <div className="v-thumb-list">
-                            {images.map((img, idx) => (
-                                <button
-                                    key={idx}
-                                    className={`v-thumb-item ${selectedImageIdx === idx ? 'active' : ''}`}
-                                    onClick={() => setSelectedImageIdx(idx)}
-                                >
-                                    <img src={img} alt="" />
-                                </button>
-                            ))}
+                <div className="detail-hero-v3">
+                    <div className="detail-header-v3">
+                        <div className="header-top-v3">
+                            <span className="v3-sub">{product.make} SHOWROOM</span>
+                            <h1>{product.year} {product.name}</h1>
                         </div>
-                        <div className="v-main-viewer glass">
-                            <img src={images[selectedImageIdx]} alt={product.name} />
-
-                            {images.length > 1 && (
-                                <div className="v-viewer-nav">
-                                    <button className="nav-btn left" onClick={() => setSelectedImageIdx(i => (i - 1 + images.length) % images.length)}>
-                                        <ChevronLeft size={24} />
-                                    </button>
-                                    <button className="nav-btn right" onClick={() => setSelectedImageIdx(i => (i + 1) % images.length)}>
-                                        <ChevronRight size={24} />
-                                    </button>
-                                </div>
-                            )}
-
-                            <button className="zoom-btn" title="Expand Details">
-                                <Search size={18} />
-                            </button>
+                        <div className="v3-price-impact">
+                            <span className="impact-label">List Price</span>
+                            <div className="impact-val">KSh {parseFloat(product.price).toLocaleString()}</div>
                         </div>
                     </div>
 
-                    {/* Information Module */}
-                    <div className="info-module-v2">
-                        <h1 className="v-product-title">{product.name}</h1>
-                        <div className="v-product-price">
-                            KSh {parseFloat(product.price).toLocaleString()}
-                        </div>
-
-                        <div className="v-purchase-section">
-                            <div className="v-qty-control">
-                                <span className="qty-label">Quantity</span>
-                                <div className="qty-box">
-                                    <button onClick={() => setQuantity(q => Math.max(1, q - 1))}><Minus size={16} /></button>
-                                    <span className="qty-val">{quantity}</span>
-                                    <button onClick={() => setQuantity(q => q + 1)}><Plus size={16} /></button>
+                    <div className="detail-media-layout-v3">
+                        <div className="main-gallery-v3 glass-panel">
+                            <img src={images[selectedImageIdx]} alt={product.name} />
+                            {images.length > 1 && (
+                                <div className="gallery-nav-v3">
+                                    <button onClick={() => setSelectedImageIdx(i => (i - 1 + images.length) % images.length)}><ChevronLeft /></button>
+                                    <button onClick={() => setSelectedImageIdx(i => (i + 1) % images.length)}><ChevronRight /></button>
                                 </div>
-                            </div>
-
-                            <div className="v-action-stack">
-                                <button
-                                    className={`v-btn-outline ${addedFeedback ? 'success' : ''}`}
-                                    onClick={handleAddToCart}
-                                    disabled={product.stock <= 0}
-                                >
-                                    {addedFeedback ? 'Success! Added' : 'Add to Collection'}
-                                </button>
-                                <button
-                                    className="v-btn-solid"
-                                    onClick={handleBuyNow}
-                                    disabled={product.stock <= 0}
-                                >
-                                    {product.stock <= 0 ? 'Finding Archived' : 'Instant Acquisition'}
-                                </button>
+                            )}
+                            <div className="thumb-track-v3">
+                                {images.map((img, idx) => (
+                                    <button
+                                        key={idx}
+                                        className={selectedImageIdx === idx ? 'active' : ''}
+                                        onClick={() => setSelectedImageIdx(idx)}
+                                    >
+                                        <img src={img} alt="" />
+                                    </button>
+                                ))}
                             </div>
                         </div>
 
-                        <div className="v-product-meta">
-                            <p className="v-desc-text">
-                                {product.description || "A master-grade culinary finding, precision-engineered for the modern kitchen sanctuary."}
-                            </p>
-                            <div className="v-features-list">
-                                <div className="feature-item">
-                                    <ShieldCheck size={18} />
-                                    <span>Lifetime Artisan Integrity Warranty</span>
-                                </div>
-                                <div className="feature-item">
-                                    <Award size={18} />
-                                    <span>Verified Professional Grade Performance</span>
+                        <div className="specs-sidebar-v3">
+                            <div className="specs-grid-v3">
+                                {vehicleSpecs.map((spec, i) => (
+                                    <div key={i} className="spec-tile-v3 glass-panel">
+                                        <div className="tile-icon-v3">{spec.icon}</div>
+                                        <div className="tile-info-v3">
+                                            <span className="tile-label-v3">{spec.label}</span>
+                                            <span className="tile-val-v3">{spec.value}</span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="action-stack-v3">
+                                <button
+                                    className="primary-btn wide-btn"
+                                    onClick={() => window.open(`https://wa.me/${BRAND.whatsapp}?text=I%20am%20interested%20in%20a%20test%20drive%20for%20the%20${product.name}`, '_blank')}
+                                >
+                                    <Calendar size={18} /> BOOK TEST DRIVE
+                                </button>
+                                <div className="alt-actions-v3">
+                                    <a href={`tel:${BRAND.phone}`} className="glass-btn flex-1 j-center"><Phone size={16} /> CALL</a>
+                                    <button onClick={() => window.open(`https://wa.me/${BRAND.whatsapp}`, '_blank')} className="glass-btn flex-1 j-center"><MessageSquare size={16} /> CHAT</button>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {/* You may also like section */}
-                {relatedProducts.length > 0 && (
-                    <section className="related-finds-section">
-                        <div className="related-header">
-                            <h2>Selected Masterpieces</h2>
-                            <p>Hand-picked alternatives that share this finding's DNA.</p>
+                <div className="vehicle-secondary-layout">
+                    {/* Left: Description & Features */}
+                    <div className="info-main-col">
+                        <section className="detail-section">
+                            <h2 className="section-title-alt">Description</h2>
+                            <div className="description-text">
+                                <p>{product.description || `This ${product.year} ${product.name} is a prime example of performance and luxury. Direct imports with verified auction sheets and meticulous maintenance history. Perfect for those seeking reliability and style on Kenyan roads.`}</p>
+                                <ul className="key-bullet-points">
+                                    <li>Meticulously Maintained Foreign Used</li>
+                                    <li>High Efficiency {product.engine_capacity} Engine</li>
+                                    <li>Fully Loaded with {product.transmission} Transmission</li>
+                                    <li>Import Quality Compliance (QISJ/KEBS)</li>
+                                </ul>
+                            </div>
+                        </section>
+
+                        <section className="detail-section">
+                            <h2 className="section-title-alt">Top Features</h2>
+                            <div className="features-checklist-v3">
+                                {featuresArray.map((feat, i) => (
+                                    <div key={i} className="feature-check-item">
+                                        <div className="check-dot"></div>
+                                        <span>{feat}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
+                    </div>
+
+                    {/* Right: Inquiry Form */}
+                    <aside className="inquiry-sidebar">
+                        <div className="inquiry-card glass-v2">
+                            <h3>Send an <span className="highlight">Inquiry</span></h3>
+                            <form onSubmit={handleFormSubmit} className="sidebar-form">
+                                <div className="form-group-v3">
+                                    <label>Name *</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        placeholder="Your Name"
+                                        value={formData.name}
+                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                    />
+                                </div>
+                                <div className="form-group-v3">
+                                    <label>Phone *</label>
+                                    <input
+                                        type="tel"
+                                        required
+                                        placeholder="+254..."
+                                        value={formData.phone}
+                                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                    />
+                                </div>
+                                <div className="form-group-v3">
+                                    <label>Email *</label>
+                                    <input
+                                        type="email"
+                                        required
+                                        placeholder="you@email.com"
+                                        value={formData.email}
+                                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                    />
+                                </div>
+                                <div className="form-group-v3">
+                                    <label>Message *</label>
+                                    <textarea
+                                        required
+                                        rows="4"
+                                        placeholder="I am interested in this vehicle..."
+                                        value={formData.message}
+                                        onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                                    ></textarea>
+                                </div>
+                                <button type="submit" className="submit-inquiry-btn">Submit Inquiry</button>
+                            </form>
                         </div>
-                        <div className="related-grid">
+                    </aside>
+                </div>
+
+                {/* Similar Vehicles */}
+                {relatedProducts.length > 0 && (
+                    <section className="similar-vehicles-section">
+                        <div className="section-header-alt">
+                            <h2>SUGGESTED <span className="highlight">FOR YOU</span></h2>
+                            <Link to="/products" className="view-more">Browse Showroom</Link>
+                        </div>
+                        <div className="similar-grid-v3">
                             {relatedProducts.map(p => (
                                 <ProductCard key={p.id} product={p} />
                             ))}
@@ -231,3 +289,4 @@ const ProductDetail = () => {
 };
 
 export default ProductDetail;
+

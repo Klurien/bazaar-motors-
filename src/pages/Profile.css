@@ -1,225 +1,129 @@
+/* ========= BAZAAR MOTORS - PROFILE - LUXURY EDITION ========= */
+
 .profile-page {
-    padding-top: 100px;
-    padding-bottom: 60px;
-    background: var(--bg-color);
+    padding-top: 140px;
+    padding-bottom: 100px;
+    background: var(--bg-black);
+    color: #FFF;
 }
 
 .profile-layout {
     display: flex;
-    gap: 32px;
-    max-width: 1100px;
+    gap: 60px;
+    max-width: 1200px;
     margin: 0 auto;
 }
 
 .profile-sidebar {
-    width: 280px;
-    flex-shrink: 0;
-    padding: 24px;
-    border-radius: 16px;
+    width: 300px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-dim);
+    padding: 40px;
     height: fit-content;
-    position: sticky;
-    top: 100px;
 }
 
 .profile-avatar {
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    background: var(--accent-color);
-    color: white;
-    font-size: 24px;
-    font-weight: 700;
+    width: 80px;
+    height: 80px;
+    background: var(--primary);
+    color: #000;
+    font-size: 2rem;
+    font-weight: 900;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 16px;
-}
-
-.profile-user-info h2 {
-    font-size: 20px;
-    margin-bottom: 4px;
+    margin-bottom: 24px;
 }
 
 .profile-role {
-    font-size: 14px;
-    color: var(--text-muted);
-    text-transform: capitalize;
+    font-size: 0.7rem;
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 0.2rem;
+    font-weight: 800;
 }
 
 .profile-nav {
-    margin-top: 32px;
+    margin-top: 48px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 12px;
 }
 
 .profile-nav button {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
-    border: none;
+    gap: 16px;
+    padding: 16px;
     background: transparent;
-    color: var(--text-color);
-    font-size: 15px;
-    font-weight: 500;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
     text-align: left;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s ease;
+    transition: var(--transition);
 }
 
-.profile-nav button:hover {
+.profile-nav button:hover,
+.profile-nav button.active {
+    color: #FFF;
     background: rgba(255, 255, 255, 0.05);
 }
 
-.profile-nav button.active {
-    background: rgba(243, 161, 86, 0.1);
-    color: var(--accent-color);
-}
-
-.profile-nav button.text-red-500 {
-    color: #ef4444;
-    margin-top: 16px;
+.profile-nav button.logout {
+    margin-top: 32px;
+    color: #ff5252;
 }
 
 .profile-content {
     flex: 1;
 }
 
-.profile-subtitle {
-    color: var(--text-muted);
-    margin-bottom: 32px;
-}
-
-.empty-orders {
-    padding: 64px 32px;
-    text-align: center;
-    border-radius: 16px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-}
-
-.empty-orders svg {
-    color: var(--text-muted);
-    opacity: 0.5;
-}
-
-.orders-list {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-}
-
 .order-card {
-    padding: 24px;
-    border-radius: 12px;
-    transition: transform 0.2s ease;
-}
-
-.order-card:hover {
-    transform: translateY(-2px);
+    background: var(--bg-surface);
+    border: 1px solid var(--border-dim);
+    padding: 32px;
+    margin-bottom: 32px;
 }
 
 .order-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    padding-bottom: 16px;
-    border-bottom: 1px solid var(--border-color);
-    margin-bottom: 16px;
-}
-
-.order-meta {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border-dim);
+    margin-bottom: 24px;
 }
 
 .order-id {
-    font-weight: 600;
-    font-size: 16px;
-}
-
-.order-date {
-    font-size: 14px;
-    color: var(--text-muted);
+    font-family: 'Outfit';
+    font-weight: 800;
+    font-size: 1.1rem;
 }
 
 .order-status {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: 600;
-    background: rgba(255, 255, 255, 0.05);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 900;
+    padding: 6px 16px;
+    background: #FFF;
+    color: #000;
 }
 
-.order-item-row {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 12px 0;
+.order-footer strong {
+    font-size: 1.5rem;
+    color: var(--primary);
+    font-weight: 900;
 }
 
-.order-item-row img {
-    width: 64px;
-    height: 64px;
-    border-radius: 8px;
-    object-fit: cover;
-}
-
-.item-details {
-    flex: 1;
-}
-
-.item-details h4 {
-    font-size: 15px;
-    font-weight: 500;
-    margin-bottom: 4px;
-}
-
-.item-details p {
-    font-size: 13px;
-    color: var(--text-muted);
-}
-
-.item-price {
-    font-weight: 600;
-}
-
-.order-footer {
-    margin-top: 16px;
-    padding-top: 16px;
-    border-top: 1px solid var(--border-color);
-    display: flex;
-    justify-content: flex-end;
-}
-
-.order-total {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    font-size: 16px;
-}
-
-.order-total strong {
-    font-size: 20px;
-    color: var(--accent-color);
-}
-
-@media (max-width: 768px) {
+@media (max-width: 992px) {
     .profile-layout {
         flex-direction: column;
     }
 
     .profile-sidebar {
         width: 100%;
-        position: static;
-        margin-bottom: 24px;
     }
 }

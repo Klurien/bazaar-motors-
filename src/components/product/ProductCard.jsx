@@ -1,16 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingCart, Eye, Star, MessageCircle, Info } from 'lucide-react';
+import { MessageCircle, Star } from 'lucide-react';
 import { BRAND } from '../../brandConfig';
 import './ProductCard.css';
 
 const ProductCard = ({ product }) => {
-    const [isHovered, setIsHovered] = useState(false);
-
     const handleWhatsApp = (e) => {
         e.preventDefault();
         e.stopPropagation();
-        const message = `Hi Bazaar Motors, I am interested in the ${product.name} (KES ${product.price.toLocaleString()}). Is it still available?`;
+        const message = `Hi Bazaar Motors, I am interested in the ${product.year} ${product.name} (KSh ${parseFloat(product.price).toLocaleString()}). Is it still available?`;
         window.open(`https://wa.me/${BRAND.whatsapp}?text=${encodeURIComponent(message)}`, '_blank');
     };
 
@@ -19,47 +17,47 @@ const ProductCard = ({ product }) => {
         : 'https://images.unsplash.com/photo-1549317661-bd3293003975?q=80&w=400&auto=format&fit=crop';
 
     return (
-        <div
-            className="premium-product-card"
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-        >
-            <Link to={`/products/${product.id}`} className="card-inner">
-                <div className="card-media">
+        <div className="vehicle-card-v3 animate-reveal">
+            <Link to={`/products/${product.id}`} className="v3-card-link">
+                <div className="v3-card-media">
                     <img src={imageUrl} alt={product.name} />
-
-                    {product.stock > 0 ? (
-                        <span className="stock-badge low">Available</span>
-                    ) : (
-                        <span className="stock-badge out">Sold Out</span>
-                    )}
-
-                    <div className="card-overlay">
-                        <div className="overlay-actions">
-                            <button className="action-btn-p" onClick={handleWhatsApp}>
-                                <MessageCircle size={20} />
-                                <span>Enquire</span>
-                            </button>
-                            <div className="action-btn-icon">
-                                <Info size={18} />
-                            </div>
-                        </div>
+                    <div className="v3-overlay-grad"></div>
+                    <div className="v3-card-badges">
+                        {product.condition && <span className="v3-badge">{product.condition}</span>}
+                        {product.year && <span className="v3-badge year">{product.year}</span>}
                     </div>
                 </div>
 
-                <div className="card-info">
-                    <div className="info-top">
-                        <span className="card-category">{product.category}</span>
-                        <div className="card-rating">
-                            <Star size={12} fill="#FF7A00" color="#FF7A00" />
-                            <span>Pristine</span>
+                <div className="v3-card-info">
+                    <div className="v3-card-header">
+                        <span className="v3-make">{product.make || 'TOYOTA'}</span>
+                        <h3 className="v3-title">{product.name}</h3>
+                    </div>
+
+                    <div className="v3-specs-grid">
+                        <div className="v3-spec">
+                            <span className="v3-label">Transmission</span>
+                            <span className="v3-val">{product.transmission || 'Automatic'}</span>
+                        </div>
+                        <div className="v3-spec">
+                            <span className="v3-label">Fuel</span>
+                            <span className="v3-val">{product.fuel_type || 'Petrol'}</span>
+                        </div>
+                        <div className="v3-spec">
+                            <span className="v3-label">Mileage</span>
+                            <span className="v3-val">{product.mileage?.toLocaleString() || '45k'} km</span>
                         </div>
                     </div>
-                    <h3 className="card-title">{product.name}</h3>
-                    <div className="info-bottom">
-                        <span className="card-price">KSh {parseFloat(product.price).toLocaleString()}</span>
+
+                    <div className="v3-card-footer">
+                        <div className="v3-price-wrap">
+                            <span className="v3-price-label">Price</span>
+                            <span className="v3-price">KSh {parseFloat(product.price).toLocaleString()}</span>
+                        </div>
+                        <button className="v3-whatsapp-btn" onClick={handleWhatsApp}>
+                            <MessageCircle size={18} strokeWidth={2.5} />
+                        </button>
                     </div>
-                    <button className="card-view-btn">View Vehicle</button>
                 </div>
             </Link>
         </div>

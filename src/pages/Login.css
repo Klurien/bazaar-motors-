@@ -1,126 +1,107 @@
+/* ========= BAZAAR MOTORS - AUTH - LUXURY EDITION ========= */
+
 .login-page {
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    padding: 120px 20px 80px;
-    background: var(--background-light);
-    /* Soft Cream */
+    padding: 120px 20px;
+    background: var(--bg-black);
 }
 
 .login-card {
     width: 100%;
-    max-width: 450px;
-    padding: 56px;
-    background: var(--glass-bg);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-    border: 1px solid var(--glass-border-light);
-    border-bottom-color: var(--glass-border-dark);
-    border-right-color: var(--glass-border-dark);
-    border-radius: var(--border-radius-lg);
-    box-shadow: var(--lg-shadow-outer), var(--lg-shadow-inner);
-    animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    max-width: 480px;
+    padding: 80px 60px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-dim);
+    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6);
 }
 
 .login-card h2 {
-    font-size: 36px;
+    font-size: 2.5rem;
+    font-weight: 800;
     margin-bottom: 12px;
-    color: var(--primary-color);
     text-align: center;
+    letter-spacing: -0.02em;
 }
 
 .login-card p {
-    color: var(--text-muted);
-    margin-bottom: 40px;
+    color: var(--text-secondary);
+    margin-bottom: 48px;
     text-align: center;
-    font-size: 16px;
+    font-size: 1rem;
+    font-weight: 500;
 }
 
 .error-message {
-    background: rgba(255, 122, 0, 0.05);
-    /* Tint */
-    color: var(--accent-color);
+    background: rgba(255, 50, 50, 0.1);
+    color: #ff5252;
     padding: 16px;
-    border-radius: var(--border-radius-sm);
-    margin-bottom: 30px;
-    font-size: 14px;
-    font-weight: 600;
+    margin-bottom: 32px;
+    font-size: 0.8rem;
+    font-weight: 700;
     display: flex;
     align-items: center;
-    gap: 10px;
-    border: 2px solid var(--accent-color);
-    /* Rule 9: Structure, not just tint */
+    gap: 12px;
+    border-left: 4px solid #ff5252;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 .form-group {
-    margin-bottom: 28px;
+    margin-bottom: 32px;
 }
 
 .form-group label {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-weight: 700;
-    font-size: 12px;
+    display: block;
+    font-weight: 800;
+    font-size: 0.65rem;
     text-transform: uppercase;
-    letter-spacing: 1.5px;
+    letter-spacing: 0.2rem;
     color: var(--text-muted);
-    margin-bottom: 12px;
+    margin-bottom: 16px;
 }
 
 .form-group input {
     width: 100%;
-    padding: 16px 20px;
-    background: rgba(255, 255, 255, 0.2);
-    border: 1px solid var(--border-color);
-    border-bottom-color: rgba(255, 255, 255, 0.2);
-    border-right-color: rgba(255, 255, 255, 0.2);
-    border-radius: var(--border-radius-lg);
+    padding: 18px 24px;
+    background: var(--bg-black);
+    border: 1px solid var(--border-dim);
     outline: none;
-    font-size: 16px;
-    color: var(--text-main);
-    transition: all 0.3s;
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-    box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.05), inset -1px -1px 3px rgba(255, 255, 255, 0.5);
+    font-size: 1rem;
+    color: #FFF;
+    font-weight: 600;
+    transition: var(--transition);
 }
 
 .form-group input:focus {
-    background: rgba(255, 255, 255, 0.3);
-    border-color: rgba(255, 255, 255, 0.8);
-    box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.08), inset -2px -2px 5px rgba(255, 255, 255, 0.7), 0 0 0 2px rgba(255, 255, 255, 0.5);
-}
-
-.form-group input.error-input {
-    border: 2px solid var(--primary-color);
-    /* Rule 9 structure */
-    background: rgba(255, 50, 50, 0.05);
-    /* very light tint */
-    box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.05), inset -2px -2px 5px rgba(255, 255, 255, 0.5), 0 0 0 1px var(--primary-color);
+    border-color: #FFF;
+    background: rgba(255, 255, 255, 0.03);
 }
 
 .btn-full {
     width: 100%;
-    margin-top: 20px;
-    padding: 18px;
-    font-size: 16px;
+    margin-top: 24px;
+    padding: 20px;
 }
 
 .login-footer {
-    margin-top: 40px;
+    margin-top: 48px;
     text-align: center;
-    font-size: 15px;
+    font-size: 0.85rem;
     color: var(--text-muted);
+    font-weight: 500;
 }
 
 .login-footer a {
-    color: var(--accent-color);
+    color: #FFF;
     font-weight: 800;
     margin-left: 8px;
-    text-decoration: none;
+    text-decoration: underline;
+    text-underline-offset: 4px;
 }
 
 .login-footer a:hover {
-    color: var(--accent-light);
+    color: var(--primary);
 }

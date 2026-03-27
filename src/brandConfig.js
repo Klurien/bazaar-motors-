@@ -14,7 +14,8 @@ export const BRAND = {
         instagram: 'https://www.instagram.com/bazaar_motors/',
         twitter: 'https://twitter.com/bazaarmotors',
         facebook: 'https://www.facebook.com/p/Bazaar-Motors-61560438815769/',
-        youtube: 'https://youtube.com/@bazaarmotors'
+        youtube: 'https://youtube.com/@bazaarmotors',
+        tiktok: 'https://www.tiktok.com/@bazaarmotors'
     },
     hero: {
         badge: 'Premier Japanese Imports Specialist',
