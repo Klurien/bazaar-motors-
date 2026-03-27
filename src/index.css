@@ -47,13 +47,34 @@ body,
   padding: 0;
 }
 
+html,
 body {
+  max-width: 100%;
+  overflow-x: hidden;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   background-color: var(--bg-black);
   color: var(--text-primary);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
+}
+
+/* Visibility Helpers */
+.desktop-only {
+  display: block;
+}
+
+.mobile-only {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .desktop-only {
+    display: none !important;
+  }
+
+  .mobile-only {
+    display: block !important;
+  }
 }
 
 h1,

@@ -369,7 +369,7 @@
 /* Responsive */
 @media (max-width: 1200px) {
     .hero-v3 h1 {
-        font-size: 4rem;
+        font-size: 3.5rem;
     }
 
     .v3-showroom-grid {
@@ -413,7 +413,20 @@
 
 @media (max-width: 768px) {
     .hero-v3 h1 {
-        font-size: 3.5rem;
+        font-size: 2.25rem;
+    }
+
+    .hero-v3-desc {
+        font-size: 1rem;
+        margin-bottom: 32px;
+    }
+
+    .trust-item-v3 strong {
+        font-size: 2rem;
+    }
+
+    .import-text-v3 h2 {
+        font-size: 2.25rem;
     }
 
     .v3-showroom-grid {
