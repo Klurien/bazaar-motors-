@@ -119,11 +119,39 @@
 }
 
 @media (max-width: 992px) {
+    .profile-page {
+        padding-top: 100px;
+        padding-bottom: 60px;
+    }
+
     .profile-layout {
         flex-direction: column;
+        gap: 40px;
+        padding: 0 20px;
     }
 
     .profile-sidebar {
         width: 100%;
+        padding: 30px;
+    }
+
+    .profile-avatar {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+    }
+
+    .profile-nav {
+        margin-top: 32px;
+    }
+
+    .order-header {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+    }
+
+    .order-status {
+        width: fit-content;
     }
 }

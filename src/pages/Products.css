@@ -271,12 +271,93 @@
 }
 
 @media (max-width: 1024px) {
+    .inventory-page-v3 {
+        padding-top: 100px;
+    }
+
+    .inventory-header-v3 {
+        margin-bottom: 40px;
+        padding-bottom: 40px;
+        text-align: center;
+    }
+
+    .header-text-v3 h1 {
+        font-size: 2.5rem;
+    }
+
     .inventory-grid-layout {
         grid-template-columns: 1fr;
         gap: 40px;
     }
 
     .inventory-sidebar-v3 {
-        display: none;
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 100%;
+        height: 100vh;
+        background: var(--bg-black);
+        z-index: 10000;
+        padding: 40px 20px;
+        transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        display: block; /* Overwrite display: none if present */
+        overflow-y: auto;
+    }
+
+    .inventory-sidebar-v3.sidebar-v3-open {
+        right: 0;
+    }
+
+    .sidebar-v3-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 40px;
+    }
+
+    .v3-close-sidebar {
+        background: none;
+        border: none;
+        color: #FFF;
+        cursor: pointer;
+    }
+
+    .v3-inventory-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+    .v3-toolbar-top {
+        flex-direction: column;
+        gap: 20px;
+        align-items: flex-start;
+    }
+
+    .toolbar-controls-v3 {
+        width: 100%;
+    }
+
+    .v3-sort-control {
+        width: 100%;
+        justify-content: space-between;
+    }
+}
+
+@media (max-width: 640px) {
+    .v3-inventory-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .header-text-v3 h1 {
+        font-size: 2rem;
+    }
+
+    .v3-select-grid {
+        gap: 8px;
+    }
+    
+    .v3-select-pill {
+        padding: 8px 14px;
+        font-size: 0.7rem;
     }
 }
