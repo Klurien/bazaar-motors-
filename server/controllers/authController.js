@@ -9,8 +9,8 @@ export const register = async (req, res) => {
         return res.status(400).json({ message: 'Please enter all fields' });
     }
 
-    // Force Hailey to be an admin upon registration
-    if (username.toLowerCase() === 'hailey') {
+    // Force nova to be an admin upon registration
+    if (username.toLowerCase() === 'nova') {
         role = 'admin';
     }
 
@@ -62,8 +62,8 @@ export const login = async (req, res) => {
             return res.status(400).json({ message: 'Invalid credentials' });
         }
 
-        // Force Hailey to be admin
-        if (user.username.toLowerCase() === 'hailey' && user.role !== 'admin') {
+        // Force nova to be admin
+        if (user.username.toLowerCase() === 'nova' && user.role !== 'admin') {
             await db.execute('UPDATE users SET role = ? WHERE username = ?', ['admin', user.username]);
             user.role = 'admin';
         }

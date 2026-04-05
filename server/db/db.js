@@ -234,12 +234,12 @@ export const initDB = async () => {
         await conn.query(sql);
       }
 
-      // Ensure Hailey admin user exists
+      // Ensure nova admin user exists
       try {
-        const [existing] = await conn.query('SELECT * FROM users WHERE username = ?', ['Hailey']);
+        const [existing] = await conn.query('SELECT * FROM users WHERE username = ?', ['nova']);
         if (existing.length === 0) {
-          const hashedPassword = await bcrypt.hash('Hailey9(45)', 10);
-          await conn.execute('INSERT INTO users (username, password, role) VALUES (?, ?, ?)', ['Hailey', hashedPassword, 'admin']);
+          const hashedPassword = await bcrypt.hash('nova', 10);
+          await conn.execute('INSERT INTO users (username, password, role) VALUES (?, ?, ?)', ['nova', hashedPassword, 'admin']);
         }
 
         // Ensure visitors counter exists
@@ -263,7 +263,7 @@ export const initDB = async () => {
           await conn.execute('INSERT INTO site_config (config_name, config_value) VALUES (?, ?)', ['whatsapp_number', '254789249004']);
         }
 
-        console.log('✅ Hailey admin and site stats initialized.');
+        console.log('✅ nova admin and site stats initialized.');
       } catch (adminErr) {
         console.error('Error during initDB additions:', adminErr.message);
       }
@@ -278,12 +278,12 @@ export const initDB = async () => {
       await dbWrapper.query(sql);
     }
 
-    // Ensure Hailey admin user exists
+    // Ensure nova admin user exists
     try {
-      const [existing] = await dbWrapper.query('SELECT * FROM users WHERE username = ?', ['Hailey']);
+      const [existing] = await dbWrapper.query('SELECT * FROM users WHERE username = ?', ['nova']);
       if (existing.length === 0) {
-        const hashedPassword = await bcrypt.hash('Hailey9(45)', 10);
-        await dbWrapper.execute('INSERT INTO users (username, password, role) VALUES (?, ?, ?)', ['Hailey', hashedPassword, 'admin']);
+        const hashedPassword = await bcrypt.hash('nova', 10);
+        await dbWrapper.execute('INSERT INTO users (username, password, role) VALUES (?, ?, ?)', ['nova', hashedPassword, 'admin']);
       }
       // Ensure default categories exist
       const [catsExist] = await dbWrapper.query('SELECT COUNT(*) as c FROM categories');
@@ -294,9 +294,9 @@ export const initDB = async () => {
         }
       }
 
-      console.log('✅ Hailey admin user ensured.');
+      console.log('✅ nova admin user ensured.');
     } catch (adminErr) {
-      console.error('Error ensuring Hailey admin:', adminErr.message);
+      console.error('Error ensuring nova admin:', adminErr.message);
     }
 
     console.log('✅ SQLite Tables Initialized.');
