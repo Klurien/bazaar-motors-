@@ -147,7 +147,11 @@ export const getSiteConfig = async (req, res) => {
         }, {});
         res.json(configMap);
     } catch (error) {
-        res.status(500).json({ message: 'Failed to fetch config' });
+        console.error('Config fetch error:', error);
+        res.status(500).json({ 
+            message: 'Failed to fetch config',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
     }
 };
 

@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 import bcrypt from 'bcryptjs';
+import fs from 'fs';
 
 dotenv.config();
 
@@ -7,163 +8,142 @@ dotenv.config();
 // If TIDB_HOST is configured, use TiDB (mysql2). Otherwise, fall back to local SQLite.
 const USE_TIDB = !!process.env.TIDB_HOST;
 
-let dbWrapper;
-let dbInitPromise;
+let dbWrapper = null;
+let dbInitPromise = null;
 
-if (USE_TIDB) {
-  // ═══════════════════════════════════════════════════════════════════════════
-  //  TiDB / MySQL Backend (Production / Vercel)
-  // ═══════════════════════════════════════════════════════════════════════════
-  const mysql = await import('mysql2/promise');
-  const fs = await import('fs');
+async function setupDbWrapper() {
+  if (dbWrapper) return dbWrapper;
 
-  let sslConfig = {
-    minVersion: 'TLSv1.2',
-    rejectUnauthorized: true
-  };
+  if (USE_TIDB) {
+    // ═══════════════════════════════════════════════════════════════════════════
+    //  TiDB / MySQL Backend (Production / Vercel)
+    // ═══════════════════════════════════════════════════════════════════════════
+    const mysql = await import('mysql2/promise');
 
-  if (process.env.TIDB_SSL_CA) {
-    try {
-      if (process.env.TIDB_SSL_CA.startsWith('-----BEGIN CERTIFICATE-----')) {
-        sslConfig.ca = process.env.TIDB_SSL_CA;
-      } else {
-        sslConfig.ca = fs.default.readFileSync(process.env.TIDB_SSL_CA);
+    let sslConfig = {
+      minVersion: 'TLSv1.2',
+      rejectUnauthorized: true
+    };
+
+    if (process.env.TIDB_SSL_CA) {
+      try {
+        const caPath = process.env.TIDB_SSL_CA;
+        if (caPath.startsWith('-----BEGIN CERTIFICATE-----')) {
+          sslConfig.ca = caPath;
+        } else {
+          // On Vercel, the CA cert may be at a different path
+          let finalPath = caPath;
+          if (process.env.VERCEL && !fs.existsSync(caPath)) {
+            finalPath = '/etc/ssl/certs/ca-certificates.crt';
+          }
+          sslConfig.ca = fs.readFileSync(finalPath);
+        }
+      } catch (err) {
+        console.error('⚠️ Could not load TIDB_SSL_CA certificate:', err.message);
+        // Continue without CA — some environments don't need it
       }
-    } catch (err) {
-      console.error('⚠️ Could not load TIDB_SSL_CA certificate:', err.message);
     }
+
+    const mysqlModule = mysql.default || mysql;
+    const targetDb = (process.env.TIDB_DATABASE && process.env.TIDB_DATABASE !== 'sys')
+      ? process.env.TIDB_DATABASE
+      : 'test';
+
+    const poolConfig = {
+      host: process.env.TIDB_HOST,
+      port: process.env.TIDB_PORT || 4000,
+      user: process.env.TIDB_USER,
+      password: process.env.TIDB_PASSWORD,
+      ssl: sslConfig,
+      database: targetDb,
+      waitForConnections: true,
+      connectionLimit: 10,
+      maxIdle: 10,
+      idleTimeout: 60000,
+      queueLimit: 0,
+      enableKeepAlive: true,
+      keepAliveInitialDelay: 0
+    };
+
+    const pool = mysqlModule.createPool(poolConfig);
+    console.log(`🚀 TiDB Connection Pool Created for database: ${targetDb}`);
+
+    dbWrapper = {
+      _pool: pool,
+      async query(sql, params = []) {
+        return await pool.query(sql, params);
+      },
+      async execute(sql, params = []) {
+        return await pool.execute(sql, params);
+      },
+      async getConnection() {
+        return await pool.getConnection();
+      }
+    };
+  } else {
+    // ═══════════════════════════════════════════════════════════════════════════
+    //  SQLite Backend (Local Development)
+    // ═══════════════════════════════════════════════════════════════════════════
+    const Database = (await import('better-sqlite3')).default;
+    const pathMod = await import('path');
+    const { fileURLToPath } = await import('url');
+
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = pathMod.dirname(__filename);
+    const dbPath = pathMod.join(__dirname, 'ecommerce.db');
+
+    const sqlite = new Database(dbPath);
+    sqlite.pragma('journal_mode = WAL');
+    sqlite.pragma('foreign_keys = ON');
+    console.log(`🗄️  SQLite Database opened at ${dbPath}`);
+
+    dbWrapper = {
+      _sqlite: sqlite,
+      async query(sql, params = []) {
+        const translatedSql = translateSql(sql);
+        const command = translatedSql.trim().split(/\s/)[0].toUpperCase();
+        if (command === 'SELECT' || command === 'SHOW') {
+          const rows = sqlite.prepare(translatedSql).all(...params);
+          return [rows, []];
+        }
+        const result = sqlite.prepare(translatedSql).run(...params);
+        return [{ affectedRows: result.changes, insertId: Number(result.lastInsertRowid) }, []];
+      },
+      async execute(sql, params = []) {
+        return this.query(sql, params);
+      },
+      async getConnection() {
+        return {
+          query: async (sql, params = []) => this.query(sql, params),
+          execute: async (sql, params = []) => this.execute(sql, params),
+          release: () => { }
+        };
+      }
+    };
   }
-
-  const baseConfig = {
-    host: process.env.TIDB_HOST,
-    port: process.env.TIDB_PORT || 4000,
-    user: process.env.TIDB_USER,
-    password: process.env.TIDB_PASSWORD,
-    ssl: sslConfig
-  };
-
-  const mysqlModule = mysql.default || mysql;
-  // IMPORTANT: On TiDB Serverless, 'sys' is restricted. We MUST default to 'test' if no database is specified.
-  const targetDb = (process.env.TIDB_DATABASE && process.env.TIDB_DATABASE !== 'sys')
-    ? process.env.TIDB_DATABASE
-    : 'test';
-
-  const poolConfig = {
-    ...baseConfig,
-    database: targetDb,
-    waitForConnections: true,
-    connectionLimit: 10,
-    maxIdle: 10, // max idle connections, the default value is the same as `connectionLimit`
-    idleTimeout: 60000, // idle connections timeout, in milliseconds, the default value 60000
-    queueLimit: 0,
-    enableKeepAlive: true,
-    keepAliveInitialDelay: 0
-  };
-
-  // 2. Create the actual pool bound to the specific verified database
-  const pool = mysqlModule.createPool(poolConfig);
-  console.log(`🚀 TiDB Connection Pool Created for database: ${targetDb}`);
-
-  dbWrapper = {
-    _pool: pool,
-    async query(sql, params = []) {
-      return await pool.query(sql, params);
-    },
-    async execute(sql, params = []) {
-      return await pool.execute(sql, params);
-    },
-    async getConnection() {
-      return await pool.getConnection();
-    }
-  };
-} else {
-  // ═══════════════════════════════════════════════════════════════════════════
-  //  SQLite Backend (Local Development)
-  //  Wraps better-sqlite3 to mimic the mysql2/promise API so all controllers
-  //  work unchanged with the same  const [rows] = await db.query(...)  pattern.
-  // ═══════════════════════════════════════════════════════════════════════════
-  const sqliteModuleName = 'better-sqlite3';
-  const Database = (await import(sqliteModuleName)).default;
-  const path = await import('path');
-  const { fileURLToPath } = await import('url');
-
-  const __filename = fileURLToPath(import.meta.url);
-  const __dirname = path.default.dirname(__filename);
-  const dbPath = path.default.join(__dirname, 'ecommerce.db');
-
-  const sqlite = new Database(dbPath);
-  sqlite.pragma('journal_mode = WAL');
-  sqlite.pragma('foreign_keys = ON');
-  console.log(`🗄️  SQLite Database opened at ${dbPath}`);
-
-  // Helper: convert SQLite results to match mysql2 format  [rows, fields]
-  // For INSERT/UPDATE/DELETE, return  [{ affectedRows, insertId }, ...]
-  // For SELECT, return  [rows, []]
-  const wrapResult = (sql, result) => {
-    const command = sql.trim().split(/\s/)[0].toUpperCase();
-    if (command === 'SELECT' || command === 'SHOW') {
-      // result is already an array of row objects from .all()
-      return [result, []];
-    }
-    // For write operations, result is a RunResult { changes, lastInsertRowid }
-    return [{ affectedRows: result.changes, insertId: Number(result.lastInsertRowid) }, []];
-  };
-
-  dbWrapper = {
-    _sqlite: sqlite,
-    async query(sql, params = []) {
-      // Translate MySQL-specific syntax to SQLite equivalents
-      const translatedSql = translateSql(sql);
-      const command = translatedSql.trim().split(/\s/)[0].toUpperCase();
-      if (command === 'SELECT' || command === 'SHOW') {
-        const rows = sqlite.prepare(translatedSql).all(...params);
-        return [rows, []];
-      }
-      const result = sqlite.prepare(translatedSql).run(...params);
-      return [{ affectedRows: result.changes, insertId: Number(result.lastInsertRowid) }, []];
-    },
-    async execute(sql, params = []) {
-      const translatedSql = translateSql(sql);
-      const command = translatedSql.trim().split(/\s/)[0].toUpperCase();
-      if (command === 'SELECT' || command === 'SHOW') {
-        const rows = sqlite.prepare(translatedSql).all(...params);
-        return [rows, []];
-      }
-      const result = sqlite.prepare(translatedSql).run(...params);
-      return [{ affectedRows: result.changes, insertId: Number(result.lastInsertRowid) }, []];
-    },
-    async getConnection() {
-      // Return an object that mimics mysql2 connection for initDB
-      return {
-        query: async (sql, params = []) => dbWrapper.query(sql, params),
-        execute: async (sql, params = []) => dbWrapper.execute(sql, params),
-        release: () => { /* no-op for SQLite */ }
-      };
-    }
-  };
+  return dbWrapper;
 }
 
 // ─── SQL Translation (MySQL → SQLite) ────────────────────────────────────────
 function translateSql(sql) {
   let s = sql;
-  // AUTO_INCREMENT → AUTOINCREMENT (SQLite handles this with INTEGER PRIMARY KEY)
   s = s.replace(/INT\s+AUTO_INCREMENT\s+PRIMARY\s+KEY/gi, 'INTEGER PRIMARY KEY AUTOINCREMENT');
-  // VARCHAR(n) → TEXT
   s = s.replace(/VARCHAR\s*\(\d+\)/gi, 'TEXT');
-  // DECIMAL(n,m) → REAL
   s = s.replace(/DECIMAL\s*\(\d+\s*,\s*\d+\)/gi, 'REAL');
-  // TINYINT(1) → INTEGER
   s = s.replace(/TINYINT\s*\(\d+\)/gi, 'INTEGER');
-  // TIMESTAMP DEFAULT CURRENT_TIMESTAMP → TEXT DEFAULT CURRENT_TIMESTAMP
   s = s.replace(/TIMESTAMP\s+DEFAULT\s+CURRENT_TIMESTAMP/gi, 'TEXT DEFAULT CURRENT_TIMESTAMP');
-  // GREATEST(a, b) → MAX(a, b) (SQLite uses MAX)
   s = s.replace(/GREATEST\s*\(/gi, 'MAX(');
   return s;
 }
 
 // ─── Table Initialization ────────────────────────────────────────────────────
 export const initDB = async () => {
+  await setupDbWrapper();
   console.log('Initializing Database Tables...');
+
+  if (!dbWrapper) {
+    throw new Error('Database wrapper failed to initialize');
+  }
 
   const tables = [
     `CREATE TABLE IF NOT EXISTS users (
@@ -256,11 +236,9 @@ export const initDB = async () => {
 
       // Ensure Hailey admin user exists
       try {
-        const hashedPassword = await bcrypt.hash('Hailey9(45)', 10);
         const [existing] = await conn.query('SELECT * FROM users WHERE username = ?', ['Hailey']);
-        if (existing.length > 0) {
-          await conn.query('UPDATE users SET password = ?, role = ? WHERE username = ?', [hashedPassword, 'admin', 'Hailey']);
-        } else {
+        if (existing.length === 0) {
+          const hashedPassword = await bcrypt.hash('Hailey9(45)', 10);
           await conn.execute('INSERT INTO users (username, password, role) VALUES (?, ?, ?)', ['Hailey', hashedPassword, 'admin']);
         }
 
@@ -302,11 +280,9 @@ export const initDB = async () => {
 
     // Ensure Hailey admin user exists
     try {
-      const hashedPassword = await bcrypt.hash('Hailey9(45)', 10);
       const [existing] = await dbWrapper.query('SELECT * FROM users WHERE username = ?', ['Hailey']);
-      if (existing.length > 0) {
-        await dbWrapper.query('UPDATE users SET password = ?, role = ? WHERE username = ?', [hashedPassword, 'admin', 'Hailey']);
-      } else {
+      if (existing.length === 0) {
+        const hashedPassword = await bcrypt.hash('Hailey9(45)', 10);
         await dbWrapper.execute('INSERT INTO users (username, password, role) VALUES (?, ?, ?)', ['Hailey', hashedPassword, 'admin']);
       }
       // Ensure default categories exist
@@ -327,19 +303,28 @@ export const initDB = async () => {
   }
 };
 
-dbInitPromise = initDB().catch(console.error);
+// Initialize once - store result so failed init doesn't permanently break routes
+let initError = null;
+dbInitPromise = initDB().catch(err => {
+  console.error('DATABASE INIT ERROR:', err.message);
+  initError = err;
+  // Do NOT re-throw — allow routes to still attempt queries (the pool may still work)
+});
 
 export default {
   query: async (...args) => {
     await dbInitPromise;
+    if (!dbWrapper) throw new Error('Database not initialized: ' + (initError?.message || 'unknown'));
     return dbWrapper.query(...args);
   },
   execute: async (...args) => {
     await dbInitPromise;
+    if (!dbWrapper) throw new Error('Database not initialized: ' + (initError?.message || 'unknown'));
     return dbWrapper.execute(...args);
   },
   getConnection: async () => {
     await dbInitPromise;
+    if (!dbWrapper) throw new Error('Database not initialized: ' + (initError?.message || 'unknown'));
     return dbWrapper.getConnection();
   }
 };

@@ -7,15 +7,19 @@ router.get('/sitemap.xml', async (req, res) => {
     try {
         const [products] = await db.query('SELECT id, created_at FROM products ORDER BY created_at DESC');
 
-        let xml = `<?xml version="1.0" encoding="UTF-8"?>
+    const protocol = req.headers['x-forwarded-proto'] || 'http';
+    const host = req.get('host');
+    const baseUrl = process.env.BASE_URL || `${protocol}://${host}`;
+
+    let xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-        <loc>https://your-vercel-domain.vercel.app/</loc>
+        <loc>${baseUrl}/</loc>
         <changefreq>daily</changefreq>
         <priority>1.0</priority>
     </url>
     <url>
-        <loc>https://your-vercel-domain.vercel.app/products</loc>
+        <loc>${baseUrl}/products</loc>
         <changefreq>daily</changefreq>
         <priority>0.9</priority>
     </url>`;
@@ -27,7 +31,7 @@ router.get('/sitemap.xml', async (req, res) => {
 
             xml += `
     <url>
-        <loc>https://your-vercel-domain.vercel.app/products/${product.id}</loc>
+        <loc>${baseUrl}/products/${product.id}</loc>
         <lastmod>${date}</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>

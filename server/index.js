@@ -15,11 +15,8 @@ import ordersRoutes from './routes/orders.js';
 import sitemapRoutes from './routes/sitemap.js';
 import statsRoutes from './routes/stats.js';
 import categoryRoutes from './routes/categories.js';
-import { initDB } from './db/db.js';
+// The db module already starts initDB() internally and its default export waits for it.
 import db from './db/db.js';
-
-// Init DB asynchronously, but store the promise
-const dbInitPromise = initDB().catch(console.error);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -28,11 +25,18 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-// Guard incoming requests until DB finishes initializing
-app.use(async (req, res, next) => {
-    await dbInitPromise;
-    next();
-});
+app.use(morgan('dev'));
+app.use(helmet({
+    crossOriginResourcePolicy: false,
+}));
+app.use(compression());
+app.use(cookieParser());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cors({
+    origin: true, // Allow all origins during dev to avoid 5173 vs 5174 conflicts
+    credentials: true
+}));
 
 // Visitor Tracker
 app.use(async (req, res, next) => {
@@ -48,19 +52,6 @@ app.use(async (req, res, next) => {
     next();
 });
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cors({
-    origin: true, // Allow all origins during dev to avoid 5173 vs 5174 conflicts
-    credentials: true
-}));
-app.use(morgan('dev'));
-app.use(helmet({
-    crossOriginResourcePolicy: false,
-}));
-app.use(compression());
-app.use(cookieParser());
-
 // Static files for uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
@@ -73,8 +64,13 @@ app.use('/api/stats', statsRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api', sitemapRoutes); // Mounts /api/sitemap.xml
 
-app.get('/', (req, res) => {
-    res.send('Ecommerce API is running...');
+// Global Error Handler
+app.use((err, req, res, next) => {
+    console.error('SERVER ERROR:', err);
+    res.status(500).json({
+        message: 'A serious server error occurred',
+        error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    });
 });
 
 // Conditionally listen if not deployed on Vercel
