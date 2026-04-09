@@ -1,238 +1,225 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Outfit:wght@200;300;400;500;600;700&display=swap');
 
-/* NUCLEAR RESET FOR MYSTERY BLUE/CYAN GLOW */
-html,
-body,
-#root,
-.app {
+/* ─── GLOBAL RESET ─────────────────────────────────────────────── */
+html, body, #root, .app {
   box-shadow: none !important;
   outline: none !important;
   border: none !important;
 }
-
-* {
-  outline: none !important;
-}
+* { outline: none !important; }
 
 :root {
-  /* Luxury Palette - Deep Black, Graphite & Gold */
-  --primary: #FF7A00;
-  /* Keeping brand orange but refined */
-  --primary-raw: 255, 122, 0;
-  --bg-black: #000000;
-  --bg-dark: #0A0A0B;
-  --bg-surface: #141416;
-  --bg-hover: #1C1C1F;
+  /* Brand */
+  --primary:        #C5A059; /* Champagne Gold */
+  --primary-raw:    197, 160, 89;
+  --primary-dim:    rgba(197, 160, 89, 0.12);
+  --primary-glow:   0 0 40px rgba(197, 160, 89, 0.15);
+  --primary-glow-lg: 0 0 80px rgba(197, 160, 89, 0.10);
+
+  /* Surfaces - Midnight Obsidian */
+  --bg-black:    #06080B;
+  --bg-dark:     #0A0D14;
+  --bg-surface:  rgba(15, 19, 28, 0.5);
+  --bg-card:     rgba(10, 13, 20, 0.7);
+  --bg-hover:    rgba(22, 28, 40, 0.6);
+  --bg-glass:    rgba(15, 19, 28, 0.65);
 
   /* Text */
-  --text-primary: #FFFFFF;
-  --text-secondary: #A1A1AA;
-  --text-muted: #52525B;
+  --text-primary:   #FAFAFA;
+  --text-secondary: #B0B0B4;
+  --text-muted:     #5A5A62;
 
-  /* Borders & Accents */
-  --border-dim: rgba(255, 255, 255, 0.08);
-  --border-gold: rgba(255, 122, 0, 0.3);
+  /* Borders */
+  --border-dim:  rgba(255, 255, 255, 0.05);
+  --border-mid:  rgba(255, 255, 255, 0.10);
+  --border-gold: rgba(197, 160, 89, 0.25);
+  --border-navy: rgba(27, 38, 59, 0.6);
 
-  /* Tokens */
+  /* Radii */
+  --radius-xs: 2px;
   --radius-sm: 4px;
   --radius-md: 8px;
   --radius-lg: 16px;
-  --transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  --radius-xl: 32px;
+
+  /* Motion */
+  --ease-out:  cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-in:   cubic-bezier(0.5, 0, 0.75, 0);
+  --transition: all 0.6s var(--ease-out);
+  --transition-fast: all 0.3s var(--ease-out);
+
+  /* Typography */
+  --font-display: 'Cormorant Garamond', serif;
+  --font-body:    'Outfit', system-ui, sans-serif;
 }
 
-/* Base Reset */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+/* ─── BASE ─────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html,
-body {
+html, body {
   max-width: 100%;
   overflow-x: hidden;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: var(--font-body);
   background-color: var(--bg-black);
   color: var(--text-primary);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Visibility Helpers */
-.desktop-only {
-  display: block;
+h1, h2, h3, h4, .font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.03em;
+  line-height: 1.05;
 }
 
-.mobile-only {
-  display: none;
-}
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; }
+img { display: block; max-width: 100%; }
+
+/* ─── VISIBILITY ───────────────────────────────────────────────── */
+.desktop-only { display: block; }
+.mobile-only  { display: none;  }
 
 @media (max-width: 1024px) {
-  .desktop-only {
-    display: none !important;
-  }
-
-  .mobile-only {
-    display: block !important;
-  }
+  .desktop-only { display: none !important; }
+  .mobile-only  { display: block !important; }
 }
 
-h1,
-h2,
-h3,
-h4,
-.font-display {
-  font-family: 'Outfit', sans-serif;
-  letter-spacing: -0.02em;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-button {
-  font-family: inherit;
-  cursor: pointer;
-}
-
-/* --- Layout --- */
+/* ─── LAYOUT ───────────────────────────────────────────────────── */
 .container {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 40px;
+  padding: 0 48px;
   width: 100%;
 }
+@media (max-width: 1024px) { .container { padding: 0 32px; } }
+@media (max-width: 768px)  { .container { padding: 0 20px; } }
 
-@media (max-width: 1024px) {
-  .container {
-    padding: 0 30px;
-  }
-}
-
-@media (max-width: 768px) {
-  .container {
-    padding: 0 20px;
-  }
-}
-
-/* --- Buttons --- */
+/* ─── BUTTONS ──────────────────────────────────────────────────── */
 .primary-btn {
   background: var(--primary);
-  color: #000;
-  padding: 14px 32px;
-  border-radius: var(--radius-sm);
-  font-weight: 700;
+  color: #050505;
+  padding: 16px 36px;
+  border-radius: var(--radius-xs);
+  font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-size: 0.85rem;
-  border: none;
+  letter-spacing: 0.12em;
+  font-size: 0.75rem;
+  border: 1px solid var(--primary);
   transition: var(--transition);
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+  font-family: var(--font-body);
 }
-
 .primary-btn:hover {
-  background: #FFF;
-  transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(255, 122, 0, 0.2);
+  background: transparent;
+  color: var(--primary);
+  box-shadow: none;
 }
 
+/* ─── GLASS ────────────────────────────────────────────────────── */
 .glass-panel {
-  background: rgba(20, 20, 22, 0.8);
-  backdrop-filter: blur(20px);
+  background: var(--bg-glass);
+  backdrop-filter: blur(32px);
+  -webkit-backdrop-filter: blur(32px);
   border: 1px solid var(--border-dim);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
 }
 
-/* --- Typography Helpers --- */
+/* ─── TYPOGRAPHY ───────────────────────────────────────────────── */
 .gradient-text {
-  background: linear-gradient(135deg, #FFF 60%, rgba(255, 255, 255, 0.4));
+  background: linear-gradient(135deg, #FFF 55%, rgba(255,255,255,0.35));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
+.accent { color: var(--primary); }
 
-.accent {
+/* Label pattern used everywhere */
+.v3-sub {
+  display: block;
   color: var(--primary);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  font-size: 0.65rem;
+  margin-bottom: 16px;
+  font-family: var(--font-body);
+  opacity: 0.8;
 }
 
-/* --- Global Scrollbar --- */
-::-webkit-scrollbar {
-  width: 8px;
+/* ─── GLOBAL SCROLLBAR ─────────────────────────────────────────── */
+::-webkit-scrollbar        { width: 6px; }
+::-webkit-scrollbar-track  { background: var(--bg-black); }
+::-webkit-scrollbar-thumb  { background: #222228; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+/* ─── ANIMATIONS ───────────────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
-
-::-webkit-scrollbar-track {
-  background: var(--bg-black);
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
 }
-
-::-webkit-scrollbar-thumb {
-  background: #27272A;
-  border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--primary);
-}
-
-/* --- Animations --- */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+@keyframes pulse {
+  0%, 100% { opacity: 0.6; }
+  50%       { opacity: 0.35; }
 }
 
 .animate-reveal {
-  animation: fadeIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  animation: fadeUp 0.7s var(--ease-out) forwards;
 }
 
-/* --- Floating Elements --- */
+/* ─── SKELETON ─────────────────────────────────────────────────── */
+.pulse { animation: pulse 1.8s ease-in-out infinite; }
+
+.shimmer-bg {
+  background: linear-gradient(90deg,
+    var(--bg-surface) 25%,
+    var(--bg-hover) 50%,
+    var(--bg-surface) 75%);
+  background-size: 200% auto;
+  animation: shimmer 1.6s linear infinite;
+}
+
+/* ─── FLOATING WHATSAPP ────────────────────────────────────────── */
 .floating-whatsapp {
   position: fixed;
-  bottom: 40px;
-  right: 40px;
-  background: #FFF;
+  bottom: 36px;
+  right: 36px;
+  background: #fff;
   color: #000;
   padding: 12px 24px;
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
   display: flex;
   align-items: center;
   gap: 12px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.7);
   z-index: 1000;
   font-weight: 800;
   text-transform: uppercase;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   letter-spacing: 0.1em;
   transition: var(--transition);
   border: 1px solid var(--border-dim);
 }
-
 .floating-whatsapp:hover {
   background: var(--primary);
   transform: translateY(-5px);
-  box-shadow: 0 30px 60px rgba(255, 122, 0, 0.3);
+  box-shadow: 0 30px 60px rgba(255,122,0,0.3);
 }
-
-.floating-whatsapp svg {
-  width: 18px;
-  height: 18px;
-}
+.floating-whatsapp svg { width: 18px; height: 18px; }
 
 @media (max-width: 768px) {
   .floating-whatsapp {
-    bottom: 20px;
-    right: 20px;
-    padding: 12px;
+    bottom: 20px; right: 20px;
+    padding: 13px;
+    border-radius: 50%;
   }
-
-  .floating-whatsapp span {
-    display: none;
-  }
+  .floating-whatsapp span { display: none; }
 }

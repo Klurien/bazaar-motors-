@@ -32,7 +32,7 @@ const Navbar = () => {
         { name: 'Inventory', path: '/products' },
         { name: 'Foreign Imports', path: '/products?condition=Foreign Used' },
         { name: 'SUVs', path: '/products?make=Toyota&q=SUV' },
-        { name: 'Contact Us', path: '#' },
+        { name: 'Contact Us', path: '/contact' },
     ];
 
     return (

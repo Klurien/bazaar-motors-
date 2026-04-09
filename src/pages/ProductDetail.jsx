@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
-    ArrowLeft,
     Check,
     ChevronLeft,
     ChevronRight,
@@ -9,22 +8,23 @@ import {
     Fuel,
     Settings,
     Dna,
-    User,
     Phone,
-    Mail,
     MessageSquare,
     Calendar,
     Zap,
-    Wind,
     ShieldCheck,
-    CarFront
+    X,
+    ZoomIn,
+    ZoomOut,
+    Maximize2,
+    Grid
 } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import ProductCard from '../components/product/ProductCard';
 import { BRAND } from '../brandConfig';
 import './ProductDetail.css';
 
-const API = (import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : "http://localhost:5000"));
+const API = (import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : ""));
 
 const ProductDetail = () => {
     const { id } = useParams();
@@ -35,12 +35,20 @@ const ProductDetail = () => {
     const [loading, setLoading] = useState(true);
     const [selectedImageIdx, setSelectedImageIdx] = useState(0);
 
+    // Lightbox state
+    const [lightboxOpen, setLightboxOpen] = useState(false);
+    const [lightboxIdx, setLightboxIdx] = useState(0);
+    const [zoom, setZoom] = useState(1);
+    const [pan, setPan] = useState({ x: 0, y: 0 });
+    const [isDragging, setIsDragging] = useState(false);
+    const dragStart = useRef({ x: 0, y: 0 });
+    const panStart = useRef({ x: 0, y: 0 });
+
     // Form state
     const [formData, setFormData] = useState({
         name: '',
         phone: '',
         email: '',
-        subject: '',
         message: ''
     });
 
@@ -53,11 +61,14 @@ const ProductDetail = () => {
                 setProduct(data);
 
                 // Fetch suggested products (by category or make)
-                const allRes = await fetch(`${API}/api/products`);
+                const params = new URLSearchParams({
+                    limit: 15,
+                    category: data.category,
+                    sort: 'newest'
+                });
+                const allRes = await fetch(`${API}/api/products?${params.toString()}`);
                 const allData = await allRes.json();
-                const filtered = allData
-                    .filter(p => (p.category === data.category || p.make === data.make) && p.id !== data.id)
-                    .slice(0, 4);
+                const filtered = allData.products.filter(p => p.id !== data.id);
                 setRelatedProducts(filtered);
 
                 setLoading(false);
@@ -77,15 +88,76 @@ const ProductDetail = () => {
         window.open(`https://wa.me/${BRAND.whatsapp}?text=${encodeURIComponent(whatsappMsg)}`, '_blank');
     };
 
+    // ── Lightbox helpers ──────────────────────────────────────
+    const openLightbox = (idx) => {
+        setLightboxIdx(idx);
+        setZoom(1);
+        setPan({ x: 0, y: 0 });
+        setLightboxOpen(true);
+        document.body.style.overflow = 'hidden';
+    };
+
+    const closeLightbox = () => {
+        setLightboxOpen(false);
+        setZoom(1);
+        setPan({ x: 0, y: 0 });
+        document.body.style.overflow = '';
+    };
+
+    const lightboxNext = () => {
+        setLightboxIdx(i => (i + 1) % images.length);
+        setZoom(1); setPan({ x: 0, y: 0 });
+    };
+
+    const lightboxPrev = () => {
+        setLightboxIdx(i => (i - 1 + images.length) % images.length);
+        setZoom(1); setPan({ x: 0, y: 0 });
+    };
+
+    const handleWheelZoom = (e) => {
+        e.preventDefault();
+        const delta = e.deltaY < 0 ? 0.25 : -0.25;
+        setZoom(z => Math.min(5, Math.max(1, z + delta)));
+        if (zoom <= 1) setPan({ x: 0, y: 0 });
+    };
+
+    const handleMouseDown = (e) => {
+        if (zoom <= 1) return;
+        setIsDragging(true);
+        dragStart.current = { x: e.clientX, y: e.clientY };
+        panStart.current = { ...pan };
+    };
+    const handleMouseMove = (e) => {
+        if (!isDragging) return;
+        setPan({
+            x: panStart.current.x + (e.clientX - dragStart.current.x),
+            y: panStart.current.y + (e.clientY - dragStart.current.y),
+        });
+    };
+    const handleMouseUp = () => setIsDragging(false);
+
+    useEffect(() => {
+        if (!lightboxOpen) return;
+        const onKey = (e) => {
+            if (e.key === 'Escape')      closeLightbox();
+            if (e.key === 'ArrowRight') lightboxNext();
+            if (e.key === 'ArrowLeft')  lightboxPrev();
+            if (e.key === '+')           setZoom(z => Math.min(5, z + 0.5));
+            if (e.key === '-')           setZoom(z => Math.max(1, z - 0.5));
+        };
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+    }, [lightboxOpen, lightboxIdx, zoom]);
+
     if (loading) {
         return (
             <div className="product-detail-skeleton-v3 container">
                 <div className="skel-grid">
-                    <div className="skel-media pulse"></div>
+                    <div className="skel-media pulse shimmer-bg"></div>
                     <div className="skel-content">
-                        <div className="skel-title pulse"></div>
-                        <div className="skel-specs pulse"></div>
-                        <div className="skel-form pulse"></div>
+                        <div className="skel-title pulse shimmer-bg"></div>
+                        <div className="skel-specs pulse shimmer-bg"></div>
+                        <div className="skel-form pulse shimmer-bg"></div>
                     </div>
                 </div>
             </div>
@@ -110,11 +182,9 @@ const ProductDetail = () => {
     let featuresArray = ["Air Conditioning", "Airbags", "Alloy Wheels", "Power Steering", "Rear Camera"];
     if (product.features) {
         try {
-            // Check if it's JSON
             const parsed = JSON.parse(product.features);
             if (Array.isArray(parsed)) featuresArray = parsed;
         } catch {
-            // Otherwise assume comma-separated
             featuresArray = product.features.split(',').map(f => f.trim());
         }
     }
@@ -122,8 +192,40 @@ const ProductDetail = () => {
     return (
         <div className="vehicle-detail-page">
             <Helmet>
-                <title>{`${product.year} ${product.name} for Sale | Bazaar Motors`}</title>
-                <meta name="description" content={`Check out the ${product.year} ${product.name} at Bazaar Motors Ruiru. Performance: ${product.engine_capacity}, Mileage: ${product.mileage}. Contact us today.`} />
+                <title>{`${product.year} ${product.name} for Sale in Kenya | Bazaar Motors`}</title>
+                <meta name="description" content={`Get the ${product.year} ${product.name} at Bazaar Motors Ruiru. Price: KSh ${parseFloat(product.price).toLocaleString()}. Condition: ${product.condition || 'Foreign Used'}. Direct Japanese imports.`} />
+                
+                {/* OpenGraph / Social */}
+                <meta property="og:title" content={`${product.year} ${product.name} for Sale | Bazaar Motors`} />
+                <meta property="og:description" content={`Verified ${product.year} ${product.name}. Price: KSh ${parseFloat(product.price).toLocaleString()}. Contact Bazaar Motors Ruiru today.`} />
+                <meta property="og:image" content={images[0]} />
+                <meta property="og:type" content="website" />
+                <meta property="og:url" content={window.location.href} />
+                <meta name="twitter:card" content="summary_large_image" />
+                <link rel="canonical" href={`https://bazaar-motors.vercel.app/products/${product.id}`} />
+
+                {/* Structured Data (JSON-LD) for Google Shopping/Search */}
+                <script type="application/ld+json">
+                    {JSON.stringify({
+                        "@context": "https://schema.org/",
+                        "@type": "Product",
+                        "name": `${product.year} ${product.name}`,
+                        "image": images,
+                        "description": product.description || `High-quality ${product.year} ${product.name} for sale at Bazaar Motors.`,
+                        "brand": {
+                            "@type": "Brand",
+                            "name": product.make
+                        },
+                        "offers": {
+                            "@type": "Offer",
+                            "url": window.location.href,
+                            "priceCurrency": "KES",
+                            "price": product.price,
+                            "itemCondition": product.condition === "New" ? "https://schema.org/NewCondition" : "https://schema.org/UsedCondition",
+                            "availability": "https://schema.org/InStock"
+                        }
+                    })}
+                </script>
             </Helmet>
 
             <div className="container">
@@ -140,14 +242,33 @@ const ProductDetail = () => {
                     </div>
 
                     <div className="detail-media-layout-v3">
-                        <div className="main-gallery-v3 glass-panel">
-                            <img src={images[selectedImageIdx]} alt={product.name} />
-                            {images.length > 1 && (
-                                <div className="gallery-nav-v3">
-                                    <button onClick={() => setSelectedImageIdx(i => (i - 1 + images.length) % images.length)}><ChevronLeft /></button>
-                                    <button onClick={() => setSelectedImageIdx(i => (i + 1) % images.length)}><ChevronRight /></button>
+                        {/* ── Main Gallery ── */}
+                        <div className="gallery-col">
+                            <div
+                                className="main-gallery-v3"
+                                onClick={() => openLightbox(selectedImageIdx)}
+                                title="Click to zoom"
+                            >
+                                <img src={images[selectedImageIdx]} alt={product.name} />
+                                <div className="gallery-overlay-ui">
+                                    <div className="gallery-counter">{selectedImageIdx + 1} / {images.length}</div>
+                                    <div className="gallery-zoom-hint">
+                                        <Maximize2 size={14} />
+                                        <span>Click to expand</span>
+                                    </div>
                                 </div>
-                            )}
+                                {images.length > 1 && (
+                                    <div className="gallery-nav-v3">
+                                        <button onClick={(e) => { e.stopPropagation(); setSelectedImageIdx(i => (i - 1 + images.length) % images.length); }}>
+                                            <ChevronLeft size={20} />
+                                        </button>
+                                        <button onClick={(e) => { e.stopPropagation(); setSelectedImageIdx(i => (i + 1) % images.length); }}>
+                                            <ChevronRight size={20} />
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                            {/* Thumbnails */}
                             <div className="thumb-track-v3">
                                 {images.map((img, idx) => (
                                     <button
@@ -161,6 +282,7 @@ const ProductDetail = () => {
                             </div>
                         </div>
 
+                        {/* ── Specs Sidebar ── */}
                         <div className="specs-sidebar-v3">
                             <div className="specs-grid-v3">
                                 {vehicleSpecs.map((spec, i) => (
@@ -278,12 +400,101 @@ const ProductDetail = () => {
                         </div>
                         <div className="similar-grid-v3">
                             {relatedProducts.map(p => (
-                                <ProductCard key={p.id} product={p} />
+                                <ProductCard key={p.id} product={p} compact />
                             ))}
                         </div>
                     </section>
                 )}
             </div>
+
+            {/* ── LIGHTBOX ── */}
+            {lightboxOpen && (
+                <div
+                    className="lightbox-overlay"
+                    onClick={closeLightbox}
+                >
+                    {/* Top Bar */}
+                    <div className="lightbox-topbar" onClick={e => e.stopPropagation()}>
+                        <span className="lightbox-title">{product.year} {product.name}</span>
+                        <div className="lightbox-controls">
+                            <span className="lightbox-counter">{lightboxIdx + 1} / {images.length}</span>
+                            <button className="lb-ctrl-btn" onClick={() => setZoom(z => Math.max(1, z - 0.5))} title="Zoom out (−)">
+                                <ZoomOut size={18} />
+                            </button>
+                            <span className="lb-zoom-level">{Math.round(zoom * 100)}%</span>
+                            <button className="lb-ctrl-btn" onClick={() => setZoom(z => Math.min(5, z + 0.5))} title="Zoom in (+)">
+                                <ZoomIn size={18} />
+                            </button>
+                            <button className="lb-ctrl-btn" onClick={() => { setZoom(1); setPan({ x: 0, y: 0 }); }} title="Reset zoom">
+                                <Grid size={18} />
+                            </button>
+                            <button className="lb-ctrl-btn lb-close" onClick={closeLightbox} title="Close (Esc)">
+                                <X size={20} />
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Image Area */}
+                    <div
+                        className={`lightbox-stage ${zoom > 1 ? 'zoomed' : ''}`}
+                        onClick={e => e.stopPropagation()}
+                        onWheel={handleWheelZoom}
+                        onMouseDown={handleMouseDown}
+                        onMouseMove={handleMouseMove}
+                        onMouseUp={handleMouseUp}
+                        onMouseLeave={handleMouseUp}
+                    >
+                        <img
+                            src={images[lightboxIdx]}
+                            alt={product.name}
+                            style={{
+                                transform: `scale(${zoom}) translate(${pan.x / zoom}px, ${pan.y / zoom}px)`,
+                                cursor: isDragging ? 'grabbing' : (zoom > 1 ? 'grab' : 'zoom-in'),
+                                transition: isDragging ? 'none' : 'transform 0.2s ease',
+                            }}
+                            draggable={false}
+                        />
+                    </div>
+
+                    {/* Prev / Next */}
+                    {images.length > 1 && (
+                        <>
+                            <button
+                                className="lb-nav lb-prev"
+                                onClick={e => { e.stopPropagation(); lightboxPrev(); }}
+                            >
+                                <ChevronLeft size={28} />
+                            </button>
+                            <button
+                                className="lb-nav lb-next"
+                                onClick={e => { e.stopPropagation(); lightboxNext(); }}
+                            >
+                                <ChevronRight size={28} />
+                            </button>
+                        </>
+                    )}
+
+                    {/* Bottom Thumbnail Rail */}
+                    {images.length > 1 && (
+                        <div className="lightbox-thumb-rail" onClick={e => e.stopPropagation()}>
+                            {images.map((img, idx) => (
+                                <button
+                                    key={idx}
+                                    className={`lb-thumb ${lightboxIdx === idx ? 'active' : ''}`}
+                                    onClick={() => { setLightboxIdx(idx); setZoom(1); setPan({ x: 0, y: 0 }); }}
+                                >
+                                    <img src={img} alt="" />
+                                </button>
+                            ))}
+                        </div>
+                    )}
+
+                    {/* Keyboard hint */}
+                    <div className="lightbox-kb-hint">
+                        ← → Navigate &nbsp;|&nbsp; Scroll to zoom &nbsp;|&nbsp; Esc to close
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

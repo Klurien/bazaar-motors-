@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { BRAND } from '../brandConfig';
 import './Checkout.css';
 
-const API = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : "http://localhost:5000");
+const API = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : "");
 
 const Checkout = () => {
     const { cart, cartTotal, clearCart } = useCart();

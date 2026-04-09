@@ -25,9 +25,68 @@ const attachImages = async (product) => {
 
 export const getProducts = async (req, res) => {
     try {
-        const [products] = await db.query('SELECT * FROM products ORDER BY created_at DESC');
+        const {
+            page = 1,
+            limit = 20,
+            category,
+            make,
+            q,
+            minPrice,
+            maxPrice,
+            sort = 'newest'
+        } = req.query;
+
+        const offset = (parseInt(page) - 1) * parseInt(limit);
+        const params = [];
+        let whereClauses = [];
+
+        if (category && category !== 'All') {
+            whereClauses.push('category = ?');
+            params.push(category);
+        }
+        if (make && make !== 'All') {
+            whereClauses.push('make = ?');
+            params.push(make);
+        }
+        if (q) {
+            whereClauses.push('(name LIKE ? OR description LIKE ? OR make LIKE ?)');
+            const searchPattern = `%${q}%`;
+            params.push(searchPattern, searchPattern, searchPattern);
+        }
+        if (minPrice) {
+            whereClauses.push('price >= ?');
+            params.push(parseFloat(minPrice));
+        }
+        if (maxPrice) {
+            whereClauses.push('price <= ?');
+            params.push(parseFloat(maxPrice));
+        }
+
+        const whereSql = whereClauses.length > 0 ? `WHERE ${whereClauses.join(' AND ')}` : '';
+
+        // Sorting
+        let orderBy = 'created_at DESC';
+        if (sort === 'price-asc') orderBy = 'price ASC';
+        if (sort === 'price-desc') orderBy = 'price DESC';
+        if (sort === 'year-desc') orderBy = 'year DESC';
+        if (sort === 'name-asc') orderBy = 'name ASC';
+
+        // Count Query
+        const [countResult] = await db.query(`SELECT COUNT(*) as total FROM products ${whereSql}`, params);
+        const total = countResult[0].total;
+
+        // Data Query
+        const dataSql = `SELECT * FROM products ${whereSql} ORDER BY ${orderBy} LIMIT ? OFFSET ?`;
+        const [products] = await db.query(dataSql, [...params, parseInt(limit), offset]);
+
         const withImages = await Promise.all(products.map(attachImages));
-        res.json(withImages);
+
+        res.json({
+            products: withImages,
+            total,
+            page: parseInt(page),
+            totalPages: Math.ceil(total / parseInt(limit))
+        });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: error.message || 'Error fetching products' });
@@ -49,7 +108,7 @@ export const createProduct = async (req, res) => {
     const { name, description, price, category, stock, make, year, condition, transmission, engine_capacity, fuel_type, mileage, auction_grade, features } = req.body;
     if (!name || !price) return res.status(400).json({ message: 'Name and price are required' });
 
-    let image_url = null;
+    let image_url = req.body.image_url || null;
     let newImageUrls = [];
     const files = req.files || (req.file ? [req.file] : []);
 

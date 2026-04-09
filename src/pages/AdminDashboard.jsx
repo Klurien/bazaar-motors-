@@ -10,7 +10,7 @@ import { Link } from 'react-router-dom';
 import './AdminDashboard.css';
 
 const COLORS = ['#FF7A00', '#00C49F', '#FFBB28', '#FF8042', '#0088FE'];
-const API = (import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : "http://localhost:5000"));
+const API = (import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : ""));
 const CONDITIONS = ['Foreign Used', 'Local Used', 'Brand New'];
 const TRANSMISSIONS = ['Automatic', 'Manual', 'CVT'];
 const FUEL_TYPES = ['Petrol', 'Diesel', 'Hybrid', 'Electric'];

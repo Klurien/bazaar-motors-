@@ -3,6 +3,7 @@ import { useSearchParams, Link } from 'react-router-dom';
 import { SlidersHorizontal, Search, X, ChevronDown, Filter, Grid, List as ListIcon } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import ProductCard from '../components/product/ProductCard';
+import CardSkeleton from '../components/product/CardSkeleton';
 import './Products.css';
 
 const MAKES = ['All', 'Toyota', 'Lexus', 'Nissan', 'Mazda', 'Subaru', 'Honda', 'Mercedes-Benz', 'BMW', 'Volkswagen'];
@@ -16,118 +17,97 @@ const SORT_OPTIONS = [
     { value: 'year-desc', label: 'Latest Year' },
 ];
 
-const API = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : "http://localhost:5000");
+const API = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : "");
 
 const Products = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [loadingMore, setLoadingMore] = useState(false);
     const [sidebarOpen, setSidebarOpen] = useState(false);
+
+    // Pagination/Meta state
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(true);
+    const [totalResults, setTotalResults] = useState(0);
 
     // Filter state
     const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
     const [selectedMake, setSelectedMake] = useState(searchParams.get('make') || 'All');
     const [selectedCondition, setSelectedCondition] = useState(searchParams.get('condition') || 'All');
     const [selectedTransmission, setSelectedTransmission] = useState(searchParams.get('transmission') || 'All');
-    const [priceRange, setPriceRange] = useState([0, 15000000]);
-    const [maxPrice, setMaxPrice] = useState(15000000);
-    const [sort, setSort] = useState('default');
+    const [priceRange, setPriceRange] = useState([0, 30000000]);
+    const [sort, setSort] = useState('newest');
 
-    useEffect(() => {
-        setLoading(true);
-        fetch(`${API}/api/products`)
-            .then(res => res.json())
-            .then(data => {
-                if (!Array.isArray(data)) {
-                    console.error("Products API didn't return an array:", data);
-                    data = [];
-                }
-                setProducts(data);
-                if (data.length > 0) {
-                    const max = Math.ceil(Math.max(...data.map(p => p.price)));
-                    setMaxPrice(max);
-                    setPriceRange([0, max]);
-                }
-                setLoading(false);
-            })
-            .catch(() => setLoading(false));
-    }, []);
+    const fetchProducts = async (pageNumber, isNewSearch = false) => {
+        if (pageNumber > 1) setLoadingMore(true);
+        else setLoading(true);
 
-    // Sync search params
-    useEffect(() => {
-        const q = searchParams.get('q') || '';
-        const make = searchParams.get('make') || 'All';
-        const cond = searchParams.get('condition') || 'All';
-        setSearchQuery(q);
-        setSelectedMake(make);
-        setSelectedCondition(cond);
-    }, [searchParams]);
+        try {
+            const params = new URLSearchParams({
+                page: pageNumber,
+                limit: 12,
+                q: searchQuery,
+                make: selectedMake !== 'All' ? selectedMake : '',
+                category: searchParams.get('category') || '',
+                minPrice: priceRange[0],
+                maxPrice: priceRange[1],
+                sort: sort
+            });
 
-    const filteredProducts = useMemo(() => {
-        let result = [...products];
+            const res = await fetch(`${API}/api/products?${params.toString()}`);
+            const data = await res.json();
 
-        // Search
-        if (searchQuery) {
-            const q = searchQuery.toLowerCase();
-            result = result.filter(p =>
-                p.name.toLowerCase().includes(q) ||
-                (p.make && p.make.toLowerCase().includes(q)) ||
-                (p.description && p.description.toLowerCase().includes(q))
-            );
+            if (isNewSearch) {
+                setProducts(data.products);
+            } else {
+                setProducts(prev => [...prev, ...data.products]);
+            }
+
+            setTotalResults(data.total);
+            setHasMore(data.page < data.totalPages);
+            setLoading(false);
+            setLoadingMore(false);
+        } catch (err) {
+            console.error(err);
+            setLoading(false);
+            setLoadingMore(false);
         }
-
-        // Make
-        if (selectedMake !== 'All') {
-            result = result.filter(p =>
-                (p.make || '').toLowerCase() === selectedMake.toLowerCase()
-            );
-        }
-
-        // Condition
-        if (selectedCondition !== 'All') {
-            result = result.filter(p =>
-                (p.condition || '').toLowerCase() === selectedCondition.toLowerCase()
-            );
-        }
-
-        // Transmission
-        if (selectedTransmission !== 'All') {
-            result = result.filter(p =>
-                (p.transmission || '').toLowerCase() === selectedTransmission.toLowerCase()
-            );
-        }
-
-        // Price
-        result = result.filter(p => p.price >= priceRange[0] && p.price <= priceRange[1]);
-
-        // Sort
-        switch (sort) {
-            case 'price-asc': result.sort((a, b) => a.price - b.price); break;
-            case 'price-desc': result.sort((a, b) => b.price - a.price); break;
-            case 'year-desc': result.sort((a, b) => b.year - a.year); break;
-            case 'name-asc': result.sort((a, b) => a.name.localeCompare(b.name)); break;
-            default: break;
-        }
-
-        return result;
-    }, [products, searchQuery, selectedMake, selectedCondition, selectedTransmission, priceRange, sort]);
-
-    const handleSearch = (e) => {
-        e.preventDefault();
-        const params = {};
-        if (searchQuery) params.q = searchQuery;
-        if (selectedMake !== 'All') params.make = selectedMake;
-        if (selectedCondition !== 'All') params.condition = selectedCondition;
-        setSearchParams(params);
     };
+
+    // Initial fetch and filter change
+    useEffect(() => {
+        setPage(1);
+        fetchProducts(1, true);
+    }, [searchQuery, selectedMake, selectedCondition, selectedTransmission, priceRange, sort, searchParams.get('category')]);
+
+    // Load more when page changes
+    useEffect(() => {
+        if (page > 1) {
+            fetchProducts(page, false);
+        }
+    }, [page]);
+
+    // Intersection Observer for Infinite Scroll
+    const observer = React.useRef();
+    const lastElementRef = React.useCallback(node => {
+        if (loading || loadingMore) return;
+        if (observer.current) observer.current.disconnect();
+        observer.current = new IntersectionObserver(entries => {
+            if (entries[0].isIntersecting && hasMore) {
+                setPage(prev => prev + 1);
+            }
+        });
+        if (node) observer.current.observe(node);
+    }, [loading, loadingMore, hasMore]);
 
     const clearFilters = () => {
         setSearchQuery('');
         setSelectedMake('All');
         setSelectedCondition('All');
         setSelectedTransmission('All');
-        setPriceRange([0, maxPrice]);
-        setSort('default');
+        setPriceRange([0, 30000000]);
+        setSort('newest');
         setSearchParams({});
     };
 
@@ -135,7 +115,7 @@ const Products = () => {
         selectedMake !== 'All',
         selectedCondition !== 'All',
         selectedTransmission !== 'All',
-        priceRange[0] > 0 || priceRange[1] < maxPrice,
+        priceRange[0] > 0 || priceRange[1] < 30000000,
     ].filter(Boolean).length;
 
     return (
@@ -151,7 +131,7 @@ const Products = () => {
                     <div className="header-flex-v3">
                         <div className="header-text-v3">
                             <h1>THE <span className="highlight">SHOWROOM</span></h1>
-                            <p>Discover {filteredProducts.length} high-performance vehicles across our elite collection.</p>
+                            <p>Discover {totalResults} high-performance vehicles across our elite collection.</p>
                         </div>
                         <div className="header-actions-v3">
                             <button className="h-action-btn-v3 mobile-only" onClick={() => setSidebarOpen(true)}>
@@ -241,7 +221,7 @@ const Products = () => {
                 <main className="inventory-main-v3">
                     <div className="v3-toolbar-top">
                         <div className="toolbar-info-v3">
-                            <p>Showing <strong>{filteredProducts.length}</strong> vehicles</p>
+                            <p>Showing <strong>{products.length}</strong> of <strong>{totalResults}</strong> vehicles</p>
                         </div>
                         <div className="toolbar-controls-v3">
                             <div className="v3-sort-control">
@@ -278,18 +258,40 @@ const Products = () => {
                     {loading ? (
                         <div className="v3-inventory-grid">
                             {[1, 2, 3, 4, 5, 6].map(i => (
-                                <div key={i} className="v3-card-skeleton pulse"></div>
+                                <CardSkeleton key={i} />
                             ))}
                         </div>
                     ) : (
-                        <div className="v3-inventory-grid">
-                            {filteredProducts.map(vehicle => (
-                                <ProductCard key={vehicle.id} product={vehicle} />
-                            ))}
-                        </div>
+                        <>
+                            <div className="v3-inventory-grid">
+                                {products.map((vehicle, index) => {
+                                    if (products.length === index + 1) {
+                                        return (
+                                            <div ref={lastElementRef} key={vehicle.id}>
+                                                <ProductCard product={vehicle} />
+                                            </div>
+                                        );
+                                    }
+                                    return <ProductCard key={vehicle.id} product={vehicle} />;
+                                })}
+                            </div>
+                            
+                            {loadingMore && (
+                                <div className="v3-loading-more">
+                                    <div className="spinner"></div>
+                                    <span>Curating more vehicles...</span>
+                                </div>
+                            )}
+
+                            {!hasMore && products.length > 0 && (
+                                <div className="v3-end-of-list">
+                                    <p>You've reached the end of our current collection.</p>
+                                </div>
+                            )}
+                        </>
                     )}
 
-                    {!loading && filteredProducts.length === 0 && (
+                    {!loading && products.length === 0 && (
                         <div className="v3-empty-state">
                             <Search size={48} />
                             <h3>No results found</h3>

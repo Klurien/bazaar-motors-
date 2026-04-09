@@ -55,7 +55,7 @@ const Footer = () => {
                     <ul className="f-v3-links">
                         <li><Link to="/">About Us</Link></li>
                         <li><Link to="/">Meet the Team</Link></li>
-                        <li><Link to="/">Contact Us</Link></li>
+                        <li><Link to="/contact">Contact Us</Link></li>
                         <li><Link to="/">Testimonials</Link></li>
                         <li><Link to="/">Visit our Yard</Link></li>
                     </ul>

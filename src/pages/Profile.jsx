@@ -4,7 +4,7 @@ import { Package, Clock, CheckCircle, Truck, AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import './Profile.css';
 
-const API = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : "http://localhost:5000");
+const API = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : "");
 
 const Profile = () => {
     const { user, logout } = useAuth();

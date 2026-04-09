@@ -4,7 +4,7 @@ import { MessageCircle, Star } from 'lucide-react';
 import { BRAND } from '../../brandConfig';
 import './ProductCard.css';
 
-const ProductCard = ({ product }) => {
+const ProductCard = ({ product, compact = false }) => {
     const handleWhatsApp = (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -13,11 +13,11 @@ const ProductCard = ({ product }) => {
     };
 
     const imageUrl = product.image_url
-        ? (product.image_url.startsWith('http') ? product.image_url : `${import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : "http://localhost:5000")}${product.image_url}`)
+        ? (product.image_url.startsWith('http') ? product.image_url : `${import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : "")}${product.image_url}`)
         : 'https://images.unsplash.com/photo-1549317661-bd3293003975?q=80&w=400&auto=format&fit=crop';
 
     return (
-        <div className="vehicle-card-v3 animate-reveal">
+        <div className={`vehicle-card-v3 animate-reveal ${compact ? 'v3-compact' : ''}`}>
             <Link to={`/products/${product.id}`} className="v3-card-link">
                 <div className="v3-card-media">
                     <img src={imageUrl} alt={product.name} />

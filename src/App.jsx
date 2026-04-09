@@ -15,12 +15,13 @@ import Register from './pages/Register';
 import Profile from './pages/Profile';
 import { Analytics } from '@vercel/analytics/react';
 import { BRAND } from './brandConfig';
+import Contact from './pages/Contact';
 
 function App() {
   const [whatsappNumber, setWhatsappNumber] = React.useState(BRAND.whatsapp);
 
   React.useEffect(() => {
-    const API = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : "http://localhost:5000");
+    const API = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : "");
     fetch(`${API}/api/stats/config`)
       .then(res => res.json())
       .then(data => {
@@ -46,6 +47,7 @@ function App() {
                 <Route path="/products" element={<Products />} />
                 <Route path="/products/:id" element={<ProductDetail />} />
                 <Route path="/checkout" element={<Checkout />} />
+                <Route path="/contact" element={<Contact />} />
                 {/* Category shortcut routes */}
                 <Route path="/category/:cat" element={<Products />} />
               </Routes>

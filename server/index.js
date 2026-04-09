@@ -27,6 +27,7 @@ const PORT = process.env.PORT || 5000;
 // Middleware
 app.use(morgan('dev'));
 app.use(helmet({
+    contentSecurityPolicy: false,
     crossOriginResourcePolicy: false,
 }));
 app.use(compression());
@@ -62,7 +63,7 @@ app.use('/api/promotions', promotionRoutes);
 app.use('/api/orders', ordersRoutes);
 app.use('/api/stats', statsRoutes);
 app.use('/api/categories', categoryRoutes);
-app.use('/api', sitemapRoutes); // Mounts /api/sitemap.xml
+app.use('/', sitemapRoutes); // Mounts /sitemap.xml (will match /api/sitemap.xml under Vercel)
 
 // Global Error Handler
 app.use((err, req, res, next) => {
