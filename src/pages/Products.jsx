@@ -49,6 +49,8 @@ const Products = () => {
                 limit: 12,
                 q: searchQuery,
                 make: selectedMake !== 'All' ? selectedMake : '',
+                condition: selectedCondition !== 'All' ? selectedCondition : '',
+                transmission: selectedTransmission !== 'All' ? selectedTransmission : '',
                 category: searchParams.get('category') || '',
                 minPrice: priceRange[0],
                 maxPrice: priceRange[1],
@@ -197,6 +199,21 @@ const Products = () => {
                         </div>
 
                         <div className="v3-filter-group">
+                            <label>TRANSMISSION</label>
+                            <div className="v3-select-grid">
+                                {TRANSMISSIONS.map(trans => (
+                                    <button
+                                        key={trans}
+                                        className={`v3-select-pill ${selectedTransmission === trans ? 'active' : ''}`}
+                                        onClick={() => setSelectedTransmission(trans)}
+                                    >
+                                        {trans}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="v3-filter-group">
                             <label>PRICE CAP (KSh)</label>
                             <div className="v3-price-inputs">
                                 <div className="price-input-v3 glass-panel">
@@ -249,6 +266,11 @@ const Products = () => {
                             {selectedCondition !== 'All' && (
                                 <span className="v3-tag">
                                     {selectedCondition} <X size={14} onClick={() => setSelectedCondition('All')} />
+                                </span>
+                            )}
+                            {selectedTransmission !== 'All' && (
+                                <span className="v3-tag">
+                                    {selectedTransmission} <X size={14} onClick={() => setSelectedTransmission('All')} />
                                 </span>
                             )}
                         </div>

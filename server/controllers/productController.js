@@ -33,6 +33,8 @@ export const getProducts = async (req, res) => {
             q,
             minPrice,
             maxPrice,
+            condition,
+            transmission,
             sort = 'newest'
         } = req.query;
 
@@ -48,16 +50,24 @@ export const getProducts = async (req, res) => {
             whereClauses.push('make = ?');
             params.push(make);
         }
+        if (condition && condition !== 'All') {
+            whereClauses.push('`condition` = ?');
+            params.push(condition);
+        }
+        if (transmission && transmission !== 'All') {
+            whereClauses.push('transmission = ?');
+            params.push(transmission);
+        }
         if (q) {
             whereClauses.push('(name LIKE ? OR description LIKE ? OR make LIKE ?)');
             const searchPattern = `%${q}%`;
             params.push(searchPattern, searchPattern, searchPattern);
         }
-        if (minPrice) {
+        if (minPrice !== undefined && minPrice !== '') {
             whereClauses.push('price >= ?');
             params.push(parseFloat(minPrice));
         }
-        if (maxPrice) {
+        if (maxPrice !== undefined && maxPrice !== '') {
             whereClauses.push('price <= ?');
             params.push(parseFloat(maxPrice));
         }
