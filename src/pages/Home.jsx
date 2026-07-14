@@ -13,7 +13,7 @@ const Home = () => {
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
-    const [searchMake, setSearchMake] = useState('All');
+    const [searchType, setSearchType] = useState('All');
 
     const { scrollY } = useScroll();
     const yHeroBg = useTransform(scrollY, [0, 1000], [0, 400]);

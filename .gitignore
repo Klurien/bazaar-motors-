@@ -35,3 +35,4 @@ dist/
 *.db*
 .vercel
 .env*.local
+.env*

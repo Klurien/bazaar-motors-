@@ -303,28 +303,67 @@ export const initDB = async () => {
   }
 };
 
-// Initialize once - store result so failed init doesn't permanently break routes
 let initError = null;
 dbInitPromise = initDB().catch(err => {
   console.error('DATABASE INIT ERROR:', err.message);
   initError = err;
-  // Do NOT re-throw — allow routes to still attempt queries (the pool may still work)
+  if (process.env.VERCEL) {
+    console.log('Running on Vercel without database — API will return empty results');
+    dbWrapper = createFallbackDb();
+  }
 });
+
+function createFallbackDb() {
+  return {
+    _isFallback: true,
+    async query(sql, params = []) {
+      const command = sql.trim().split(/\s/)[0].toUpperCase();
+      if (command === 'SELECT' || command === 'SHOW') return [[]];
+      return [{ affectedRows: 0, insertId: 0 }];
+    },
+    async execute(sql, params = []) { return this.query(sql, params); },
+    async getConnection() {
+      return {
+        query: async (...args) => this.query(...args),
+        execute: async (...args) => this.execute(...args),
+        release: () => {}
+      };
+    }
+  };
+}
 
 export default {
   query: async (...args) => {
     await dbInitPromise;
-    if (!dbWrapper) throw new Error('Database not initialized: ' + (initError?.message || 'unknown'));
+    if (!dbWrapper) {
+      if (process.env.VERCEL) {
+        dbWrapper = createFallbackDb();
+      } else {
+        throw new Error('Database not initialized: ' + (initError?.message || 'unknown'));
+      }
+    }
     return dbWrapper.query(...args);
   },
   execute: async (...args) => {
     await dbInitPromise;
-    if (!dbWrapper) throw new Error('Database not initialized: ' + (initError?.message || 'unknown'));
+    if (!dbWrapper) {
+      if (process.env.VERCEL) {
+        dbWrapper = createFallbackDb();
+      } else {
+        throw new Error('Database not initialized: ' + (initError?.message || 'unknown'));
+      }
+    }
     return dbWrapper.execute(...args);
   },
   getConnection: async () => {
     await dbInitPromise;
-    if (!dbWrapper) throw new Error('Database not initialized: ' + (initError?.message || 'unknown'));
+    if (!dbWrapper) {
+      if (process.env.VERCEL) {
+        dbWrapper = createFallbackDb();
+      } else {
+        throw new Error('Database not initialized: ' + (initError?.message || 'unknown'));
+      }
+    }
     return dbWrapper.getConnection();
   }
 };
