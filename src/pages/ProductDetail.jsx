@@ -163,7 +163,7 @@ const ProductDetail = () => {
 
     const images = product.images?.length > 0
         ? product.images.map(img => img.url.startsWith('http') ? img.url : `${API}${img.url}`)
-        : [product.image_url ? (product.image_url.startsWith('http') ? product.image_url : `${API}${product.image_url}`) : 'https://placehold.co/800x600?text=Strain+Image'];
+        : [product.image_url ? (product.image_url.startsWith('http') ? product.image_url : `${API}${product.image_url}`) : 'https://images.unsplash.com/photo-1593113598332-cd288d649433?w=800&q=80&auto=format&fit=crop'];
 
     const strainSpecs = [
         { icon: <Dna size={20} />, label: 'Type', value: product.category || 'Hybrid' },

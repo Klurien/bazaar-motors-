@@ -76,7 +76,7 @@ const Home = () => {
 
                 <motion.div className="hero-v3-image" style={{ y: yHeroBg }}>
                     <img 
-                        src="https://images.unsplash.com/photo-1603900055207-07f571524012?q=80&w=2970&auto=format&fit=crop" 
+                        src="https://images.unsplash.com/photo-1542435503-956c469947f6?q=80&w=2970&auto=format&fit=crop" 
                         alt="Premium Cannabis" 
                     />
                     <div className="hero-v3-overlay"></div>

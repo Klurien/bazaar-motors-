@@ -14,7 +14,7 @@ const ProductCard = ({ product, compact = false }) => {
 
     const imageUrl = product.image_url
         ? (product.image_url.startsWith('http') ? product.image_url : `${import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : "")}${product.image_url}`)
-        : 'https://images.unsplash.com/photo-1603900055207-07f571524012?q=80&w=400&auto=format&fit=crop';
+        : 'https://images.unsplash.com/photo-1593113598332-cd288d649433?q=80&w=400&auto=format&fit=crop';
 
     return (
         <div className={`vehicle-card-v3 animate-reveal ${compact ? 'v3-compact' : ''}`}>

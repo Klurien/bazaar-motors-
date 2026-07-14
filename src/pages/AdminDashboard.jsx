@@ -20,7 +20,7 @@ const ImageCarousel = ({ images, baseUrl = API }) => {
     const [idx, setIdx] = useState(0);
     const urls = images?.length > 0
         ? images.map(img => img.url.startsWith('http') ? img.url : `${baseUrl}${img.url}`)
-        : ['https://placehold.co/600x400?text=No+Image'];
+        : ['https://images.unsplash.com/photo-1593113598332-cd288d649433?w=600&h=400&fit=crop'];
 
     useEffect(() => { setIdx(0); }, [images?.length]);
 

@@ -20,9 +20,9 @@ const products = [
         category: 'Indica',
         stock: 15,
         images: [
-            'https://images.unsplash.com/photo-1603900055207-07f571524012?auto=format&fit=crop&q=80&w=1200',
-            'https://images.unsplash.com/photo-1609987339210-2f212961cee6?auto=format&fit=crop&q=80&w=1200',
-            'https://images.unsplash.com/photo-1610382164007-4dca4f87c7f4?auto=format&fit=crop&q=80&w=1200'
+            'https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&q=80&w=1200',
+            'https://images.unsplash.com/photo-1542435503-956c469947f6?auto=format&fit=crop&q=80&w=1200',
+            'https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80&w=1200'
         ]
     },
     {
@@ -41,9 +41,9 @@ const products = [
         category: 'Indica',
         stock: 10,
         images: [
-            'https://images.unsplash.com/photo-1603900055207-07f571524012?auto=format&fit=crop&q=80&w=1200',
-            'https://images.unsplash.com/photo-1609987339210-2f212961cee6?auto=format&fit=crop&q=80&w=1200',
-            'https://images.unsplash.com/photo-1610382164007-4dca4f87c7f4?auto=format&fit=crop&q=80&w=1200'
+            'https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&q=80&w=1200',
+            'https://images.unsplash.com/photo-1542435503-956c469947f6?auto=format&fit=crop&q=80&w=1200',
+            'https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80&w=1200'
         ]
     },
     {
@@ -62,9 +62,9 @@ const products = [
         category: 'Indica',
         stock: 8,
         images: [
-            'https://images.unsplash.com/photo-1603900055207-07f571524012?auto=format&fit=crop&q=80&w=1200',
-            'https://images.unsplash.com/photo-1609987339210-2f212961cee6?auto=format&fit=crop&q=80&w=1200',
-            'https://images.unsplash.com/photo-1610382164007-4dca4f87c7f4?auto=format&fit=crop&q=80&w=1200'
+            'https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&q=80&w=1200',
+            'https://images.unsplash.com/photo-1542435503-956c469947f6?auto=format&fit=crop&q=80&w=1200',
+            'https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80&w=1200'
         ]
     },
     {
@@ -83,9 +83,9 @@ const products = [
         category: 'Indica',
         stock: 20,
         images: [
-            'https://images.unsplash.com/photo-1603900055207-07f571524012?auto=format&fit=crop&q=80&w=1200',
-            'https://images.unsplash.com/photo-1609987339210-2f212961cee6?auto=format&fit=crop&q=80&w=1200',
-            'https://images.unsplash.com/photo-1610382164007-4dca4f87c7f4?auto=format&fit=crop&q=80&w=1200'
+            'https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&q=80&w=1200',
+            'https://images.unsplash.com/photo-1542435503-956c469947f6?auto=format&fit=crop&q=80&w=1200',
+            'https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80&w=1200'
         ]
     },
     {
@@ -104,9 +104,9 @@ const products = [
         category: 'Indica',
         stock: 12,
         images: [
-            'https://images.unsplash.com/photo-1603900055207-07f571524012?auto=format&fit=crop&q=80&w=1200',
-            'https://images.unsplash.com/photo-1609987339210-2f212961cee6?auto=format&fit=crop&q=80&w=1200',
-            'https://images.unsplash.com/photo-1610382164007-4dca4f87c7f4?auto=format&fit=crop&q=80&w=1200'
+            'https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&q=80&w=1200',
+            'https://images.unsplash.com/photo-1542435503-956c469947f6?auto=format&fit=crop&q=80&w=1200',
+            'https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80&w=1200'
         ]
     },
 
@@ -127,9 +127,9 @@ const products = [
         category: 'Sativa',
         stock: 18,
         images: [
-            'https://images.unsplash.com/photo-1603900055207-07f571524012?auto=format&fit=crop&q=80&w=1200',
-            'https://images.unsplash.com/photo-1609987339210-2f212961cee6?auto=format&fit=crop&q=80&w=1200',
-            'https://images.unsplash.com/photo-1610382164007-4dca4f87c7f4?auto=format&fit=crop&q=80&w=1200'
+            'https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&q=80&w=1200',
+            'https://images.unsplash.com/photo-1542435503-956c469947f6?auto=format&fit=crop&q=80&w=1200',
+            'https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80&w=1200'
         ]
     },
     {
@@ -148,9 +148,9 @@ const products = [
         category: 'Sativa',
         stock: 14,
         images: [
-            'https://images.unsplash.com/photo-1603900055207-07f571524012?auto=format&fit=crop&q=80&w=1200',
-            'https://images.unsplash.com/photo-1609987339210-2f212961cee6?auto=format&fit=crop&q=80&w=1200',
-            'https://images.unsplash.com/photo-1610382164007-4dca4f87c7f4?auto=format&fit=crop&q=80&w=1200'
+            'https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&q=80&w=1200',
+            'https://images.unsplash.com/photo-1542435503-956c469947f6?auto=format&fit=crop&q=80&w=1200',
+            'https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80&w=1200'
         ]
     },
     {
@@ -169,9 +169,9 @@ const products = [
         category: 'Sativa',
         stock: 9,
         images: [
-            'https://images.unsplash.com/photo-1603900055207-07f571524012?auto=format&fit=crop&q=80&w=1200',
-            'https://images.unsplash.com/photo-1609987339210-2f212961cee6?auto=format&fit=crop&q=80&w=1200',
-            'https://images.unsplash.com/photo-1610382164007-4dca4f87c7f4?auto=format&fit=crop&q=80&w=1200'
+            'https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&q=80&w=1200',
+            'https://images.unsplash.com/photo-1542435503-956c469947f6?auto=format&fit=crop&q=80&w=1200',
+            'https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80&w=1200'
         ]
     },
 
@@ -192,9 +192,9 @@ const products = [
         category: 'Hybrid',
         stock: 11,
         images: [
-            'https://images.unsplash.com/photo-1603900055207-07f571524012?auto=format&fit=crop&q=80&w=1200',
-            'https://images.unsplash.com/photo-1609987339210-2f212961cee6?auto=format&fit=crop&q=80&w=1200',
-            'https://images.unsplash.com/photo-1610382164007-4dca4f87c7f4?auto=format&fit=crop&q=80&w=1200'
+            'https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&q=80&w=1200',
+            'https://images.unsplash.com/photo-1542435503-956c469947f6?auto=format&fit=crop&q=80&w=1200',
+            'https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80&w=1200'
         ]
     },
     {
@@ -213,9 +213,9 @@ const products = [
         category: 'Hybrid',
         stock: 7,
         images: [
-            'https://images.unsplash.com/photo-1603900055207-07f571524012?auto=format&fit=crop&q=80&w=1200',
-            'https://images.unsplash.com/photo-1609987339210-2f212961cee6?auto=format&fit=crop&q=80&w=1200',
-            'https://images.unsplash.com/photo-1610382164007-4dca4f87c7f4?auto=format&fit=crop&q=80&w=1200'
+            'https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&q=80&w=1200',
+            'https://images.unsplash.com/photo-1542435503-956c469947f6?auto=format&fit=crop&q=80&w=1200',
+            'https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80&w=1200'
         ]
     },
     {
@@ -234,9 +234,9 @@ const products = [
         category: 'Hybrid',
         stock: 16,
         images: [
-            'https://images.unsplash.com/photo-1603900055207-07f571524012?auto=format&fit=crop&q=80&w=1200',
-            'https://images.unsplash.com/photo-1609987339210-2f212961cee6?auto=format&fit=crop&q=80&w=1200',
-            'https://images.unsplash.com/photo-1610382164007-4dca4f87c7f4?auto=format&fit=crop&q=80&w=1200'
+            'https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&q=80&w=1200',
+            'https://images.unsplash.com/photo-1542435503-956c469947f6?auto=format&fit=crop&q=80&w=1200',
+            'https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80&w=1200'
         ]
     },
     {
@@ -255,9 +255,9 @@ const products = [
         category: 'Hybrid',
         stock: 13,
         images: [
-            'https://images.unsplash.com/photo-1603900055207-07f571524012?auto=format&fit=crop&q=80&w=1200',
-            'https://images.unsplash.com/photo-1609987339210-2f212961cee6?auto=format&fit=crop&q=80&w=1200',
-            'https://images.unsplash.com/photo-1610382164007-4dca4f87c7f4?auto=format&fit=crop&q=80&w=1200'
+            'https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&q=80&w=1200',
+            'https://images.unsplash.com/photo-1542435503-956c469947f6?auto=format&fit=crop&q=80&w=1200',
+            'https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80&w=1200'
         ]
     },
 
@@ -278,8 +278,8 @@ const products = [
         category: 'Edibles',
         stock: 50,
         images: [
-            'https://images.unsplash.com/photo-1603900055207-07f571524012?auto=format&fit=crop&q=80&w=1200',
-            'https://images.unsplash.com/photo-1609987339210-2f212961cee6?auto=format&fit=crop&q=80&w=1200'
+            'https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&q=80&w=1200',
+            'https://images.unsplash.com/photo-1542435503-956c469947f6?auto=format&fit=crop&q=80&w=1200'
         ]
     },
     {
@@ -298,8 +298,8 @@ const products = [
         category: 'Edibles',
         stock: 35,
         images: [
-            'https://images.unsplash.com/photo-1603900055207-07f571524012?auto=format&fit=crop&q=80&w=1200',
-            'https://images.unsplash.com/photo-1609987339210-2f212961cee6?auto=format&fit=crop&q=80&w=1200'
+            'https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&q=80&w=1200',
+            'https://images.unsplash.com/photo-1542435503-956c469947f6?auto=format&fit=crop&q=80&w=1200'
         ]
     },
     {
@@ -318,8 +318,8 @@ const products = [
         category: 'Edibles',
         stock: 25,
         images: [
-            'https://images.unsplash.com/photo-1603900055207-07f571524012?auto=format&fit=crop&q=80&w=1200',
-            'https://images.unsplash.com/photo-1609987339210-2f212961cee6?auto=format&fit=crop&q=80&w=1200'
+            'https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&q=80&w=1200',
+            'https://images.unsplash.com/photo-1542435503-956c469947f6?auto=format&fit=crop&q=80&w=1200'
         ]
     },
 
@@ -340,9 +340,9 @@ const products = [
         category: 'CBD',
         stock: 20,
         images: [
-            'https://images.unsplash.com/photo-1603900055207-07f571524012?auto=format&fit=crop&q=80&w=1200',
-            'https://images.unsplash.com/photo-1609987339210-2f212961cee6?auto=format&fit=crop&q=80&w=1200',
-            'https://images.unsplash.com/photo-1610382164007-4dca4f87c7f4?auto=format&fit=crop&q=80&w=1200'
+            'https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&q=80&w=1200',
+            'https://images.unsplash.com/photo-1542435503-956c469947f6?auto=format&fit=crop&q=80&w=1200',
+            'https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80&w=1200'
         ]
     },
     {
@@ -361,9 +361,9 @@ const products = [
         category: 'CBD',
         stock: 15,
         images: [
-            'https://images.unsplash.com/photo-1603900055207-07f571524012?auto=format&fit=crop&q=80&w=1200',
-            'https://images.unsplash.com/photo-1609987339210-2f212961cee6?auto=format&fit=crop&q=80&w=1200',
-            'https://images.unsplash.com/photo-1610382164007-4dca4f87c7f4?auto=format&fit=crop&q=80&w=1200'
+            'https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&q=80&w=1200',
+            'https://images.unsplash.com/photo-1542435503-956c469947f6?auto=format&fit=crop&q=80&w=1200',
+            'https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80&w=1200'
         ]
     },
 
@@ -384,8 +384,8 @@ const products = [
         category: 'Concentrates',
         stock: 10,
         images: [
-            'https://images.unsplash.com/photo-1603900055207-07f571524012?auto=format&fit=crop&q=80&w=1200',
-            'https://images.unsplash.com/photo-1609987339210-2f212961cee6?auto=format&fit=crop&q=80&w=1200'
+            'https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&q=80&w=1200',
+            'https://images.unsplash.com/photo-1542435503-956c469947f6?auto=format&fit=crop&q=80&w=1200'
         ]
     },
     {
@@ -404,8 +404,8 @@ const products = [
         category: 'Concentrates',
         stock: 8,
         images: [
-            'https://images.unsplash.com/photo-1603900055207-07f571524012?auto=format&fit=crop&q=80&w=1200',
-            'https://images.unsplash.com/photo-1609987339210-2f212961cee6?auto=format&fit=crop&q=80&w=1200'
+            'https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&q=80&w=1200',
+            'https://images.unsplash.com/photo-1542435503-956c469947f6?auto=format&fit=crop&q=80&w=1200'
         ]
     }
 ];
@@ -414,7 +414,7 @@ const promotions = [
     {
         title: 'Fresh From the Highlands',
         subtitle: 'Our latest harvest is here. Premium sun-grown strains from the Jamaican Blue Mountains. Lab-tested and ready for you.',
-        image_url: 'https://images.unsplash.com/photo-1603900055207-07f571524012?q=80&w=2070&auto=format&fit=crop',
+        image_url: 'https://images.unsplash.com/photo-1593113598332-cd288d649433?q=80&w=2070&auto=format&fit=crop',
         link: '/products',
         active: 1,
         sort_order: 0
@@ -422,7 +422,7 @@ const promotions = [
     {
         title: 'New Member Special',
         subtitle: 'First time ordering? Get 10% off your first purchase. Use code ISLAND10 at checkout. Welcome to the IslandLeaf family.',
-        image_url: 'https://images.unsplash.com/photo-1610382164007-4dca4f87c7f4?q=80&w=2070&auto=format&fit=crop',
+        image_url: 'https://images.unsplash.com/photo-1542435503-956c469947f6?q=80&w=2070&auto=format&fit=crop',
         link: '/products',
         active: 1,
         sort_order: 1
