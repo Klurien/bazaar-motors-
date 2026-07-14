@@ -35,7 +35,6 @@ const ProductDetail = () => {
     const [loading, setLoading] = useState(true);
     const [selectedImageIdx, setSelectedImageIdx] = useState(0);
 
-    // Lightbox state
     const [lightboxOpen, setLightboxOpen] = useState(false);
     const [lightboxIdx, setLightboxIdx] = useState(0);
     const [zoom, setZoom] = useState(1);
@@ -44,7 +43,6 @@ const ProductDetail = () => {
     const dragStart = useRef({ x: 0, y: 0 });
     const panStart = useRef({ x: 0, y: 0 });
 
-    // Form state
     const [formData, setFormData] = useState({
         name: '',
         phone: '',
@@ -60,7 +58,6 @@ const ProductDetail = () => {
                 const data = await res.json();
                 setProduct(data);
 
-                // Fetch suggested products (by category or make)
                 const params = new URLSearchParams({
                     limit: 15,
                     category: data.category,
@@ -83,12 +80,10 @@ const ProductDetail = () => {
 
     const handleFormSubmit = (e) => {
         e.preventDefault();
-        // Here you would typically send the inquiry to the backend or WhatsApp
-        const whatsappMsg = `Inquiry for ${product.year} ${product.name}:\nName: ${formData.name}\nEmail: ${formData.email}\nMessage: ${formData.message}`;
+        const whatsappMsg = `Inquiry for ${product.name}:\nName: ${formData.name}\nEmail: ${formData.email}\nMessage: ${formData.message}`;
         window.open(`https://wa.me/${BRAND.whatsapp}?text=${encodeURIComponent(whatsappMsg)}`, '_blank');
     };
 
-    // ── Lightbox helpers ──────────────────────────────────────
     const openLightbox = (idx) => {
         setLightboxIdx(idx);
         setZoom(1);
@@ -168,18 +163,18 @@ const ProductDetail = () => {
 
     const images = product.images?.length > 0
         ? product.images.map(img => img.url.startsWith('http') ? img.url : `${API}${img.url}`)
-        : [product.image_url ? (product.image_url.startsWith('http') ? product.image_url : `${API}${product.image_url}`) : 'https://placehold.co/800x600?text=Vehicle+Image'];
+        : [product.image_url ? (product.image_url.startsWith('http') ? product.image_url : `${API}${product.image_url}`) : 'https://placehold.co/800x600?text=Strain+Image'];
 
-    const vehicleSpecs = [
-        { icon: <Dna size={20} />, label: 'Body Type', value: product.category || 'SUV' },
-        { icon: <Gauge size={20} />, label: 'Mileage', value: product.mileage ? `${product.mileage.toLocaleString()} km` : 'TBA' },
-        { icon: <Zap size={20} />, label: 'Engine', value: product.engine_capacity || 'N/A' },
-        { icon: <Fuel size={20} />, label: 'Fuel', value: product.fuel_type || 'Petrol' },
-        { icon: <Settings size={20} />, label: 'Drive', value: product.transmission || 'Automatic' },
-        { icon: <ShieldCheck size={20} />, label: 'Grade', value: product.auction_grade || 'Auction 4.5/B' },
+    const strainSpecs = [
+        { icon: <Dna size={20} />, label: 'Type', value: product.category || 'Hybrid' },
+        { icon: <Gauge size={20} />, label: 'THC', value: product.mileage ? `${product.mileage}%` : 'TBA' },
+        { icon: <Zap size={20} />, label: 'CBD', value: product.engine_capacity || 'N/A' },
+        { icon: <Fuel size={20} />, label: 'Terpenes', value: product.fuel_type || 'Myrcene' },
+        { icon: <Settings size={20} />, label: 'Effect', value: product.transmission || 'Balanced' },
+        { icon: <ShieldCheck size={20} />, label: 'Lab Grade', value: product.auction_grade || 'A+' },
     ];
 
-    let featuresArray = ["Air Conditioning", "Airbags", "Alloy Wheels", "Power Steering", "Rear Camera"];
+    let featuresArray = ["Organic Grown", "Lab Tested", "Hand Trimmed", "Cured Perfectly", "Discreet Packaging"];
     if (product.features) {
         try {
             const parsed = JSON.parse(product.features);
@@ -192,36 +187,29 @@ const ProductDetail = () => {
     return (
         <div className="vehicle-detail-page">
             <Helmet>
-                <title>{`${product.year} ${product.name} for Sale in Kenya | Bazaar Motors`}</title>
-                <meta name="description" content={`Get the ${product.year} ${product.name} at Bazaar Motors Ruiru. Price: KSh ${parseFloat(product.price).toLocaleString()}. Condition: ${product.condition || 'Foreign Used'}. Direct Japanese imports.`} />
+                <title>{`${product.name} | IslandLeaf Jamaica`}</title>
+                <meta name="description" content={`Get ${product.name} at IslandLeaf. Price: JMD ${parseFloat(product.price).toLocaleString()}. Type: ${product.category || 'Hybrid'}. Lab tested, island grown.`} />
                 
-                {/* OpenGraph / Social */}
-                <meta property="og:title" content={`${product.year} ${product.name} for Sale | Bazaar Motors`} />
-                <meta property="og:description" content={`Verified ${product.year} ${product.name}. Price: KSh ${parseFloat(product.price).toLocaleString()}. Contact Bazaar Motors Ruiru today.`} />
+                <meta property="og:title" content={`${product.name} | IslandLeaf`} />
+                <meta property="og:description" content={`Premium ${product.name}. Price: JMD ${parseFloat(product.price).toLocaleString()}. Shop IslandLeaf today.`} />
                 <meta property="og:image" content={images[0]} />
                 <meta property="og:type" content="website" />
                 <meta property="og:url" content={window.location.href} />
                 <meta name="twitter:card" content="summary_large_image" />
-                <link rel="canonical" href={`https://bazaar-motors.vercel.app/products/${product.id}`} />
+                <link rel="canonical" href={`https://islandleaf.vercel.app/products/${product.id}`} />
 
-                {/* Structured Data (JSON-LD) for Google Shopping/Search */}
                 <script type="application/ld+json">
                     {JSON.stringify({
                         "@context": "https://schema.org/",
                         "@type": "Product",
-                        "name": `${product.year} ${product.name}`,
+                        "name": `${product.name}`,
                         "image": images,
-                        "description": product.description || `High-quality ${product.year} ${product.name} for sale at Bazaar Motors.`,
-                        "brand": {
-                            "@type": "Brand",
-                            "name": product.make
-                        },
+                        "description": product.description || `Premium ${product.name} at IslandLeaf.`,
                         "offers": {
                             "@type": "Offer",
                             "url": window.location.href,
-                            "priceCurrency": "KES",
+                            "priceCurrency": "JMD",
                             "price": product.price,
-                            "itemCondition": product.condition === "New" ? "https://schema.org/NewCondition" : "https://schema.org/UsedCondition",
                             "availability": "https://schema.org/InStock"
                         }
                     })}
@@ -232,17 +220,16 @@ const ProductDetail = () => {
                 <div className="detail-hero-v3">
                     <div className="detail-header-v3">
                         <div className="header-top-v3">
-                            <span className="v3-sub">{product.make} SHOWROOM</span>
-                            <h1>{product.year} {product.name}</h1>
+                            <span className="v3-sub">{product.make || product.category} STRAIN</span>
+                            <h1>{product.name}</h1>
                         </div>
                         <div className="v3-price-impact">
-                            <span className="impact-label">List Price</span>
-                            <div className="impact-val">KSh {parseFloat(product.price).toLocaleString()}</div>
+                            <span className="impact-label">Price</span>
+                            <div className="impact-val">JMD {parseFloat(product.price).toLocaleString()}</div>
                         </div>
                     </div>
 
                     <div className="detail-media-layout-v3">
-                        {/* ── Main Gallery ── */}
                         <div className="gallery-col">
                             <div
                                 className="main-gallery-v3"
@@ -268,7 +255,6 @@ const ProductDetail = () => {
                                     </div>
                                 )}
                             </div>
-                            {/* Thumbnails */}
                             <div className="thumb-track-v3">
                                 {images.map((img, idx) => (
                                     <button
@@ -282,10 +268,9 @@ const ProductDetail = () => {
                             </div>
                         </div>
 
-                        {/* ── Specs Sidebar ── */}
                         <div className="specs-sidebar-v3">
                             <div className="specs-grid-v3">
-                                {vehicleSpecs.map((spec, i) => (
+                                {strainSpecs.map((spec, i) => (
                                     <div key={i} className="spec-tile-v3 glass-panel">
                                         <div className="tile-icon-v3">{spec.icon}</div>
                                         <div className="tile-info-v3">
@@ -298,9 +283,9 @@ const ProductDetail = () => {
                             <div className="action-stack-v3">
                                 <button
                                     className="primary-btn wide-btn"
-                                    onClick={() => window.open(`https://wa.me/${BRAND.whatsapp}?text=I%20am%20interested%20in%20a%20test%20drive%20for%20the%20${product.name}`, '_blank')}
+                                    onClick={() => window.open(`https://wa.me/${BRAND.whatsapp}?text=I%20am%20interested%20in%20${product.name}`, '_blank')}
                                 >
-                                    <Calendar size={18} /> BOOK TEST DRIVE
+                                    <Calendar size={18} /> ORDER NOW
                                 </button>
                                 <div className="alt-actions-v3">
                                     <a href={`tel:${BRAND.phone}`} className="glass-btn flex-1 j-center"><Phone size={16} /> CALL</a>
@@ -312,17 +297,16 @@ const ProductDetail = () => {
                 </div>
 
                 <div className="vehicle-secondary-layout">
-                    {/* Left: Description & Features */}
                     <div className="info-main-col">
                         <section className="detail-section">
                             <h2 className="section-title-alt">Description</h2>
                             <div className="description-text">
-                                <p>{product.description || `This ${product.year} ${product.name} is a prime example of performance and luxury. Direct imports with verified auction sheets and meticulous maintenance history. Perfect for those seeking reliability and style on Kenyan roads.`}</p>
+                                <p>{product.description || `This ${product.name} is a premium example of Jamaican cultivation. Lab-tested for purity and potency, hand-trimmed, and cured to perfection.`}</p>
                                 <ul className="key-bullet-points">
-                                    <li>Meticulously Maintained Foreign Used</li>
-                                    <li>High Efficiency {product.engine_capacity} Engine</li>
-                                    <li>Fully Loaded with {product.transmission} Transmission</li>
-                                    <li>Import Quality Compliance (QISJ/KEBS)</li>
+                                    <li>Locally Grown in Jamaica</li>
+                                    <li>Third-Party Lab Tested</li>
+                                    <li>Hand Trimmed & Cured</li>
+                                    <li>Discreet Island-Wide Delivery</li>
                                 </ul>
                             </div>
                         </section>
@@ -340,7 +324,6 @@ const ProductDetail = () => {
                         </section>
                     </div>
 
-                    {/* Right: Inquiry Form */}
                     <aside className="inquiry-sidebar">
                         <div className="inquiry-card glass-v2">
                             <h3>Send an <span className="highlight">Inquiry</span></h3>
@@ -360,7 +343,7 @@ const ProductDetail = () => {
                                     <input
                                         type="tel"
                                         required
-                                        placeholder="+254..."
+                                        placeholder="+1 876..."
                                         value={formData.phone}
                                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                                     />
@@ -380,7 +363,7 @@ const ProductDetail = () => {
                                     <textarea
                                         required
                                         rows="4"
-                                        placeholder="I am interested in this vehicle..."
+                                        placeholder="I am interested in this strain..."
                                         value={formData.message}
                                         onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                                     ></textarea>
@@ -391,12 +374,11 @@ const ProductDetail = () => {
                     </aside>
                 </div>
 
-                {/* Similar Vehicles */}
                 {relatedProducts.length > 0 && (
                     <section className="similar-vehicles-section">
                         <div className="section-header-alt">
-                            <h2>SUGGESTED <span className="highlight">FOR YOU</span></h2>
-                            <Link to="/products" className="view-more">Browse Showroom</Link>
+                            <h2>RELATED <span className="highlight">STRAINS</span></h2>
+                            <Link to="/products" className="view-more">Browse Dispensary</Link>
                         </div>
                         <div className="similar-grid-v3">
                             {relatedProducts.map(p => (
@@ -407,15 +389,13 @@ const ProductDetail = () => {
                 )}
             </div>
 
-            {/* ── LIGHTBOX ── */}
             {lightboxOpen && (
                 <div
                     className="lightbox-overlay"
                     onClick={closeLightbox}
                 >
-                    {/* Top Bar */}
                     <div className="lightbox-topbar" onClick={e => e.stopPropagation()}>
-                        <span className="lightbox-title">{product.year} {product.name}</span>
+                        <span className="lightbox-title">{product.name}</span>
                         <div className="lightbox-controls">
                             <span className="lightbox-counter">{lightboxIdx + 1} / {images.length}</span>
                             <button className="lb-ctrl-btn" onClick={() => setZoom(z => Math.max(1, z - 0.5))} title="Zoom out (−)">
@@ -434,7 +414,6 @@ const ProductDetail = () => {
                         </div>
                     </div>
 
-                    {/* Image Area */}
                     <div
                         className={`lightbox-stage ${zoom > 1 ? 'zoomed' : ''}`}
                         onClick={e => e.stopPropagation()}
@@ -456,7 +435,6 @@ const ProductDetail = () => {
                         />
                     </div>
 
-                    {/* Prev / Next */}
                     {images.length > 1 && (
                         <>
                             <button
@@ -474,7 +452,6 @@ const ProductDetail = () => {
                         </>
                     )}
 
-                    {/* Bottom Thumbnail Rail */}
                     {images.length > 1 && (
                         <div className="lightbox-thumb-rail" onClick={e => e.stopPropagation()}>
                             {images.map((img, idx) => (
@@ -489,7 +466,6 @@ const ProductDetail = () => {
                         </div>
                     )}
 
-                    {/* Keyboard hint */}
                     <div className="lightbox-kb-hint">
                         ← → Navigate &nbsp;|&nbsp; Scroll to zoom &nbsp;|&nbsp; Esc to close
                     </div>
@@ -500,4 +476,3 @@ const ProductDetail = () => {
 };
 
 export default ProductDetail;
-

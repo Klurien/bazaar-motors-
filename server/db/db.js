@@ -251,7 +251,7 @@ export const initDB = async () => {
         // Ensure default categories exist
         const [catsExist] = await conn.query('SELECT COUNT(*) as c FROM categories');
         if (catsExist[0].c === 0) {
-          const defaults = ['SUV', 'Sedan', 'Hatchback', 'Pickup', 'Luxury', 'Performance'];
+          const defaults = ['Indica', 'Sativa', 'Hybrid', 'Edibles', 'Luxury', 'Performance'];
           for (let name of defaults) {
             await conn.execute('INSERT INTO categories (name) VALUES (?)', [name]);
           }
@@ -288,7 +288,7 @@ export const initDB = async () => {
       // Ensure default categories exist
       const [catsExist] = await dbWrapper.query('SELECT COUNT(*) as c FROM categories');
       if (catsExist[0].c === 0) {
-        const defaults = ['SUV', 'Sedan', 'Hatchback', 'Pickup', 'Luxury', 'Performance'];
+        const defaults = ['Indica', 'Sativa', 'Hybrid', 'Edibles', 'Luxury', 'Performance'];
         for (let name of defaults) {
           await dbWrapper.execute('INSERT INTO categories (name) VALUES (?)', [name]);
         }

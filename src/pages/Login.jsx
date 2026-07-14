@@ -28,7 +28,6 @@ const Login = () => {
             const data = await response.json();
 
             if (response.ok) {
-                // Pass both user data and token to AuthContext
                 login(data.user, data.token);
                 navigate(data.user.role === 'admin' ? '/admin' : '/');
             } else {
@@ -45,7 +44,7 @@ const Login = () => {
         <div className="login-page">
             <div className="login-card">
                 <h2>Welcome Back</h2>
-                <p>Sign in to manage your account or shop our collection.</p>
+                <p>Sign in to manage your account or browse our collection.</p>
 
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">

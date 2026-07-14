@@ -1,28 +1,27 @@
-import { Car } from 'lucide-react';
+import { Leaf } from 'lucide-react';
 
 export const BRAND = {
-    name: 'BAZAAR MOTORS',
-    nameRaw: 'Bazaar Motors',
-    logo: Car,
-    tagline: 'Drive your dreams',
-    description: 'Kenya\'s premier destination for high-quality Japanese imports and luxury vehicles. Located along Thika Road, Ruiru.',
-    email: 'sheqouemiano@gmail.com',
-    phone: '+254 789 249 004',
-    whatsapp: '254789249004',
-    address: 'Thika Road, Bypass, next to Zetech University, Ruiru, Kenya',
+    name: 'ISLANDLEAF',
+    nameRaw: 'IslandLeaf',
+    logo: Leaf,
+    tagline: 'Rooted in Nature',
+    description: 'Jamaica\'s premier online marketplace for premium cannabis strains, edibles, and herbal wellness products. Quality grown, lab tested, island delivered.',
+    email: 'hello@islandleaf.co',
+    phone: '+1 876 555 0123',
+    whatsapp: '18765550123',
+    address: 'Kings Street, Downtown Kingston, Jamaica',
     social: {
-        instagram: 'https://www.instagram.com/bazaar_motors/',
-        twitter: 'https://twitter.com/bazaarmotors',
-        facebook: 'https://www.facebook.com/p/Bazaar-Motors-61560438815769/',
-        youtube: 'https://youtube.com/@bazaarmotors',
-        tiktok: 'https://www.tiktok.com/@bazaarmotors'
+        instagram: 'https://www.instagram.com/islandleaf/',
+        twitter: 'https://twitter.com/islandleaf',
+        facebook: 'https://www.facebook.com/islandleaf',
+        youtube: 'https://youtube.com/@islandleaf',
+        tiktok: 'https://www.tiktok.com/@islandleaf'
     },
     hero: {
-        badge: 'Premier Japanese Imports Specialist',
-        titleMain: 'Drive Your',
-        titleAccent: 'Dreams with',
-        titleSuffix: 'Bazaar Motors',
-        subtitle: 'Experience the pinnacle of automotive excellence with our curated collection of pristine Japanese imports and luxury vehicles in Ruiru.'
+        badge: 'Premium Jamaican Herbal Marketplace',
+        titleMain: 'Rooted in',
+        titleAccent: 'Nature.',
+        titleSuffix: 'IslandLeaf',
+        subtitle: 'Discover Jamaica\'s finest curated selection of premium strains, edibles, and wellness products — lab tested, locally grown, and delivered with care.'
     }
 };
-

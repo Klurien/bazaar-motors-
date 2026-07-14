@@ -1,6 +1,6 @@
-/* ========= BAZAAR MOTORS - PRODUCT DETAIL ========= */
+/* ========= IslandLeaf - PRODUCT DETAIL ========= */
 
-.vehicle-detail-page {
+.strain-detail-page {
     padding-top: 100px;
     padding-bottom: 140px;
     background: var(--bg-black);
@@ -243,7 +243,7 @@
 }
 
 /* ─── SECONDARY LAYOUT ─────────────────────────────────────────── */
-.vehicle-secondary-layout {
+.strain-secondary-layout {
     display: grid;
     grid-template-columns: 1fr 380px;
     gap: 80px;
@@ -373,7 +373,7 @@
 /* ─── RESPONSIVE ───────────────────────────────────────────────── */
 @media (max-width: 1100px) {
     .detail-media-layout-v3,
-    .vehicle-secondary-layout {
+    .strain-secondary-layout {
         grid-template-columns: 1fr;
         gap: 40px;
     }
@@ -392,7 +392,7 @@
 }
 
 @media (max-width: 480px) {
-    .vehicle-detail-page { padding-top: 80px; padding-bottom: 80px; }
+    .strain-detail-page { padding-top: 80px; padding-bottom: 80px; }
     .header-top-v3 h1 { font-size: 1.8rem; }
     .impact-val { font-size: 1.8rem; }
     .spec-tile-v3 { padding: 14px; }

@@ -5,10 +5,10 @@ import os
 import re
 
 # Configuration
-BASE_URL = "https://bazaar-motors.vercel.app"
+BASE_URL = "https://islandleaf.vercel.app"
 ADMIN_USER = "nova"
 ADMIN_PASS = "nova"
-PKR_TO_KES = 0.46
+PKR_TO_JMD = 0.46
 
 CATEGORIES = {
     "SUV": "https://www.pakwheels.com/used-cars/suv/107776",
@@ -63,12 +63,12 @@ def parse_price(price_str):
         else:
             pkr = val
             
-        return int(pkr * PKR_TO_KES)
+        return int(pkr * PKR_TO_JMD)
     except:
         return 1500000
 
 def scrape_category(cat_name, cat_url, limit=200):
-    cars = []
+    strains = []
     page = 1
     print(f"\n--- Scraping Category: {cat_name} ---")
     
@@ -113,7 +113,7 @@ def scrape_category(cat_name, cat_url, limit=200):
                     if img_url and img_url.startswith('//'):
                         img_url = 'https:' + img_url
                         
-                    details = ad.select('ul.search-vehicle-info li') or ad.select('ul.search-vehicle-info-list li')
+                    details = ad.select('ul.search-strain-info li') or ad.select('ul.search-strain-info-list li')
                     year = details[0].text.strip() if len(details) > 0 else "2020"
                     mileage_str = details[1].text.strip() if len(details) > 1 else "0"
                     mileage = re.sub(r'[^\d]', '', mileage_str) or "0"
@@ -125,7 +125,7 @@ def scrape_category(cat_name, cat_url, limit=200):
                     engine = parts[0].strip() if len(parts) > 0 else "1500 cc"
                     trans = parts[-1].strip() if len(parts) > 1 else "Automatic"
                     
-                    cars.append({
+                    strains.append({
                         "name": name,
                         "price": price_kes,
                         "image_url": img_url,
@@ -150,7 +150,7 @@ def scrape_category(cat_name, cat_url, limit=200):
             print(f"  Request error: {e}")
             break
             
-    return cars
+    return strains
 
 def upload_car(car):
     try:
@@ -195,14 +195,14 @@ def main():
     
     total_uploaded = 0
     for cat_name, cat_url in CATEGORIES.items():
-        cars = scrape_category(cat_name, cat_url, limit=200)
-        print(f"Found {len(cars)} cars for {cat_name}. Uploading...")
-        for car in cars:
+        strains = scrape_category(cat_name, cat_url, limit=200)
+        print(f"Found {len(cars)} strains for {cat_name}. Uploading...")
+        for strain in strains:
             if upload_car(car):
                 total_uploaded += 1
         time.sleep(2) # Gap between categories
         
-    print(f"\nDone! Total cars uploaded: {total_uploaded}")
+    print(f"\nDone! Total strains uploaded: {total_uploaded}")
 
 if __name__ == "__main__":
     main()

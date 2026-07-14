@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Search, User, LogOut, LayoutDashboard, Menu, X, Phone, Car } from 'lucide-react';
+import { Search, User, LogOut, LayoutDashboard, Menu, X, Phone, Leaf } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { BRAND } from '../../brandConfig';
 import './Navbar.css';
@@ -29,9 +29,9 @@ const Navbar = () => {
     };
 
     const categories = [
-        { name: 'Inventory', path: '/products' },
-        { name: 'Foreign Imports', path: '/products?condition=Foreign Used' },
-        { name: 'SUVs', path: '/products?make=Toyota&q=SUV' },
+        { name: 'Dispensary', path: '/products' },
+        { name: 'Indica', path: '/products?category=Indica' },
+        { name: 'Sativa', path: '/products?category=Sativa' },
         { name: 'Contact Us', path: '/contact' },
     ];
 
@@ -40,11 +40,11 @@ const Navbar = () => {
             <div className="container navbar-v3-inner">
                 <Link to="/" className="navbar-v3-logo">
                     <div className="logo-symbol">
-                        <Car size={24} strokeWidth={1.5} />
+                        <Leaf size={24} strokeWidth={1.5} />
                     </div>
                     <div className="logo-text">
-                        <span className="logo-main">BAZAAR</span>
-                        <span className="logo-accent">MOTORS</span>
+                        <span className="logo-main">ISLAND</span>
+                        <span className="logo-accent">LEAF</span>
                     </div>
                 </Link>
 
@@ -65,7 +65,7 @@ const Navbar = () => {
                         <Search size={18} />
                         <input
                             type="text"
-                            placeholder="Find a car..."
+                            placeholder="Find a strain..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
@@ -74,7 +74,7 @@ const Navbar = () => {
                     <div className="action-group-v3">
                         <a href={`https://wa.me/${BRAND.whatsapp}`} className="primary-btn nav-btn desktop-only">
                             <Phone size={14} />
-                            <span>Inquiry</span>
+                            <span>Contact Us</span>
                         </a>
 
                         {user ? (
@@ -86,7 +86,7 @@ const Navbar = () => {
                                         <span>{user.role}</span>
                                     </div>
                                     <div className="user-menu-divider"></div>
-                                    <Link to="/products">My Wishlist</Link>
+                                    <Link to="/products">My Strains</Link>
                                     {user.role === 'admin' && <Link to="/admin">Admin Panel</Link>}
                                     <button onClick={logout}>Logout</button>
                                 </div>
@@ -104,14 +104,13 @@ const Navbar = () => {
                 </div>
             </div>
 
-            {/* Premium Mobile Menu */}
             <div className={`mobile-nav-v3 ${mobileMenuOpen ? 'active' : ''}`}>
                 <div className="mobile-search-v3">
                     <form onSubmit={handleSearch}>
                         <Search size={20} />
                         <input
                             type="text"
-                            placeholder="Search cars..."
+                            placeholder="Search strains..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
@@ -126,7 +125,7 @@ const Navbar = () => {
                 </div>
                 <div className="mobile-footer-v3">
                     <a href={`https://wa.me/${BRAND.whatsapp}`} className="mobile-cta-v3">
-                        <Phone size={20} /> Contact Sales
+                        <Phone size={20} /> Contact Grower
                     </a>
                 </div>
             </div>
@@ -135,4 +134,3 @@ const Navbar = () => {
 };
 
 export default Navbar;
-

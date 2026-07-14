@@ -1,12 +1,12 @@
-/* ========= BAZAAR MOTORS - SHOWROOM/PRODUCTS PAGE ========= */
+/* ========= IslandLeaf - Dispensary/PRODUCTS PAGE ========= */
 
-.inventory-page-v3 {
+.strain dispensary-page-v3 {
     background: var(--bg-black);
     min-height: 100vh;
 }
 
 /* ─── PAGE HEADER ──────────────────────────────────────────────── */
-.inventory-header-v3 {
+.strain dispensary-header-v3 {
     padding: 160px 0 72px;
     background: var(--bg-black);
     border-bottom: 1px solid var(--border-dim);
@@ -15,7 +15,7 @@
 }
 
 /* Ambient glow */
-.inventory-header-v3::before {
+.strain dispensary-header-v3::before {
     content: '';
     position: absolute;
     top: -40%;
@@ -26,7 +26,7 @@
     pointer-events: none;
 }
 
-.inventory-header-v3 .container {
+.strain dispensary-header-v3 .container {
     position: relative;
     z-index: 2;
 }
@@ -75,7 +75,7 @@
 }
 
 /* ─── LAYOUT ───────────────────────────────────────────────────── */
-.inventory-grid-layout {
+.strain dispensary-grid-layout {
     display: grid;
     grid-template-columns: 280px 1fr;
     gap: 0;
@@ -86,7 +86,7 @@
 }
 
 /* ─── SIDEBAR ──────────────────────────────────────────────────── */
-.inventory-sidebar-v3 {
+.strain dispensary-sidebar-v3 {
     position: sticky;
     top: 70px;
     height: calc(100vh - 70px);
@@ -97,7 +97,7 @@
     scrollbar-width: none;
     flex-shrink: 0;
 }
-.inventory-sidebar-v3::-webkit-scrollbar { display: none; }
+.strain dispensary-sidebar-v3::-webkit-scrollbar { display: none; }
 
 .sidebar-v3-header {
     display: flex;
@@ -230,7 +230,7 @@
 }
 
 /* ─── MAIN CONTENT ─────────────────────────────────────────────── */
-.inventory-main-v3 {
+.strain dispensary-main-v3 {
     padding: 40px 48px 80px;
     min-height: calc(100vh - 70px);
 }
@@ -312,8 +312,8 @@
 .v3-tag svg { cursor: pointer; opacity: 0.7; }
 .v3-tag svg:hover { opacity: 1; }
 
-/* ─── VEHICLE GRID ─────────────────────────────────────────────── */
-.v3-inventory-grid {
+/* ─── strain GRID ─────────────────────────────────────────────── */
+.v3-strain dispensary-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 24px;
@@ -390,21 +390,21 @@
 
 /* ─── RESPONSIVE ───────────────────────────────────────────────── */
 @media (max-width: 1200px) {
-    .inventory-grid-layout {
+    .strain dispensary-grid-layout {
         grid-template-columns: 240px 1fr;
     }
-    .inventory-main-v3 {
+    .strain dispensary-main-v3 {
         padding: 40px 32px 80px;
     }
 }
 
 @media (max-width: 1024px) {
-    .inventory-grid-layout {
+    .strain dispensary-grid-layout {
         grid-template-columns: 1fr;
         border: none;
     }
 
-    .inventory-sidebar-v3 {
+    .strain dispensary-sidebar-v3 {
         position: fixed;
         top: 0; right: -100%;
         width: min(360px, 100%);
@@ -417,16 +417,16 @@
         border-left: 1px solid var(--border-dim);
         display: block;
     }
-    .inventory-sidebar-v3.sidebar-v3-open { right: 0; }
+    .strain dispensary-sidebar-v3.sidebar-v3-open { right: 0; }
     .v3-close-sidebar { display: flex; }
 
-    .inventory-main-v3 { padding: 32px 20px 60px; }
-    .v3-inventory-grid { grid-template-columns: repeat(2, 1fr); }
-    .inventory-header-v3 { padding: 120px 0 56px; }
+    .strain dispensary-main-v3 { padding: 32px 20px 60px; }
+    .v3-strain dispensary-grid { grid-template-columns: repeat(2, 1fr); }
+    .strain dispensary-header-v3 { padding: 120px 0 56px; }
 }
 
 @media (max-width: 640px) {
-    .v3-inventory-grid {
+    .v3-strain dispensary-grid {
         grid-template-columns: 1fr;
     }
     .header-text-v3 h1 { font-size: 2rem; }

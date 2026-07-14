@@ -51,7 +51,6 @@ const Profile = () => {
     return (
         <div className="profile-page">
             <div className="container profile-layout">
-                {/* Sidebar */}
                 <aside className="profile-sidebar glass">
                     <div className="profile-user-info">
                         <div className="profile-avatar">
@@ -66,10 +65,9 @@ const Profile = () => {
                     </nav>
                 </aside>
 
-                {/* Main Content */}
                 <main className="profile-content">
-                    <h1>My Collection History</h1>
-                    <p className="profile-subtitle">Review your past architectural kitchen acquisitions.</p>
+                    <h1>My Order History</h1>
+                    <p className="profile-subtitle">Review your past orders.</p>
 
                     {loading ? (
                         <div className="animate-pulse flex flex-col gap-4 mt-6">
@@ -78,9 +76,9 @@ const Profile = () => {
                     ) : orders.length === 0 ? (
                         <div className="empty-orders glass">
                             <Package size={48} />
-                            <h3>No acquisitions yet.</h3>
-                            <p>Explore the catalog to find your next masterpiece.</p>
-                            <button className="btn btn-primary mt-4" onClick={() => navigate('/products')}>Browse Items</button>
+                            <h3>No orders yet.</h3>
+                            <p>Browse the dispensary to find your strain.</p>
+                            <button className="btn btn-primary mt-4" onClick={() => navigate('/products')}>Browse Strains</button>
                         </div>
                     ) : (
                         <div className="orders-list">
@@ -105,15 +103,15 @@ const Profile = () => {
                                                     <p>Qty: {item.quantity}</p>
                                                 </div>
                                                 <div className="item-price">
-                                                    KES {parseFloat(item.price_at_purchase).toLocaleString()}
+                                                    JMD {parseFloat(item.price_at_purchase).toLocaleString()}
                                                 </div>
                                             </div>
                                         ))}
                                     </div>
                                     <div className="order-footer">
                                         <div className="order-total">
-                                            <span>Total Investment</span>
-                                            <strong>KES {parseFloat(order.total_amount).toLocaleString()}</strong>
+                                            <span>Total</span>
+                                            <strong>JMD {parseFloat(order.total_amount).toLocaleString()}</strong>
                                         </div>
                                     </div>
                                 </div>

@@ -50,7 +50,7 @@ const Register = () => {
         <div className="register-page">
             <div className="register-card">
                 <h2>Join The Circle</h2>
-                <p>Register to start finding your culinary masterpieces.</p>
+                <p>Register to start browsing our curated collection.</p>
 
                 {error && <div className="error-message">{error}</div>}
 

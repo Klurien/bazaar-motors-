@@ -1,6 +1,6 @@
-/* ========= BAZAAR MOTORS - VEHICLE CARD - LUXURY EDITION ========= */
+/* ========= IslandLeaf - strain CARD - LUXURY EDITION ========= */
 
-.vehicle-card-v3 {
+.strain-card-v3 {
   background: var(--bg-card);
   border: 1px solid var(--border-dim);
   transition: var(--transition);
@@ -13,7 +13,7 @@
 }
 
 /* Glow reveal on hover */
-.vehicle-card-v3::before {
+.strain-card-v3::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -24,13 +24,13 @@
   z-index: 1;
 }
 
-.vehicle-card-v3:hover {
+.strain-card-v3:hover {
   border-color: var(--border-gold);
   box-shadow: 0 0 0 1px rgba(197,160,89,0.1), 0 24px 60px rgba(0,0,0,0.8), var(--primary-glow);
   transform: translateY(-6px);
 }
 
-.vehicle-card-v3:hover::before { opacity: 1; }
+.strain-card-v3:hover::before { opacity: 1; }
 
 /* ─── LINK WRAPPER ─────────────────────────────────────────────── */
 .v3-card-link {
@@ -60,7 +60,7 @@
   100% { transform: scale(1.04) translate(-1%, 1%); }
 }
 
-.vehicle-card-v3:hover .v3-card-media img {
+.strain-card-v3:hover .v3-card-media img {
   transform: scale(1.08) !important;
   animation-play-state: paused;
 }
@@ -80,7 +80,7 @@
   opacity: 0;
   transition: opacity 0.3s;
 }
-.vehicle-card-v3:hover .v3-card-media::after {
+.strain-card-v3:hover .v3-card-media::after {
   opacity: 1;
   animation: shimmer 1.2s linear;
 }
@@ -236,22 +236,22 @@
 }
 
 /* ─── COMPACT MODE ─────────────────────────────────────────────── */
-.vehicle-card-v3.v3-compact .v3-card-info {
+.strain-card-v3.v3-compact .v3-card-info {
   padding: 18px;
 }
-.vehicle-card-v3.v3-compact .v3-title {
+.strain-card-v3.v3-compact .v3-title {
   font-size: 1rem;
   margin-bottom: 14px;
 }
-.vehicle-card-v3.v3-compact .v3-specs-grid {
+.strain-card-v3.v3-compact .v3-specs-grid {
   gap: 10px;
   margin-bottom: 16px;
   padding-top: 14px;
 }
-.vehicle-card-v3.v3-compact .v3-price {
+.strain-card-v3.v3-compact .v3-price {
   font-size: 1.15rem;
 }
-.vehicle-card-v3.v3-compact .v3-whatsapp-btn {
+.strain-card-v3.v3-compact .v3-whatsapp-btn {
   width: 36px;
   height: 36px;
 }

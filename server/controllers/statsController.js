@@ -14,15 +14,14 @@ export const getDashboardStats = async (req, res) => {
         const [visitorsRes] = await db.query('SELECT stat_value FROM site_stats WHERE stat_name = "visitors"');
         const visitors = visitorsRes[0]?.stat_value || 0;
 
-        // 4. Inventory Items (Total unique products)
-        const [inventoryRes] = await db.query('SELECT COUNT(*) as count FROM products');
-        const inventoryCount = inventoryRes[0].count || 0;
+        const [productCountRes] = await db.query('SELECT COUNT(*) as count FROM products');
+        const productCount = productCountRes[0].count || 0;
 
         res.json({
             totalRevenue,
             activeOrders,
             visitors,
-            inventoryCount
+            productCount
         });
     } catch (error) {
         console.error('Stats controller error:', error);

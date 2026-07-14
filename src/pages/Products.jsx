@@ -1,331 +1,287 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
-import { SlidersHorizontal, Search, X, ChevronDown, Filter, Grid, List as ListIcon } from 'lucide-react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import {
+    Search,
+    SlidersHorizontal,
+    X,
+    ChevronDown,
+    Grid,
+    List,
+    Leaf
+} from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import ProductCard from '../components/product/ProductCard';
-import CardSkeleton from '../components/product/CardSkeleton';
+import { BRAND } from '../brandConfig';
 import './Products.css';
 
-const MAKES = ['All', 'Toyota', 'Lexus', 'Nissan', 'Mazda', 'Subaru', 'Honda', 'Mercedes-Benz', 'BMW', 'Volkswagen'];
-const CONDITIONS = ['All', 'Foreign Used', 'Local Used', 'Brand New'];
-const TRANSMISSIONS = ['All', 'Automatic', 'Manual', 'CVT'];
+const API = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : "");
 
 const SORT_OPTIONS = [
-    { value: 'default', label: 'Featured' },
-    { value: 'price-asc', label: 'Price: Low to High' },
-    { value: 'price-desc', label: 'Price: High to Low' },
-    { value: 'year-desc', label: 'Latest Year' },
+    { value: 'newest', label: 'Newest First' },
+    { value: 'oldest', label: 'Oldest First' },
+    { value: 'price_asc', label: 'Price: Low to High' },
+    { value: 'price_desc', label: 'Price: High to Low' },
+    { value: 'name_asc', label: 'Name: A-Z' },
+    { value: 'name_desc', label: 'Name: Z-A' },
 ];
 
-const API = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : "");
+const STRAIN_CATEGORIES = [
+    { value: '', label: 'All Strains' },
+    { value: 'Indica', label: 'Indica' },
+    { value: 'Sativa', label: 'Sativa' },
+    { value: 'Hybrid', label: 'Hybrid' },
+    { value: 'CBD', label: 'CBD' },
+    { value: 'Edibles', label: 'Edibles' },
+    { value: 'Concentrates', label: 'Concentrates' },
+];
 
 const Products = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [loadingMore, setLoadingMore] = useState(false);
-    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [totalCount, setTotalCount] = useState(0);
+    const [viewMode, setViewMode] = useState('grid');
+    const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+    const [searchTerm, setSearchTerm] = useState(searchParams.get('q') || '');
+    const [filters, setFilters] = useState({
+        category: searchParams.get('category') || '',
+        minPrice: searchParams.get('minPrice') || '',
+        maxPrice: searchParams.get('maxPrice') || '',
+    });
+    const [sort, setSort] = useState(searchParams.get('sort') || 'newest');
+    const [page, setPage] = useState(parseInt(searchParams.get('page')) || 1);
+    const limit = 30;
 
-    // Pagination/Meta state
-    const [page, setPage] = useState(1);
-    const [hasMore, setHasMore] = useState(true);
-    const [totalResults, setTotalResults] = useState(0);
+    const dropdownRef = useRef(null);
+    const [sortOpen, setSortOpen] = useState(false);
 
-    // Filter state
-    const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
-    const [selectedMake, setSelectedMake] = useState(searchParams.get('make') || 'All');
-    const [selectedCondition, setSelectedCondition] = useState(searchParams.get('condition') || 'All');
-    const [selectedTransmission, setSelectedTransmission] = useState(searchParams.get('transmission') || 'All');
-    const [priceRange, setPriceRange] = useState([0, 30000000]);
-    const [sort, setSort] = useState('newest');
+    const buildQuery = useCallback(() => {
+        const params = new URLSearchParams();
+        params.set('limit', String(limit));
+        params.set('offset', String((page - 1) * limit));
 
-    const fetchProducts = async (pageNumber, isNewSearch = false) => {
-        if (pageNumber > 1) setLoadingMore(true);
-        else setLoading(true);
+        const q = searchTerm || searchParams.get('q');
+        if (q) params.set('q', q);
+        if (filters.category) params.set('category', filters.category);
+        if (filters.minPrice) params.set('minPrice', filters.minPrice);
+        if (filters.maxPrice) params.set('maxPrice', filters.maxPrice);
+        if (sort) params.set('sort', sort);
 
+        return params.toString();
+    }, [page, searchTerm, filters, sort, searchParams]);
+
+    const fetchProducts = useCallback(async () => {
+        setLoading(true);
+        const qs = buildQuery();
+        const url = `${API}/api/products?${qs}`;
         try {
-            const params = new URLSearchParams({
-                page: pageNumber,
-                limit: 12,
-                q: searchQuery,
-                make: selectedMake !== 'All' ? selectedMake : '',
-                condition: selectedCondition !== 'All' ? selectedCondition : '',
-                transmission: selectedTransmission !== 'All' ? selectedTransmission : '',
-                category: searchParams.get('category') || '',
-                minPrice: priceRange[0],
-                maxPrice: priceRange[1],
-                sort: sort
-            });
-
-            const res = await fetch(`${API}/api/products?${params.toString()}`);
+            const res = await fetch(url);
             const data = await res.json();
-
-            if (isNewSearch) {
-                setProducts(data.products);
-            } else {
-                setProducts(prev => [...prev, ...data.products]);
-            }
-
-            setTotalResults(data.total);
-            setHasMore(data.page < data.totalPages);
-            setLoading(false);
-            setLoadingMore(false);
+            setProducts(data.products || data || []);
+            setTotalCount(data.totalCount || data.total || data.products?.length || 0);
         } catch (err) {
             console.error(err);
+        } finally {
             setLoading(false);
-            setLoadingMore(false);
         }
-    };
+    }, [buildQuery]);
 
-    // Initial fetch and filter change
     useEffect(() => {
-        setPage(1);
-        fetchProducts(1, true);
-    }, [searchQuery, selectedMake, selectedCondition, selectedTransmission, priceRange, sort, searchParams.get('category')]);
+        fetchProducts();
+    }, [fetchProducts]);
 
-    // Load more when page changes
     useEffect(() => {
-        if (page > 1) {
-            fetchProducts(page, false);
-        }
-    }, [page]);
+        const newParams = new URLSearchParams();
+        if (searchTerm) newParams.set('q', searchTerm);
+        if (filters.category) newParams.set('category', filters.category);
+        if (filters.minPrice) newParams.set('minPrice', filters.minPrice);
+        if (filters.maxPrice) newParams.set('maxPrice', filters.maxPrice);
+        if (sort && sort !== 'newest') newParams.set('sort', sort);
+        if (page > 1) newParams.set('page', String(page));
+        setSearchParams(newParams, { replace: true });
+    }, [searchTerm, filters, sort, page, setSearchParams]);
 
-    // Intersection Observer for Infinite Scroll
-    const observer = React.useRef();
-    const lastElementRef = React.useCallback(node => {
-        if (loading || loadingMore) return;
-        if (observer.current) observer.current.disconnect();
-        observer.current = new IntersectionObserver(entries => {
-            if (entries[0].isIntersecting && hasMore) {
-                setPage(prev => prev + 1);
-            }
-        });
-        if (node) observer.current.observe(node);
-    }, [loading, loadingMore, hasMore]);
+    const totalPages = Math.ceil(totalCount / limit);
 
     const clearFilters = () => {
-        setSearchQuery('');
-        setSelectedMake('All');
-        setSelectedCondition('All');
-        setSelectedTransmission('All');
-        setPriceRange([0, 30000000]);
+        setFilters({ category: '', minPrice: '', maxPrice: '' });
+        setSearchTerm('');
         setSort('newest');
+        setPage(1);
         setSearchParams({});
     };
 
-    const activeFilterCount = [
-        selectedMake !== 'All',
-        selectedCondition !== 'All',
-        selectedTransmission !== 'All',
-        priceRange[0] > 0 || priceRange[1] < 30000000,
-    ].filter(Boolean).length;
+    const isFiltered = searchTerm || filters.category || filters.minPrice || filters.maxPrice;
+
+    const handleSearchSubmit = (e) => {
+        e.preventDefault();
+        setPage(1);
+    };
 
     return (
         <div className="inventory-page-v3">
             <Helmet>
-                <title>Bazaar Motors | Quality Vehicles for Sale in Kenya</title>
-                <meta name="description" content="Explore our premium collection of foreign and local used vehicles in Ruiru." />
+                <title>Dispensary – {BRAND.name} Jamaica</title>
+                <meta name="description" content={`Browse our curated selection of premium Jamaican cannabis strains. Indica, Sativa, Hybrid, CBD, Edibles & more at ${BRAND.name}.`} />
             </Helmet>
 
-            <div className="inventory-header-v3">
+            <section className="inventory-hero">
                 <div className="container">
-                    <div className="v3-sub">CURATED SELECTION</div>
-                    <div className="header-flex-v3">
-                        <div className="header-text-v3">
-                            <h1>THE <span className="highlight">SHOWROOM</span></h1>
-                            <p>Discover {totalResults} high-performance vehicles across our elite collection.</p>
+                    <div className="hero-content">
+                        <div className="stock-count" data-count={totalCount || '—'}>
+                            <Leaf size={24} />
+                            <span>{totalCount || '—'} strains available</span>
                         </div>
-                        <div className="header-actions-v3">
-                            <button className="h-action-btn-v3 mobile-only" onClick={() => setSidebarOpen(true)}>
-                                <Filter size={18} />
-                            </button>
-                        </div>
+                        <h1>Our <span className="highlight">Dispensary</span></h1>
+                        <p>Curated Jamaican cannabis, lab-tested and island-grown.</p>
+                    </div>
+                </div>
+            </section>
+
+            <div className="inventory-toolbar container">
+                <form className="search-bar-v3" onSubmit={handleSearchSubmit}>
+                    <Search size={18} />
+                    <input
+                        type="text"
+                        placeholder="Search strains..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                    {searchTerm && (
+                        <button type="button" className="clear-search" onClick={() => { setSearchTerm(''); setPage(1); }}>
+                            <X size={16} />
+                        </button>
+                    )}
+                </form>
+
+                <div className="toolbar-right">
+                    <button className="mobile-filter-btn glass-btn" onClick={() => setMobileFiltersOpen(true)}>
+                        <SlidersHorizontal size={16} />
+                        <span>Filters</span>
+                        {isFiltered && <span className="filter-badge-dot"></span>}
+                    </button>
+
+                    <div className="sort-dropdown" ref={dropdownRef}>
+                        <button className="sort-trigger glass-btn" onClick={() => setSortOpen(o => !o)}>
+                            <span>{SORT_OPTIONS.find(o => o.value === sort)?.label || 'Sort'}</span>
+                            <ChevronDown size={14} className={`sort-arrow ${sortOpen ? 'open' : ''}`} />
+                        </button>
+                        {sortOpen && (
+                            <div className="sort-menu">
+                                {SORT_OPTIONS.map(opt => (
+                                    <button key={opt.value} className={sort === opt.value ? 'active' : ''} onClick={() => { setSort(opt.value); setPage(1); setSortOpen(false); }}>
+                                        {opt.label}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="view-toggle">
+                        <button className={`glass-btn ${viewMode === 'grid' ? 'active' : ''}`} onClick={() => setViewMode('grid')}>
+                            <Grid size={16} />
+                        </button>
+                        <button className={`glass-btn ${viewMode === 'list' ? 'active' : ''}`} onClick={() => setViewMode('list')}>
+                            <List size={16} />
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <div className="container inventory-grid-layout">
-                {/* Advanced Filters Sidebar */}
-                <aside className={`inventory-sidebar-v3 ${sidebarOpen ? 'sidebar-v3-open' : ''}`}>
-                    <div className="sidebar-v3-header">
-                        <h3>FILTERS</h3>
-                        <button className="v3-close-sidebar" onClick={() => setSidebarOpen(false)}>
+            <div className="inventory-layout container">
+                <aside className={`filter-sidebar ${mobileFiltersOpen ? 'mobile-open' : ''}`}>
+                    <div className="sidebar-header">
+                        <h3>Filters</h3>
+                        <button className="close-sidebar" onClick={() => setMobileFiltersOpen(false)}>
                             <X size={20} />
                         </button>
                     </div>
 
-                    <div className="v3-filter-wrapper">
-                        <div className="v3-filter-group">
-                            <label>SEARCH INVENTORY</label>
-                            <div className="v3-search-box glass-panel">
-                                <input
-                                    type="text"
-                                    placeholder="Make, model..."
-                                    value={searchQuery}
-                                    onChange={e => setSearchQuery(e.target.value)}
-                                />
-                                <Search size={16} />
-                            </div>
+                    <div className="filter-group">
+                        <h4>Category</h4>
+                        <div className="filter-chips">
+                            {STRAIN_CATEGORIES.map(cat => (
+                                <button
+                                    key={cat.value}
+                                    className={`chip ${filters.category === cat.value ? 'active' : ''}`}
+                                    onClick={() => { setFilters(f => ({ ...f, category: cat.value })); setPage(1); }}
+                                >
+                                    {cat.label}
+                                </button>
+                            ))}
                         </div>
-
-                        <div className="v3-filter-group">
-                            <label>SELECT MAKE</label>
-                            <div className="v3-select-grid">
-                                {MAKES.map(make => (
-                                    <button
-                                        key={make}
-                                        className={`v3-select-pill ${selectedMake === make ? 'active' : ''}`}
-                                        onClick={() => setSelectedMake(make)}
-                                    >
-                                        {make}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-
-                        <div className="v3-filter-group">
-                            <label>CONDITION</label>
-                            <div className="v3-select-grid">
-                                {CONDITIONS.map(cond => (
-                                    <button
-                                        key={cond}
-                                        className={`v3-select-pill ${selectedCondition === cond ? 'active' : ''}`}
-                                        onClick={() => setSelectedCondition(cond)}
-                                    >
-                                        {cond}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-
-                        <div className="v3-filter-group">
-                            <label>TRANSMISSION</label>
-                            <div className="v3-select-grid">
-                                {TRANSMISSIONS.map(trans => (
-                                    <button
-                                        key={trans}
-                                        className={`v3-select-pill ${selectedTransmission === trans ? 'active' : ''}`}
-                                        onClick={() => setSelectedTransmission(trans)}
-                                    >
-                                        {trans}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-
-                        <div className="v3-filter-group">
-                            <label>PRICE CAP (KSh)</label>
-                            <div className="v3-price-inputs">
-                                <div className="price-input-v3 glass-panel">
-                                    <input
-                                        type="number"
-                                        value={priceRange[1]}
-                                        onChange={e => setPriceRange([priceRange[0], Number(e.target.value)])}
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                        {activeFilterCount > 0 && (
-                            <button className="v3-reset-btn" onClick={clearFilters}>
-                                RESET FILTERS
-                            </button>
-                        )}
                     </div>
+
+                    <div className="filter-group">
+                        <h4>Price Range (JMD)</h4>
+                        <div className="price-range-inputs">
+                            <input
+                                type="number"
+                                placeholder="Min"
+                                value={filters.minPrice}
+                                onChange={(e) => { setFilters(f => ({ ...f, minPrice: e.target.value })); setPage(1); }}
+                            />
+                            <span>—</span>
+                            <input
+                                type="number"
+                                placeholder="Max"
+                                value={filters.maxPrice}
+                                onChange={(e) => { setFilters(f => ({ ...f, maxPrice: e.target.value })); setPage(1); }}
+                            />
+                        </div>
+                    </div>
+
+                    {isFiltered && (
+                        <button className="clear-filters-btn" onClick={clearFilters}>Clear All Filters</button>
+                    )}
                 </aside>
 
-                {/* Main Content Area */}
-                <main className="inventory-main-v3">
-                    <div className="v3-toolbar-top">
-                        <div className="toolbar-info-v3">
-                            <p>Showing <strong>{products.length}</strong> of <strong>{totalResults}</strong> vehicles</p>
-                        </div>
-                        <div className="toolbar-controls-v3">
-                            <div className="v3-sort-control">
-                                <span>Sort By</span>
-                                <select
-                                    value={sort}
-                                    onChange={e => setSort(e.target.value)}
-                                >
-                                    {SORT_OPTIONS.map(opt => (
-                                        <option key={opt.value} value={opt.value}>{opt.label}</option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Active Filter Tags */}
-                    {activeFilterCount > 0 && (
-                        <div className="v3-active-tags">
-                            {selectedMake !== 'All' && (
-                                <span className="v3-tag">
-                                    {selectedMake} <X size={14} onClick={() => setSelectedMake('All')} />
-                                </span>
-                            )}
-                            {selectedCondition !== 'All' && (
-                                <span className="v3-tag">
-                                    {selectedCondition} <X size={14} onClick={() => setSelectedCondition('All')} />
-                                </span>
-                            )}
-                            {selectedTransmission !== 'All' && (
-                                <span className="v3-tag">
-                                    {selectedTransmission} <X size={14} onClick={() => setSelectedTransmission('All')} />
-                                </span>
-                            )}
-                        </div>
-                    )}
-
-                    {/* Content Grid */}
+                <main className="inventory-main">
                     {loading ? (
-                        <div className="v3-inventory-grid">
-                            {[1, 2, 3, 4, 5, 6].map(i => (
-                                <CardSkeleton key={i} />
+                        <div className="loading-grid">
+                            {Array.from({ length: 6 }).map((_, i) => (
+                                <div key={i} className="skel-card pulse shimmer-bg"></div>
                             ))}
+                        </div>
+                    ) : products.length === 0 ? (
+                        <div className="no-results">
+                            <Leaf size={48} />
+                            <h3>No strains found</h3>
+                            <p>Try adjusting your filters or search term.</p>
+                            {isFiltered && <button className="primary-btn" onClick={clearFilters}>Clear Filters</button>}
                         </div>
                     ) : (
                         <>
-                            <div className="v3-inventory-grid">
-                                {products.map((vehicle, index) => {
-                                    if (products.length === index + 1) {
-                                        return (
-                                            <div ref={lastElementRef} key={vehicle.id}>
-                                                <ProductCard product={vehicle} />
-                                            </div>
-                                        );
-                                    }
-                                    return <ProductCard key={vehicle.id} product={vehicle} />;
-                                })}
+                            <div className={`product-grid-v3 ${viewMode}`}>
+                                {products.map(product => (
+                                    <ProductCard key={product.id} product={product} compact={viewMode === 'list'} />
+                                ))}
                             </div>
-                            
-                            {loadingMore && (
-                                <div className="v3-loading-more">
-                                    <div className="spinner"></div>
-                                    <span>Curating more vehicles...</span>
-                                </div>
-                            )}
 
-                            {!hasMore && products.length > 0 && (
-                                <div className="v3-end-of-list">
-                                    <p>You've reached the end of our current collection.</p>
+                            {totalPages > 1 && (
+                                <div className="pagination-v3">
+                                    <button disabled={page <= 1} onClick={() => setPage(p => p - 1)}>Previous</button>
+                                    <div className="page-numbers">
+                                        {Array.from({ length: totalPages }, (_, i) => i + 1)
+                                            .filter(p => p === 1 || p === totalPages || Math.abs(p - page) <= 2)
+                                            .map((p, idx, arr) => (
+                                                <React.Fragment key={p}>
+                                                    {idx > 0 && arr[idx - 1] !== p - 1 && <span className="page-ellipsis">...</span>}
+                                                    <button className={page === p ? 'active' : ''} onClick={() => setPage(p)}>{p}</button>
+                                                </React.Fragment>
+                                            ))}
+                                    </div>
+                                    <button disabled={page >= totalPages} onClick={() => setPage(p => p + 1)}>Next</button>
                                 </div>
                             )}
                         </>
                     )}
-
-                    {!loading && products.length === 0 && (
-                        <div className="v3-empty-state">
-                            <Search size={48} />
-                            <h3>No results found</h3>
-                            <p>Try adjusting your filters to find what you're looking for.</p>
-                            <button onClick={clearFilters}>Clear All Filters</button>
-                        </div>
-                    )}
                 </main>
             </div>
+
+            {mobileFiltersOpen && <div className="sidebar-overlay" onClick={() => setMobileFiltersOpen(false)}></div>}
         </div>
     );
 };
 
 export default Products;
-

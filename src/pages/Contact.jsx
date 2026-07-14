@@ -1,6 +1,6 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Phone, Mail, MapPin, Clock, Send, Instagram, Facebook, MessageCircle } from 'lucide-react';
+import { Phone, Mail, MapPin, Clock, Send, Leaf } from 'lucide-react';
 import { BRAND } from '../brandConfig';
 import './Contact.css';
 
@@ -8,9 +8,9 @@ const Contact = () => {
     return (
         <div className="contact-page">
             <Helmet>
-                <title>Contact Us | Bazaar Motors Ruiru</title>
-                <meta name="description" content="Talk to our team at Bazaar Motors. Located in Ruiru near Zetech University. Direct Japanese imports, luxury car sales, and custom sourcing." />
-                <link rel="canonical" href="https://bazaar-motors.vercel.app/contact" />
+                <title>Contact Us | IslandLeaf Jamaica</title>
+                <meta name="description" content="Get in touch with IslandLeaf. Located in Kingston, Jamaica. Premium cannabis strains, island-grown and lab-tested." />
+                <link rel="canonical" href="https://islandleaf.vercel.app/contact" />
             </Helmet>
 
             <section className="contact-hero">
@@ -24,7 +24,7 @@ const Contact = () => {
                 <div className="contact-info-grid">
                     <div className="contact-info-card glass-panel">
                         <div className="info-icon"><MapPin /></div>
-                        <h3>Showroom Location</h3>
+                        <h3>Dispensary Location</h3>
                         <p>{BRAND.address}</p>
                     </div>
                     <div className="contact-info-card glass-panel">
@@ -40,7 +40,7 @@ const Contact = () => {
                     <div className="contact-info-card glass-panel">
                         <div className="info-icon"><Clock /></div>
                         <h3>Opening Hours</h3>
-                        <p>Mon - Sat: 8:00 AM - 6:30 PM<br />Sun: By Appointment</p>
+                        <p>Mon - Sat: 9:00 AM - 7:00 PM<br />Sun: By Appointment</p>
                     </div>
                 </div>
 
@@ -55,21 +55,21 @@ const Contact = () => {
                                 </div>
                                 <div className="form-group-v3">
                                     <label>Phone Number</label>
-                                    <input type="tel" placeholder="+254..." required />
+                                    <input type="tel" placeholder="+1 876..." required />
                                 </div>
                             </div>
                             <div className="form-group-v3">
                                 <label>Subject</label>
                                 <select className="v3-select">
                                     <option>General Inquiry</option>
-                                    <option>Custom Import Request</option>
-                                    <option>Vehicle Valuation</option>
-                                    <option>Financing Options</option>
+                                    <option>Wholesale Order</option>
+                                    <option>Strain Information</option>
+                                    <option>Delivery Inquiry</option>
                                 </select>
                             </div>
                             <div className="form-group-v3">
                                 <label>Your Message</label>
-                                <textarea rows="5" placeholder="Tell us about the vehicle you're looking for..."></textarea>
+                                <textarea rows="5" placeholder="Tell us what you're looking for..."></textarea>
                             </div>
                             <button type="submit" className="primary-btn contact-submit">
                                 Send Message <Send size={16} />
@@ -79,14 +79,14 @@ const Contact = () => {
 
                     <div className="contact-map-wrap glass-panel">
                         <iframe 
-                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15955.932408381!2d36.9634731!3d-1.1472851!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f3f886f6d0f88%3A0x61560438815769!2sBazaar%20Motors!5e0!3m2!1sen!2ske!4v1711200000000!5m2!1sen!2ske" 
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d24298.4443298557!2d-76.801338!3d18.017561!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8edb8a3c8b1e1a8f%3A0x5f8f8c6b2b2b2b2b!2sKingston%2C%20Jamaica!5e0!3m2!1sen!2s!4v1711200000000!5m2!1sen!2s" 
                             width="100%" 
                             height="100%" 
                             style={{ border: 0 }} 
                             allowFullScreen="" 
                             loading="lazy" 
                             referrerPolicy="no-referrer-when-downgrade"
-                            title="Bazaar Motors Location"
+                            title="IslandLeaf Location"
                         ></iframe>
                     </div>
                 </div>

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
     Plus, Edit2, Trash2, Package, Upload, X, ChevronLeft, ChevronRight,
     Save, BarChart2, ShoppingBag, Users, Star, Search, Check, AlertCircle,
-    Image as ImageIcon, GripVertical, Eye, Zap, TrendingUp, Calendar, ArrowRight, Settings, Menu, Car
+    Image as ImageIcon, GripVertical, Eye, Zap, TrendingUp, Calendar, ArrowRight, Settings, Menu, Leaf
 } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { useAuth } from '../context/AuthContext';
@@ -11,9 +11,9 @@ import './AdminDashboard.css';
 
 const COLORS = ['#FF7A00', '#00C49F', '#FFBB28', '#FF8042', '#0088FE'];
 const API = (import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : ""));
-const CONDITIONS = ['Foreign Used', 'Local Used', 'Brand New'];
-const TRANSMISSIONS = ['Automatic', 'Manual', 'CVT'];
-const FUEL_TYPES = ['Petrol', 'Diesel', 'Hybrid', 'Electric'];
+const QUALITY_GRADES = ['Premium A+', 'Premium AA', 'Premium AAA', 'Top Shelf'];
+const EFFECTS = ['Relaxing', 'Euphoric', 'Creative', 'Uplifting', 'Sleepy', 'Energetic'];
+const TERPENES = ['Myrcene', 'Limonene', 'Pinene', 'Caryophyllene', 'Linalool', 'Humulene'];
 
 // ─── Image Carousel (for Product Preview) ───────────────────────────────────
 const ImageCarousel = ({ images, baseUrl = API }) => {
@@ -167,12 +167,12 @@ const ProductModal = ({ product, onClose, onSaved, token }) => {
         price: product?.price || '',
         category: product?.category || '',
         stock: product?.stock || 0,
-        make: product?.make || '',
+        make: product?.make || 'Hybrid',
         year: product?.year || '',
-        condition: product?.condition || 'Foreign Used',
-        transmission: product?.transmission || 'Automatic',
+        condition: product?.condition || 'Premium AA',
+        transmission: product?.transmission || 'Relaxing',
         engine_capacity: product?.engine_capacity || '',
-        fuel_type: product?.fuel_type || 'Petrol',
+        fuel_type: product?.fuel_type || 'Myrcene',
         mileage: product?.mileage || '',
         auction_grade: product?.auction_grade || '',
         features: product?.features || '',
@@ -251,20 +251,20 @@ const ProductModal = ({ product, onClose, onSaved, token }) => {
                     {tab === 'details' ? (
                         <div className="tab-content-panel">
                             <div className="form-group-full">
-                                <label>Vehicle Name (Model) *</label>
-                                <input name="name" value={form.name} onChange={handleChange} required placeholder="e.g. Toyota Harrier Progressive" />
+                                <label>Strain Name *</label>
+                                <input name="name" value={form.name} onChange={handleChange} required placeholder="e.g. Blue Dream" />
                             </div>
                             <div className="form-row-3">
                                 <div className="form-group">
-                                    <label>Make *</label>
-                                    <input name="make" value={form.make} onChange={handleChange} required placeholder="e.g. Toyota" />
+                                    <label>Strain Type *</label>
+                                    <input name="make" value={form.make} onChange={handleChange} required placeholder="e.g. Indica, Sativa, Hybrid" />
                                 </div>
                                 <div className="form-group">
-                                    <label>Year *</label>
-                                    <input type="number" name="year" value={form.year} onChange={handleChange} required placeholder="e.g. 2018" />
+                                    <label>THC (%) *</label>
+                                    <input type="number" name="year" value={form.year} onChange={handleChange} required placeholder="e.g. 22" />
                                 </div>
                                 <div className="form-group">
-                                    <label>Price (KES) *</label>
+                                    <label>Price (JMD) *</label>
                                     <input type="number" name="price" value={form.price} onChange={handleChange} step="1" required />
                                 </div>
                             </div>
@@ -277,45 +277,45 @@ const ProductModal = ({ product, onClose, onSaved, token }) => {
                                     </select>
                                 </div>
                                 <div className="form-group">
-                                    <label>Condition</label>
+                                    <label>Quality Grade</label>
                                     <select name="condition" value={form.condition} onChange={handleChange}>
-                                        {CONDITIONS.map(c => <option key={c} value={c}>{c}</option>)}
+                                        {QUALITY_GRADES.map(c => <option key={c} value={c}>{c}</option>)}
                                     </select>
                                 </div>
                                 <div className="form-group">
-                                    <label>Mileage (km)</label>
-                                    <input type="number" name="mileage" value={form.mileage} onChange={handleChange} placeholder="e.g. 48000" />
+                                    <label>Weight (g)</label>
+                                    <input type="number" name="mileage" value={form.mileage} onChange={handleChange} placeholder="e.g. 3.5" />
                                 </div>
                             </div>
                             <div className="form-row-3">
                                 <div className="form-group">
-                                    <label>Transmission</label>
+                                    <label>Effect Profile</label>
                                     <select name="transmission" value={form.transmission} onChange={handleChange}>
-                                        {TRANSMISSIONS.map(t => <option key={t} value={t}>{t}</option>)}
+                                        {EFFECTS.map(t => <option key={t} value={t}>{t}</option>)}
                                     </select>
                                 </div>
                                 <div className="form-group">
-                                    <label>Engine Capacity</label>
-                                    <input name="engine_capacity" value={form.engine_capacity} onChange={handleChange} placeholder="e.g. 2000cc" />
+                                    <label>CBD (%)</label>
+                                    <input name="engine_capacity" value={form.engine_capacity} onChange={handleChange} placeholder="e.g. 0.5" />
                                 </div>
                                 <div className="form-group">
-                                    <label>Fuel Type</label>
+                                    <label>Terpenes</label>
                                     <select name="fuel_type" value={form.fuel_type} onChange={handleChange}>
-                                        {FUEL_TYPES.map(f => <option key={f} value={f}>{f}</option>)}
+                                        {TERPENES.map(f => <option key={f} value={f}>{f}</option>)}
                                     </select>
                                 </div>
                                 <div className="form-group">
-                                    <label>Auction Grade</label>
-                                    <input name="auction_grade" value={form.auction_grade} onChange={handleChange} placeholder="e.g. 4.5/B" />
+                                    <label>Lab Grade</label>
+                                    <input name="auction_grade" value={form.auction_grade} onChange={handleChange} placeholder="e.g. A+" />
                                 </div>
                             </div>
                             <div className="form-group-full">
                                 <label>Key Features (comma-separated)</label>
-                                <input name="features" value={form.features} onChange={handleChange} placeholder="e.g. Leather Seats, Panoramic Sunroof, Reverse Camera" />
+                                <input name="features" value={form.features} onChange={handleChange} placeholder="e.g. Organic, Hand-Trimmed, Lab Tested" />
                             </div>
                             <div className="form-group-full">
                                 <label>Description</label>
-                                <textarea name="description" value={form.description} onChange={handleChange} rows={5} placeholder="Pristine condition, verified auction grade..." />
+                                <textarea name="description" value={form.description} onChange={handleChange} rows={5} placeholder="Top-shelf strain with a smooth, relaxing finish..." />
                             </div>
                         </div>
                     ) : (
@@ -450,7 +450,7 @@ const AdminDashboard = () => {
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [deleteConfirm, setDeleteConfirm] = useState(null);
     const [toast, setToast] = useState(null);
-    const [stats, setStats] = useState({ totalRevenue: 0, activeOrders: 0, visitors: 0, inventoryCount: 0 });
+    const [stats, setStats] = useState({ totalRevenue: 0, activeOrders: 0, visitors: 0, productCount: 0 });
     const [chartData, setChartData] = useState([]);
     const [topCategories, setTopCategories] = useState([]);
     const [customers, setCustomers] = useState([]);
@@ -486,7 +486,7 @@ const AdminDashboard = () => {
 
             const pData = pRes.ok ? await pRes.json() : [];
             const promData = promRes.ok ? await promRes.json() : [];
-            const sData = sRes.ok ? await sRes.json() : { totalRevenue: 0, activeOrders: 0, visitors: 0, inventoryCount: 0 };
+            const sData = sRes.ok ? await sRes.json() : { totalRevenue: 0, activeOrders: 0, visitors: 0, productCount: 0 };
             const cData = cRes.ok ? await cRes.json() : [];
             const tcData = tcRes.ok ? await tcRes.json() : [];
             const confData = confRes.ok ? await confRes.json() : { whatsapp_number: '' };
@@ -685,8 +685,8 @@ const AdminDashboard = () => {
             <aside className={`admin-sidebar ${mobileSidebarOpen ? 'open' : ''}`}>
                 <button className="mobile-sidebar-close" onClick={() => setMobileSidebarOpen(false)}><X size={24} /></button>
                 <div className="sidebar-brand">
-                    <div className="sidebar-logo-icon"><Car size={20} strokeWidth={2.5} /></div>
-                    <span>BAZAAR <span className="text-secondary-label">ADMIN</span></span>
+                    <div className="sidebar-logo-icon"><Leaf size={20} strokeWidth={2.5} /></div>
+                    <span>ISLANDLEAF <span className="text-secondary-label">ADMIN</span></span>
                 </div>
                 <div className="sidebar-mobile-label">DASHBOARD MENU</div>
                 <nav className="sidebar-nav">
@@ -706,7 +706,7 @@ const AdminDashboard = () => {
                         className={`sidebar-item ${activeTab === 'products' ? 'active' : ''}`}
                         onClick={() => { setActiveTab('products'); setMobileSidebarOpen(false); }}
                     >
-                        <ShoppingBag size={18} /> Inventory
+                        <ShoppingBag size={18} /> Strains
                     </button>
                     <button
                         className={`sidebar-item ${activeTab === 'promotions' ? 'active' : ''}`}
@@ -765,7 +765,7 @@ const AdminDashboard = () => {
                     <div className="stat-card-v3 glass-panel">
                         <span className="stat-label">TOTAL REVENUE (EST)</span>
                         <div className="stat-main">
-                            <span className="stat-val">KES {parseFloat(stats.totalRevenue).toLocaleString()}</span>
+                            <span className="stat-val">JMD {parseFloat(stats.totalRevenue).toLocaleString()}</span>
                             <TrendingUp size={20} className="stat-up" />
                         </div>
                     </div>
@@ -784,10 +784,10 @@ const AdminDashboard = () => {
                         </div>
                     </div>
                     <div className="stat-card-v3 glass-panel">
-                        <span className="stat-label">LIVE INVENTORY</span>
+                        <span className="stat-label">LIVE STRAINS</span>
                         <div className="stat-main">
-                            <span className="stat-val">{stats.inventoryCount}</span>
-                            <Car size={20} className="stat-icon" />
+                            <span className="stat-val">{stats.productCount || 0}</span>
+                            <Leaf size={20} className="stat-icon" />
                         </div>
                     </div>
                 </div>
@@ -806,7 +806,7 @@ const AdminDashboard = () => {
                                     </div>
                                     <div className="add-row-info">
                                         <p className="add-title">Add New Product</p>
-                                        <p className="add-subtitle">Create a new masterpiece in your catalog</p>
+                                        <p className="add-subtitle">Add a new strain to your dispensary</p>
                                     </div>
                                     <ArrowRight size={18} className="add-arrow" />
                                 </div>
@@ -815,9 +815,9 @@ const AdminDashboard = () => {
                                         <div className="row-img-wrap"><img src={p.image_url ? (p.image_url.startsWith('http') ? p.image_url : `${API}${p.image_url}`) : 'https://placehold.co/100'} alt="" /></div>
                                         <div className="row-info">
                                             <p className="row-name">{p.name}</p>
-                                            <p className="row-meta">{p.year} • {p.condition} • {p.mileage?.toLocaleString()}km</p>
+                                            <p className="row-meta">{p.condition} • {p.make} • THC: {p.year || 'N/A'}%</p>
                                         </div>
-                                        <div className="row-price">KES {parseFloat(p.price).toLocaleString()}</div>
+                                        <div className="row-price">JMD {parseFloat(p.price).toLocaleString()}</div>
                                         <div className="row-actions">
                                             <button className="action-btn edit" onClick={(e) => { e.stopPropagation(); setEditingProduct(p); setShowModal(true); }}><Edit2 size={16} /></button>
                                             <button className="action-btn del" onClick={(e) => { e.stopPropagation(); setDeleteConfirm(p); }}><Trash2 size={16} /></button>
@@ -831,12 +831,12 @@ const AdminDashboard = () => {
                                 <>
                                     <ImageCarousel images={selectedProduct.images} />
                                     <div className="detail-body">
-                                        <h3>{selectedProduct.year} {selectedProduct.name}</h3>
-                                        <p className="detail-price">KES {parseFloat(selectedProduct.price).toLocaleString()}</p>
+                                        <h3>{selectedProduct.name}</h3>
+                                        <p className="detail-price">JMD {parseFloat(selectedProduct.price).toLocaleString()}</p>
                                         <div className="detail-specs-mini">
-                                            <span><strong>Make:</strong> {selectedProduct.make}</span>
-                                            <span><strong>Engine:</strong> {selectedProduct.engine_capacity}</span>
-                                            <span><strong>Fuel:</strong> {selectedProduct.fuel_type}</span>
+                                            <span><strong>Type:</strong> {selectedProduct.make}</span>
+                                            <span><strong>THC:</strong> {selectedProduct.year || 'N/A'}%</span>
+                                            <span><strong>Terpenes:</strong> {selectedProduct.fuel_type}</span>
                                         </div>
                                         <p className="detail-desc">{selectedProduct.description}</p>
                                     </div>
@@ -875,7 +875,7 @@ const AdminDashboard = () => {
                                                         {order.username ? order.username : 'Guest User'}
                                                     </td>
                                                     <td className="p-4 text-sm opacity-80">{new Date(order.created_at).toLocaleDateString()}</td>
-                                                    <td className="p-4 font-bold text-[var(--accent-color)]">KES {parseFloat(order.total_amount).toLocaleString()}</td>
+                                                    <td className="p-4 font-bold text-[var(--accent-color)]">JMD {parseFloat(order.total_amount).toLocaleString()}</td>
                                                     <td className="p-4">
                                                         <select
                                                             className={`status-select ${order.status.toLowerCase()}`}
@@ -899,7 +899,7 @@ const AdminDashboard = () => {
                                                                         <img src={item.image_url ? (item.image_url.startsWith('http') ? item.image_url : `${API}${item.image_url}`) : 'https://placehold.co/40'} className="w-full h-full object-cover" />
                                                                     </div>
                                                                     <span>{item.name} <span className="opacity-60">x{item.quantity}</span></span>
-                                                                    <span className="ml-auto opacity-80">KES {parseFloat(item.price_at_purchase).toLocaleString()}</span>
+                                                                    <span className="ml-auto opacity-80">JMD {parseFloat(item.price_at_purchase).toLocaleString()}</span>
                                                                 </div>
                                                             ))}
                                                         </div>
@@ -957,8 +957,8 @@ const AdminDashboard = () => {
                                                     </linearGradient>
                                                 </defs>
                                                 <XAxis dataKey="date" stroke="rgba(255,255,255,0.3)" tick={{ fontSize: 12 }} tickFormatter={val => new Date(val).toLocaleDateString([], { weekday: 'short' })} />
-                                                <YAxis stroke="rgba(255,255,255,0.3)" tick={{ fontSize: 12 }} tickFormatter={val => `KES ${val.toLocaleString()}`} />
-                                                <RechartsTooltip contentStyle={{ backgroundColor: '#1C1F24', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }} formatter={(val) => [`KES ${parseFloat(val).toLocaleString()}`, 'Revenue']} labelFormatter={val => new Date(val).toDateString()} />
+                                                <YAxis stroke="rgba(255,255,255,0.3)" tick={{ fontSize: 12 }} tickFormatter={val => `JMD ${val.toLocaleString()}`} />
+                                                <RechartsTooltip contentStyle={{ backgroundColor: '#1C1F24', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }} formatter={(val) => [`JMD ${parseFloat(val).toLocaleString()}`, 'Revenue']} labelFormatter={val => new Date(val).toDateString()} />
                                                 <Area type="monotone" dataKey="amount" stroke="var(--accent-color)" strokeWidth={3} fillOpacity={1} fill="url(#colorAmount)" />
                                             </AreaChart>
                                         </ResponsiveContainer>
@@ -979,7 +979,7 @@ const AdminDashboard = () => {
                                                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                                         ))}
                                                     </Pie>
-                                                    <RechartsTooltip contentStyle={{ backgroundColor: '#1C1F24', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }} formatter={(val) => [`KES ${parseFloat(val).toLocaleString()}`, 'Sales']} />
+                                                    <RechartsTooltip contentStyle={{ backgroundColor: '#1C1F24', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }} formatter={(val) => [`JMD ${parseFloat(val).toLocaleString()}`, 'Sales']} />
                                                 </PieChart>
                                             </ResponsiveContainer>
                                         </div>
@@ -1013,7 +1013,7 @@ const AdminDashboard = () => {
                                             <div className="activity-icon primary"><ShoppingBag size={14} /></div>
                                             <div className="activity-info">
                                                 <p>Order #{act.id} by <strong>{act.username || 'Guest'}</strong></p>
-                                                <span className="text-xs text-[var(--primary)]">KES {parseFloat(act.total_amount).toLocaleString()} • {act.status}</span>
+                                                <span className="text-xs text-[var(--primary)]">JMD {parseFloat(act.total_amount).toLocaleString()} • {act.status}</span>
                                                 <span className="block mt-1">{new Date(act.created_at).toLocaleString()}</span>
                                             </div>
                                         </div>
@@ -1059,7 +1059,7 @@ const AdminDashboard = () => {
                                                     </span>
                                                 </td>
                                                 <td className="p-4">{c.total_orders} orders</td>
-                                                <td className="p-4 font-bold text-[var(--primary)]">KES {parseFloat(c.total_spent).toLocaleString()}</td>
+                                                <td className="p-4 font-bold text-[var(--primary)]">JMD {parseFloat(c.total_spent).toLocaleString()}</td>
                                                 <td className="p-4 text-sm opacity-80">{new Date(c.created_at).toLocaleDateString()}</td>
                                             </tr>
                                         ))}
@@ -1106,7 +1106,7 @@ const AdminDashboard = () => {
                             </form>
 
                             <div className="mt-12 pt-8 border-t border-white/10">
-                                <h3 className="text-xl font-bold text-white mb-6">Manage Vehicle Categories</h3>
+                                    <h3 className="text-xl font-bold text-white mb-6">Manage Categories</h3>
                                 <form onSubmit={handleAddCategory} className="flex gap-2 mb-6">
                                     <input
                                         type="text"
