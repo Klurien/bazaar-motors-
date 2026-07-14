@@ -5,8 +5,8 @@ import fs from 'fs';
 dotenv.config();
 
 // ─── Determine which database backend to use ─────────────────────────────────
-// If TIDB_HOST is configured, use TiDB (mysql2). Otherwise, fall back to local SQLite.
 const USE_TIDB = !!process.env.TIDB_HOST;
+const USE_POSTGRES = !USE_TIDB && process.env.DATABASE_URL && process.env.DATABASE_URL.startsWith('postgresql://');
 
 let dbWrapper = null;
 let dbInitPromise = null;
@@ -14,7 +14,70 @@ let dbInitPromise = null;
 async function setupDbWrapper() {
   if (dbWrapper) return dbWrapper;
 
-  if (USE_TIDB) {
+  if (USE_POSTGRES) {
+    // ═══════════════════════════════════════════════════════════════════════════
+    //  PostgreSQL / Neon Backend (Vercel Production)
+    // ═══════════════════════════════════════════════════════════════════════════
+    const { default: pg } = await import('pg');
+    const { Pool } = pg;
+
+    const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
+    console.log('🚀 PostgreSQL Connection Pool Created');
+
+    function convertPgParams(sql, params) {
+      let idx = 0;
+      const converted = sql.replace(/\?/g, () => `$${++idx}`);
+      return { sql: converted, params };
+    }
+
+    function translateSqlPg(sql) {
+      let s = sql;
+      s = s.replace(/INT\s+AUTO_INCREMENT\s+PRIMARY\s+KEY/gi, 'SERIAL PRIMARY KEY');
+      s = s.replace(/VARCHAR\s*\(\d+\)/gi, 'VARCHAR(255)');
+      s = s.replace(/TINYINT\s*\(\d+\)/gi, 'SMALLINT');
+      s = s.replace(/"([^"']*?)"/g, "'$1'");
+      s = s.replace(/`(\w+)`/g, '"$1"');
+      s = s.replace(/DATE_SUB\s*\(\s*CURRENT_DATE\s*,\s*INTERVAL\s+(\d+)\s+DAY\s*\)/gi, "CURRENT_DATE - INTERVAL '$1 days'");
+      s = s.replace(/strftime\s*\(\s*'([^']+)'\s*,\s*(\w+)\s*\)/gi, "TO_CHAR($2, '$1')");
+      return s;
+    }
+
+    dbWrapper = {
+      _pool: pool,
+      async query(sql, params = []) {
+        const { sql: pgSql, params: pgParams } = convertPgParams(translateSqlPg(sql), params);
+        const result = await pool.query(pgSql, pgParams);
+        return [result.rows, result.fields || []];
+      },
+      async execute(sql, params = []) {
+        const translated = translateSqlPg(sql);
+        const isInsert = /^\s*INSERT\s/i.test(translated);
+        const finalSql = isInsert ? translated + ' RETURNING id' : translated;
+        const { sql: pgSql, params: pgParams } = convertPgParams(finalSql, params);
+        const result = await pool.query(pgSql, pgParams);
+        return [{ affectedRows: result.rowCount, insertId: result.rows[0]?.id || 0 }, []];
+      },
+      async getConnection() {
+        const client = await pool.connect();
+        return {
+          async query(text, params = []) {
+            const { sql: pgSql, params: pgParams } = convertPgParams(translateSqlPg(text), params);
+            const result = await client.query(pgSql, pgParams);
+            return [result.rows, result.fields || []];
+          },
+          async execute(text, params = []) {
+            const translated = translateSqlPg(text);
+            const isInsert = /^\s*INSERT\s/i.test(translated);
+            const finalSql = isInsert ? translated + ' RETURNING id' : translated;
+            const { sql: pgSql, params: pgParams } = convertPgParams(finalSql, params);
+            const result = await client.query(pgSql, pgParams);
+            return [{ affectedRows: result.rowCount, insertId: result.rows[0]?.id || 0 }, []];
+          },
+          release: () => client.release()
+        };
+      }
+    };
+  } else if (USE_TIDB) {
     // ═══════════════════════════════════════════════════════════════════════════
     //  TiDB / MySQL Backend (Production / Vercel)
     // ═══════════════════════════════════════════════════════════════════════════
@@ -31,7 +94,6 @@ async function setupDbWrapper() {
         if (caPath.startsWith('-----BEGIN CERTIFICATE-----')) {
           sslConfig.ca = caPath;
         } else {
-          // On Vercel, the CA cert may be at a different path
           let finalPath = caPath;
           if (process.env.VERCEL && !fs.existsSync(caPath)) {
             finalPath = '/etc/ssl/certs/ca-certificates.crt';
@@ -40,7 +102,6 @@ async function setupDbWrapper() {
         }
       } catch (err) {
         console.error('⚠️ Could not load TIDB_SSL_CA certificate:', err.message);
-        // Continue without CA — some environments don't need it
       }
     }
 
@@ -145,7 +206,7 @@ export const initDB = async () => {
     throw new Error('Database wrapper failed to initialize');
   }
 
-  const tables = [
+  const mysqlTables = [
     `CREATE TABLE IF NOT EXISTS users (
             id INT AUTO_INCREMENT PRIMARY KEY,
             username VARCHAR(255) UNIQUE NOT NULL,
@@ -170,7 +231,7 @@ export const initDB = async () => {
             transmission VARCHAR(50),
             engine_capacity VARCHAR(50),
             fuel_type VARCHAR(50),
-            mileage INT,
+            mileage DECIMAL(10,1),
             auction_grade VARCHAR(50),
             features TEXT,
             stock INT DEFAULT 0,
@@ -227,14 +288,13 @@ export const initDB = async () => {
         )`
   ];
 
-  if (USE_TIDB) {
+  if (USE_POSTGRES || USE_TIDB) {
     const conn = await dbWrapper.getConnection();
     try {
-      for (let sql of tables) {
+      for (let sql of mysqlTables) {
         await conn.query(sql);
       }
 
-      // Ensure nova admin user exists
       try {
         const [existing] = await conn.query('SELECT * FROM users WHERE username = ?', ['nova']);
         if (existing.length === 0) {
@@ -242,53 +302,48 @@ export const initDB = async () => {
           await conn.execute('INSERT INTO users (username, password, role) VALUES (?, ?, ?)', ['nova', hashedPassword, 'admin']);
         }
 
-        // Ensure visitors counter exists
         const [statExists] = await conn.query('SELECT * FROM site_stats WHERE stat_name = ?', ['visitors']);
         if (statExists.length === 0) {
           await conn.execute('INSERT INTO site_stats (stat_name, stat_value) VALUES (?, ?)', ['visitors', 0]);
         }
 
-        // Ensure default categories exist
         const [catsExist] = await conn.query('SELECT COUNT(*) as c FROM categories');
-        if (catsExist[0].c === 0) {
-          const defaults = ['Indica', 'Sativa', 'Hybrid', 'Edibles', 'Luxury', 'Performance'];
+        if (Number(catsExist[0].c) === 0) {
+          const defaults = ['Indica', 'Sativa', 'Hybrid', 'Edibles', 'CBD', 'Concentrates'];
           for (let name of defaults) {
             await conn.execute('INSERT INTO categories (name) VALUES (?)', [name]);
           }
         }
 
-        // Ensure whatsapp_number exists in config
         const [configExists] = await conn.query('SELECT * FROM site_config WHERE config_name = ?', ['whatsapp_number']);
         if (configExists.length === 0) {
           await conn.execute('INSERT INTO site_config (config_name, config_value) VALUES (?, ?)', ['whatsapp_number', '254789249004']);
         }
 
-        console.log('✅ nova admin and site stats initialized.');
+        console.log('✅ Admin user and site stats initialized.');
       } catch (adminErr) {
         console.error('Error during initDB additions:', adminErr.message);
       }
 
-      console.log('✅ TiDB Tables Initialized.');
+      console.log('✅ Tables Initialized.');
     } finally {
       conn.release();
     }
   } else {
     // SQLite path — use the wrapper directly
-    for (let sql of tables) {
+    for (let sql of mysqlTables) {
       await dbWrapper.query(sql);
     }
 
-    // Ensure nova admin user exists
     try {
       const [existing] = await dbWrapper.query('SELECT * FROM users WHERE username = ?', ['nova']);
       if (existing.length === 0) {
         const hashedPassword = await bcrypt.hash('nova', 10);
         await dbWrapper.execute('INSERT INTO users (username, password, role) VALUES (?, ?, ?)', ['nova', hashedPassword, 'admin']);
       }
-      // Ensure default categories exist
       const [catsExist] = await dbWrapper.query('SELECT COUNT(*) as c FROM categories');
-      if (catsExist[0].c === 0) {
-        const defaults = ['Indica', 'Sativa', 'Hybrid', 'Edibles', 'Luxury', 'Performance'];
+      if (Number(catsExist[0].c) === 0) {
+        const defaults = ['Indica', 'Sativa', 'Hybrid', 'Edibles', 'CBD', 'Concentrates'];
         for (let name of defaults) {
           await dbWrapper.execute('INSERT INTO categories (name) VALUES (?)', [name]);
         }
