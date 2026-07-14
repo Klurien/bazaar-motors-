@@ -318,7 +318,11 @@ function createFallbackDb() {
     _isFallback: true,
     async query(sql, params = []) {
       const command = sql.trim().split(/\s/)[0].toUpperCase();
-      if (command === 'SELECT' || command === 'SHOW') return [[]];
+      if (command === 'SELECT' || command === 'SHOW') {
+        const isCount = /\bCOUNT\s*\(/i.test(sql);
+        if (isCount) return [[{ total: 0, count: 0 }]];
+        return [[]];
+      }
       return [{ affectedRows: 0, insertId: 0 }];
     },
     async execute(sql, params = []) { return this.query(sql, params); },
