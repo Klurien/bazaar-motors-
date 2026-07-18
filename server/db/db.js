@@ -83,10 +83,15 @@ async function setupDbWrapper() {
     // ═══════════════════════════════════════════════════════════════════════════
     const mysql = await import('mysql2/promise');
 
-    let sslConfig = {
-      minVersion: 'TLSv1.2',
-      rejectUnauthorized: true
-    };
+    let sslConfig;
+    if (process.env.TIDB_SKIP_SSL) {
+      sslConfig = false;
+    } else {
+      sslConfig = {
+        minVersion: 'TLSv1.2',
+        rejectUnauthorized: true
+      };
+    }
 
     if (process.env.TIDB_SSL_CA) {
       try {
